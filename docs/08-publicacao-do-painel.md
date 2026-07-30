@@ -89,6 +89,26 @@ CI, roda no fluxo de publicação, e tem testes que plantam vazamentos de
 propósito (`tests/test_publicacao.py`). Uma trava que nunca foi vista falhando
 não é trava.
 
+## Mandar o painel para alguém editar
+
+```bash
+make pacote     # gera dist/redes-bahia-painel.zip
+```
+
+"Me manda o HTML do painel" não tem resposta de um arquivo só: a página depende
+do CSS, de quatro módulos de JavaScript, da fonte Raleway, dos logos, da malha
+dos municípios e dos dados publicados. O zip leva o pacote inteiro — o mesmo
+`_site/` que vai ao ar, montado pela lista de permissão e já conferido pela
+trava —, mais um LEIA-ME e dois atalhos para abrir.
+
+Os atalhos existem porque **a página não abre com clique duplo**: o navegador
+recusa módulo de JavaScript e fonte vindos de `file://`, e a tela fica em
+branco com erro de CORS no console. Precisa de um servidor local, e é o que
+`abrir.sh` e `abrir.bat` fazem.
+
+Não há caminho separado de montagem para o zip, de propósito: um pacote montado
+por outras regras seria um segundo lugar de onde dado sigiloso poderia escapar.
+
 ## Quem entra
 
 O painel abre atrás de uma tela de usuário e senha (`dashboard/index.html`). A

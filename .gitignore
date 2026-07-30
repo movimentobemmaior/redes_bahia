@@ -48,6 +48,9 @@ reports/*
 # --- Pacote do site (sempre remontado por `make site`) ------------------------
 _site/
 
+# --- Zip para enviar a quem vai editar (sempre refeito por `make pacote`) -----
+dist/
+
 # --- Sistema / editor ---------------------------------------------------------
 .DS_Store
 Thumbs.db

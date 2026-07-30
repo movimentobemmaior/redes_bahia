@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := ajuda
 PY ?= python3
 
-.PHONY: ajuda instalar exemplo perfil validar dados dicionario malhas teste lint formatar painel site limpar tudo
+.PHONY: ajuda instalar exemplo perfil validar dados dicionario malhas teste lint formatar painel site pacote limpar tudo
 
 ajuda:  ## mostra esta ajuda
 	@echo "Painel Redes Bahia — comandos disponíveis:"
@@ -49,8 +49,11 @@ site:  ## monta o pacote do painel em _site/ e roda a trava de sigilo
 	$(PY) scripts/montar_site.py
 	$(PY) scripts/checar_publicacao.py
 
+pacote:  ## gera dist/redes-bahia-painel.zip para enviar a quem vai editar o painel
+	$(PY) scripts/empacotar.py
+
 limpar:  ## apaga saídas intermediárias e relatórios locais
-	rm -rf data/interim/* reports/* _site .pytest_cache .ruff_cache
+	rm -rf data/interim/* reports/* _site dist .pytest_cache .ruff_cache
 	find . -name __pycache__ -type d -prune -exec rm -rf {} +
 
 tudo: lint teste dados  ## checagem completa: estilo, testes e pipeline
