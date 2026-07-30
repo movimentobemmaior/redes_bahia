@@ -22,6 +22,19 @@ Cada pasta tem um README com o que se espera dela.
   painel mostra as demais como "ainda sem dados".
 - A planilha não pode estar protegida por senha.
 
+## Enquanto o repositório for público
+
+As planilhas destas pastas estão **fora do git** (ver `.gitignore`). O desenho
+do projeto as versiona — é o que torna qualquer publicação refazível
+([ADR 0001](../../docs/adr/0001-base-estatica-versionada.md)) —, mas com o
+repositório público isso publicaria nome e e-mail de quem respondeu, e a
+decisão ficou em aberto.
+
+Na prática: a planilha fica na sua máquina, `make dados` a processa
+normalmente, e o que vai para o repositório é `data/published/`, sem dado de
+identificação. Para voltar ao desenho original, apague as duas últimas linhas
+do bloco correspondente no `.gitignore`.
+
 ## Atenção — LGPD
 
 Os arquivos destas pastas contêm dados de identificação (nome e e-mail de quem
