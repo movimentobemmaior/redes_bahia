@@ -59,13 +59,21 @@ estrutura, e o catálogo de indicadores confirmado pela coordenação.
 - ✅ Publicação: GitHub Pages
   ([ADR 0005](adr/0005-painel-publico-no-github-pages.md)).
 
+- ✅ Funil das cinco etapas do edital (divulgação, cadastramento, triagem,
+  seleção, resultado), montado a partir do bloco `etapas:` do contrato.
+- ✅ Identidade visual do regulamento: roxo institucional, Raleway e a faixa da
+  coalizão, tudo servido do próprio repositório.
+
 Fica para as próximas rodadas:
 
-1. Mapa por território — depende de uma coluna de município, que o formulário
-   de credenciamento não coleta.
-2. Comparação entre dias usando `historico.csv` (hoje a evolução vem da data de
+1. Contratos das etapas 1, 3, 4 e 5, conforme as planilhas chegarem. Cada uma é
+   `make perfil` + um dataset novo no contrato.
+2. Taxa de passagem entre etapas — o cálculo já está no painel, e passa a
+   aparecer assim que duas etapas tiverem dado.
+3. Mapa por território, que depende de uma coluna de município ainda não
+   coletada pelo formulário de credenciamento.
+4. Comparação entre dias usando `historico.csv` (hoje a evolução vem da data de
    resposta, não do histórico de execuções).
-3. Telas da etapa de inscrição, quando essa base existir.
 
 ## Fase 4 — Além do piloto
 

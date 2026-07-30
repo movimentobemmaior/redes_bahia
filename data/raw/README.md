@@ -1,38 +1,30 @@
-# `data/raw/` — a planilha do dia entra aqui
+# `data/raw/` — as planilhas de cada etapa
 
-Esta é a **única pasta** em que se mexe na rotina diária.
+O edital tem cinco etapas, e cada uma tem a sua pasta. **É a única parte do
+repositório em que se mexe na rotina.**
 
-## O que fazer
+| Pasta | Etapa | O que entra |
+|---|---|---|
+| `1-divulgacao/` | Divulgação | dados da comunicação: alcance, canais, origem |
+| `2-cadastramento/` | Cadastramento | respostas do formulário de credenciamento |
+| `3-triagem/` | Triagem | propostas submetidas e conferência documental |
+| `4-selecao/` | Seleção | avaliação de mérito: notas, critérios, avaliadores |
+| `5-resultado/` | Resultado | selecionadas, valores aprovados, carteira final |
 
-1. Exporte/salve a planilha do edital como `.xlsx`.
-2. Renomeie usando a data de referência, no formato:
-
-   ```
-   AAAA-MM-DD_redes_bahia.xlsx
-   ```
-
-   Exemplo: `2026-08-01_redes_bahia.xlsx`
-
-3. Coloque o arquivo aqui e faça o commit (ou arraste pelo site do GitHub).
-4. O fluxo **Atualizar base** roda sozinho e regera `data/published/`.
-   Para rodar na sua máquina: `make dados`.
+Cada pasta tem um README com o que se espera dela.
 
 ## Regras
 
-- **Nunca sobrescreva** um arquivo de dia anterior. Cada dia é um arquivo novo:
-  o histórico da pasta é o que permite refazer qualquer publicação passada.
-- O nome define qual arquivo é o mais recente (a ordenação é por nome, não pela
-  data do sistema). Data errada no nome = base errada publicada.
-- Se a estrutura da planilha mudar (coluna nova, aba renomeada), o pipeline
-  **para e avisa**. Rode `make perfil` para ver o que mudou e ajuste
-  `config/fontes.yml`.
+- Um arquivo por dia, por etapa. **Nunca sobrescrever** o de ontem.
+- Nome no formato `AAAA-MM-DD_<etapa>.xlsx`. A data no nome define qual é o mais
+  recente; data errada, base errada.
+- Etapa sem planilha não é problema: o pipeline processa as que existem e o
+  painel mostra as demais como "ainda sem dados".
+- A planilha não pode estar protegida por senha.
 
 ## Atenção — LGPD
 
-Os arquivos desta pasta contêm dados de identificação (CNPJ, e-mail) e ficam
-versionados no repositório. Por isso o repositório é **privado**, e precisa
-continuar sendo.
-
-As colunas marcadas como `sensivel: true` no contrato nunca chegam a
-`data/published/`, mas isso protege a camada publicada, **não** esta pasta:
+Os arquivos destas pastas contêm dados de identificação (nome e e-mail de quem
+respondeu). As colunas marcadas como `sensivel: true` no contrato nunca chegam a
+`data/published/`, mas isso protege a camada publicada, **não** estas pastas:
 aqui o arquivo fica como veio. Ver `docs/06-governanca-e-lgpd.md`.

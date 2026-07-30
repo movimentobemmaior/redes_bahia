@@ -1,13 +1,67 @@
 {
   "painel": "Redes Bahia",
-  "gerado_em": "2026-07-30T14:43:17+00:00",
+  "gerado_em": "2026-07-30T15:19:28+00:00",
   "data_execucao": "2026-07-30",
   "versao_pipeline": "0.1.0",
-  "versao_contrato": 2,
-  "fonte": {
-    "arquivo": "2026-07-30_redes_bahia.xlsx",
-    "hash_sha256": "eee5e5c8d44a1f0b2dc84480087f9a326293285aa20e96707045014d9d3005d5",
-    "bytes": 11512
+  "versao_contrato": 3,
+  "etapas": [
+    {
+      "chave": "divulgacao",
+      "nome": "Divulgação",
+      "resumo": "Alcance da comunicação do edital: por onde as organizações souberam da chamada e quantas chegaram ao formulário.",
+      "ordem": 1,
+      "dataset": null,
+      "pasta": "data/raw/1-divulgacao",
+      "estado": "sem_contrato",
+      "n_linhas": null
+    },
+    {
+      "chave": "cadastramento",
+      "nome": "Cadastramento",
+      "resumo": "Organizações que responderam o formulário de credenciamento e o resultado da checagem automática de elegibilidade.",
+      "ordem": 2,
+      "dataset": "credenciamento",
+      "pasta": "data/raw/2-cadastramento",
+      "estado": "com_dados",
+      "n_linhas": 13
+    },
+    {
+      "chave": "triagem",
+      "nome": "Triagem",
+      "resumo": "Propostas efetivamente submetidas pelas organizações credenciadas e a conferência documental.",
+      "ordem": 3,
+      "dataset": null,
+      "pasta": "data/raw/3-triagem",
+      "estado": "sem_contrato",
+      "n_linhas": null
+    },
+    {
+      "chave": "selecao",
+      "nome": "Seleção",
+      "resumo": "Avaliação de mérito das propostas triadas: notas, critérios e avaliadores.",
+      "ordem": 4,
+      "dataset": null,
+      "pasta": "data/raw/4-selecao",
+      "estado": "sem_contrato",
+      "n_linhas": null
+    },
+    {
+      "chave": "resultado",
+      "nome": "Resultado",
+      "resumo": "Organizações selecionadas, valores aprovados e composição final da carteira.",
+      "ordem": 5,
+      "dataset": null,
+      "pasta": "data/raw/5-resultado",
+      "estado": "sem_contrato",
+      "n_linhas": null
+    }
+  ],
+  "fontes": {
+    "credenciamento": {
+      "arquivo": "2026-07-30_cadastramento.xlsx",
+      "hash_sha256": "eee5e5c8d44a1f0b2dc84480087f9a326293285aa20e96707045014d9d3005d5",
+      "bytes": 11512
+    }
   },
   "validacao": {
     "status": "aprovado",
@@ -18,6 +72,7 @@
   "datasets": [
     {
       "nome": "credenciamento",
+      "etapa": "cadastramento",
       "aba": "Credenciamento Redes Bahia",
       "descricao": "Uma linha por organização que respondeu o formulário de credenciamento. Grão: resposta ao formulário. É o funil de elegibilidade do edital — cada coluna `criterio_*` é um requisito respondido pela própria organização, e o `status_credenciamento` é o resultado da checagem automática desses requisitos.",
       "grao": [

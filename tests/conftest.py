@@ -14,11 +14,16 @@ from pipeline.config import Dataset, carregar  # noqa: E402
 
 CONTRATO_MINIMO = {
     "versao": 1,
+    "etapas": [
+        {"chave": "cadastro", "nome": "Cadastro", "resumo": "teste",
+         "pasta": "data/raw/cadastro", "dataset": "inscricoes"},
+    ],
     "fonte": {"diretorio": "data/raw", "padrao_arquivo": "*.xlsm", "selecao": "mais_recente"},
     "publicacao": {"formatos": ["csv", "json"], "remover_sensiveis": True},
     "historico": {"arquivo": "data/published/historico.csv", "agrupar_por": ["status"]},
     "datasets": {
         "inscricoes": {
+            "etapa": "cadastro",
             "aba": "Inscricoes",
             "descricao": "teste",
             "linha_cabecalho": 1,
@@ -78,7 +83,12 @@ def contrato_com_referencia(tmp_path, contrato):
     A regra é testada aqui, e não contra config/fontes.yml, para que o teste
     da funcionalidade não quebre toda vez que o contrato do projeto mudar.
     """
+    contrato["etapas"].append(
+        {"chave": "avaliacao", "nome": "Avaliação", "resumo": "teste",
+         "pasta": "data/raw/avaliacao", "dataset": "avaliacoes"}
+    )
     contrato["datasets"]["avaliacoes"] = {
+        "etapa": "avaliacao",
         "aba": "Avaliacoes",
         "descricao": "teste",
         "linha_cabecalho": 1,

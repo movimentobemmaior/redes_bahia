@@ -108,6 +108,24 @@ base.
 - Painel destaca **não aprovadas sem requisito não atendido**: nos dados reais
   há um caso assim, em que o motivo está fora das colunas do formulário.
 
+### Etapas do edital e identidade visual (30/07/2026)
+
+- O contrato passa a declarar as **cinco etapas** do edital (divulgação,
+  cadastramento, triagem, seleção, resultado), cada uma com sua pasta de
+  entrada em `data/raw/`. O painel monta o funil a partir dessa lista.
+- Etapa sem planilha não bloqueia as outras: o pipeline processa o que existe e
+  o painel marca as demais como "ainda sem dados", com a pasta onde o arquivo
+  deve ser solto.
+- Manifesto ganha o bloco `etapas` e passa a registrar uma fonte por dataset
+  (`fontes`), no lugar da fonte única.
+- Identidade visual derivada do regulamento (`docs/Edital-RedesBahia.pdf`):
+  roxo institucional amostrado da capa, tipografia **Raleway** hospedada no
+  repositório (licença SIL OFL) e a faixa de logos da coalizão no rodapé.
+- Paleta de séries refeita com os hues da coalizão e **reverificada** para
+  daltonismo e contraste nos dois modos. Passou de oito para quatro slots: os
+  hues da marca não cobrem espaço de cor suficiente para oito categorias
+  seguras, e quatro cobrem o que o painel usa.
+
 ### Pendente
 
 - Confirmar com a coordenação o sentido de exclusão dos critérios invertidos.
@@ -118,3 +136,4 @@ base.
   que não tem dado de identificação. Ver
   [governança](docs/06-governanca-e-lgpd.md).
 - Investigar a não aprovada cujo motivo não está nas colunas do formulário.
+- Definir os contratos das etapas 1, 3, 4 e 5 conforme as planilhas chegarem.

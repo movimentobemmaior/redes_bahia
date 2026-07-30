@@ -71,22 +71,42 @@ def _salvar_relatorio(problemas: list[Problema], arquivo: str, quando: datetime)
 
 
 def _carregar_tabelas(
-    cfg, arquivo: ingest.Arquivo
+    cfg, fontes: dict[str, ingest.Arquivo]
 ) -> tuple[dict[str, pd.DataFrame], list[Problema]]:
     tabelas: dict[str, pd.DataFrame] = {}
     problemas: list[Problema] = []
-    for nome, ds in cfg.datasets.items():
-        bruto = ingest.ler_aba(arquivo.caminho, ds)
-        resultado = padronizar(bruto, ds)
+    for nome, arquivo in fontes.items():
+        ds = cfg.datasets[nome]
+        resultado = padronizar(ingest.ler_aba(arquivo.caminho, ds), ds)
         tabelas[nome] = resultado.df
         problemas.extend(resultado.problemas)
-        print(f"  {nome:<14} {len(resultado.df):>6} linha(s)  (aba '{ds.aba}')")
+        print(f"  {nome:<16} {len(resultado.df):>6} linha(s)  ({arquivo.nome})")
     return tabelas, problemas
+
+
+def _tentar_localizar(cfg, pasta) -> list[ingest.Arquivo]:
+    try:
+        return ingest.localizar(cfg, pasta)
+    except ErroFonte:
+        return []
 
 
 def cmd_perfil(args: argparse.Namespace) -> int:
     cfg = carregar(args.config)
-    alvo = Path(args.arquivo) if args.arquivo else ingest.localizar(cfg)[-1].caminho
+    if args.arquivo:
+        alvo = Path(args.arquivo)
+    else:
+        candidatos = [
+            a.caminho
+            for etapa in cfg.etapas
+            for a in _tentar_localizar(cfg, etapa.pasta)
+        ]
+        if not candidatos:
+            raise ErroFonte(
+                "Nenhuma planilha encontrada nas pastas das etapas.\n"
+                "Coloque o arquivo em data/raw/<etapa>/ ou passe --arquivo."
+            )
+        alvo = candidatos[-1]
     _titulo(f"Perfilando {alvo.name}")
     perfis = profiling.perfilar_arquivo(alvo)
     for p in perfis:
@@ -100,19 +120,34 @@ def cmd_perfil(args: argparse.Namespace) -> int:
 
 def _executar(args: argparse.Namespace, publicar: bool) -> int:
     cfg = carregar(args.config)
-    arquivos = ingest.localizar(cfg)
-    arquivo = arquivos[-1]
-    _titulo(f"Lendo {arquivo.nome}")
-    print(f"  sha256 {arquivo.hash_sha256[:12]}…  ({arquivo.bytes / 1024:.0f} KB)")
+    fontes = ingest.localizar_por_etapa(cfg)
 
-    tabelas, problemas = _carregar_tabelas(cfg, arquivo)
+    _titulo("Etapas do edital")
+    for etapa in cfg.etapas:
+        if etapa.dataset and etapa.dataset in fontes:
+            situacao = f"{fontes[etapa.dataset].nome}"
+        elif etapa.dataset:
+            situacao = f"aguardando planilha em {caminho_curto(etapa.pasta)}/"
+        else:
+            situacao = f"sem contrato — solte o .xlsx em {caminho_curto(etapa.pasta)}/"
+        print(f"  {etapa.ordem}. {etapa.nome:<16} {situacao}")
+
+    if not fontes:
+        raise ErroFonte(
+            "Nenhuma etapa tem planilha para processar.\n"
+            "Coloque o arquivo do dia na pasta da etapa correspondente "
+            "(ver data/raw/) e rode de novo."
+        )
+
+    _titulo("Lendo")
+    tabelas, problemas = _carregar_tabelas(cfg, fontes)
 
     _titulo("Validando contra o contrato")
     problemas += validar(tabelas, cfg, estrito=args.estrito)
     _relatar(problemas)
 
     agora = datetime.now()
-    relatorio = _salvar_relatorio(problemas, arquivo.nome, agora)
+    relatorio = _salvar_relatorio(problemas, ", ".join(a.nome for a in fontes.values()), agora)
     print(f"  Relatório salvo em {caminho_curto(relatorio)}")
 
     erros, _ = contar(problemas)
@@ -133,7 +168,7 @@ def _executar(args: argparse.Namespace, publicar: bool) -> int:
     manifesto = publish.publicar(
         tabelas=tabelas,
         cfg=cfg,
-        arquivo=arquivo,
+        fontes=fontes,
         problemas=problemas,
         data_execucao=data_execucao,
         versao_pipeline=__version__,

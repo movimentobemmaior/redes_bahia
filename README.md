@@ -2,8 +2,10 @@
 
 Monitoramento do Edital Redes Bahia — Movimento Bem Maior.
 
-Todo dia uma planilha `.xlsx` entra em `data/raw/`. Um comando a transforma em
-base validada, documentada e versionada, sobre a qual o painel é construído.
+O edital anda em cinco etapas — divulgação, cadastramento, triagem, seleção e
+resultado. Cada uma tem sua planilha e sua pasta; um comando as transforma em
+base validada, documentada e versionada, e o painel monta o funil a partir
+disso.
 
 > **Piloto.** As escolhas aqui priorizam funcionar já e ser fácil de refazer.
 > O que foi deliberadamente deixado de fora, e o gatilho para reconsiderar cada
@@ -22,8 +24,8 @@ base validada, documentada e versionada, sobre a qual o painel é construído.
 ## A rotina do dia
 
 ```bash
-# 1. coloque a planilha em data/raw/ com a data no nome
-cp planilha.xlsx data/raw/2026-08-01_redes_bahia.xlsx
+# 1. coloque a planilha na pasta da etapa, com a data no nome
+cp planilha.xlsx data/raw/2-cadastramento/2026-08-01_cadastramento.xlsx
 
 # 2. valide e publique
 make dados
@@ -52,9 +54,10 @@ A estrutura esperada da planilha vive em **um arquivo declarativo**,
 dicionário de dados e os metadados publicados. Adaptar o pipeline a uma
 planilha nova é editar esse YAML, não o código.
 
-> O contrato foi escrito a partir da planilha real de 30/07/2026. Se a
-> estrutura do formulário mudar, rode `make perfil`: ele inspeciona a planilha
-> e propõe um contrato para comparar com o atual.
+> Hoje só a etapa de **cadastramento** tem contrato de dados, escrito a partir
+> da planilha real de 30/07/2026. As outras quatro aparecem no painel como
+> "ainda sem dados" até receberem a primeira planilha. Para ativar uma etapa,
+> rode `make perfil` e declare o dataset no contrato.
 
 ## Estrutura do repositório
 
@@ -68,7 +71,11 @@ pipeline/             leitura, padronização, validação e publicação
   profiling.py          inspeciona planilha desconhecida e propõe contrato
   dicionario.py         gera o dicionário de dados
 data/
-  raw/                  planilha de cada dia, intocada  ← você mexe aqui
+  raw/1-divulgacao/     ┐
+  raw/2-cadastramento/  │ uma pasta por etapa do edital
+  raw/3-triagem/        │ planilha de cada dia, intocada
+  raw/4-selecao/        │ ← é aqui que você mexe
+  raw/5-resultado/      ┘
   processed/            base completa (csv + parquet), inclui dado sigiloso
   published/            base do painel + manifest.json + historico.csv
 design/tokens/        cores, tipografia e espaçamentos do painel
@@ -102,7 +109,7 @@ scripts/              utilitários: planilha de exemplo, montagem e trava do sit
 | [Rotina de atualização](docs/02-rotina-de-atualizacao.md) | o passo a passo do dia, e o que fazer quando falha |
 | [Dicionário de dados](docs/03-dicionario-de-dados.md) | toda coluna, gerado a partir do contrato |
 | [Indicadores](docs/04-indicadores.md) | o que o painel vai medir (proposta a validar) |
-| [Identidade visual](docs/05-identidade-visual.md) | cor, tipografia e regras de gráfico |
+| [Identidade visual](docs/05-identidade-visual.md) | cor, tipografia e regras de gráfico, derivadas do edital |
 | [Governança e LGPD](docs/06-governanca-e-lgpd.md) | o que é sigiloso e o que ainda precisa de decisão |
 | [Roteiro](docs/07-roteiro.md) | fases, riscos e o que ficou fora do piloto |
 | [Publicação do painel](docs/08-publicacao-do-painel.md) | como o painel vai ao ar e o que nunca vai junto |

@@ -2,7 +2,7 @@
 
 > **Arquivo gerado automaticamente — não edite à mão.**
 > Fonte: `config/fontes.yml`. Para atualizar: `make dicionario`.
-> Última geração: 2026-07-30 · versão do contrato: 2
+> Última geração: 2026-07-30 · versão do contrato: 3
 
 ## Como ler
 

@@ -31,12 +31,21 @@ def _gerar_exemplo(destino: Path, linhas: int = 30) -> Path:
 
 @pytest.fixture
 def ambiente(tmp_path, monkeypatch):
-    """Repositório de mentira: planilha, contrato e saídas todos em tmp_path."""
-    entrada = tmp_path / "raw"
-    _gerar_exemplo(entrada / "exemplo_2026-05-01_redes_bahia.xlsx")
+    """Repositório de mentira: planilhas, contrato e saídas todos em tmp_path.
 
+    Cada etapa aponta para uma pasta dentro de tmp_path. Redirecionar apenas
+    `fonte.diretorio` não basta desde que a fonte passou a vir da etapa: o teste
+    acabaria lendo `data/raw/` do repositório de verdade e passando por engano.
+    """
     contrato = copy.deepcopy(CONTRATO_REAL)
-    contrato["fonte"]["diretorio"] = str(entrada)
+    for etapa in contrato["etapas"]:
+        pasta = tmp_path / "raw" / etapa["chave"]
+        pasta.mkdir(parents=True, exist_ok=True)
+        etapa["pasta"] = str(pasta)
+        if etapa["dataset"]:
+            _gerar_exemplo(pasta / f"exemplo_2026-05-01_{etapa['chave']}.xlsx")
+
+    contrato["fonte"]["diretorio"] = str(tmp_path / "raw")
     contrato["historico"]["arquivo"] = str(tmp_path / "published" / "historico.csv")
     caminho = tmp_path / "fontes.yml"
     caminho.write_text(
@@ -74,17 +83,36 @@ def test_validar_nao_escreve_nada(ambiente):
     assert not (tmp_path / "published").exists()
 
 
-def test_planilha_ausente_falha_com_codigo_2(tmp_path, ambiente, capsys):
+def test_nenhuma_etapa_com_planilha_falha_com_codigo_2(tmp_path, ambiente, capsys):
+    """Sem planilha em etapa nenhuma não há o que publicar — e isso precisa ser
+    dito, não virar uma publicação vazia."""
     _, contrato = ambiente
     dados = yaml.safe_load(contrato.read_text(encoding="utf-8"))
-    dados["fonte"]["diretorio"] = str(tmp_path / "vazio")
-    (tmp_path / "vazio").mkdir(exist_ok=True)
+    vazio = tmp_path / "vazio"
+    vazio.mkdir(exist_ok=True)
+    for etapa in dados["etapas"]:
+        etapa["pasta"] = str(vazio)
     contrato.write_text(
         yaml.safe_dump(dados, allow_unicode=True, sort_keys=False), encoding="utf-8"
     )
 
     assert cli.main(["--config", str(contrato), "dados"]) == 2
-    assert "Nenhum arquivo" in capsys.readouterr().err
+    assert "Nenhuma etapa" in capsys.readouterr().err
+
+
+def test_etapa_sem_planilha_nao_impede_as_outras(ambiente):
+    """O edital anda por fases: as etapas finais ficam vazias por meses, e isso
+    não pode impedir a publicação das que já têm dado."""
+    tmp_path, contrato = ambiente
+    assert cli.main(["--config", str(contrato), "dados", "--data", "2026-05-01"]) == 0
+
+    manifesto = json.loads(
+        (tmp_path / "published" / "manifest.json").read_text(encoding="utf-8")
+    )
+    estados = {e["chave"]: e["estado"] for e in manifesto["etapas"]}
+    assert estados["cadastramento"] == "com_dados"
+    assert set(estados.values()) - {"com_dados"}, "as demais etapas precisam aparecer no funil"
+    assert len(manifesto["etapas"]) == 5
 
 
 def test_erro_de_estrutura_bloqueia_publicacao(ambiente, monkeypatch):
