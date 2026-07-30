@@ -1,0 +1,35 @@
+# --- Camadas de dados ---------------------------------------------------------
+# raw/ e published/ SÃO versionados (base estática do painel).
+# interim/ é descartável: sempre reconstruído pelo pipeline.
+data/interim/*
+!data/interim/.gitkeep
+
+# Arquivos de exemplo gerados por scripts/gerar_exemplo.py
+data/raw/exemplo_*
+
+# Lixo de planilha (arquivos temporários do Excel)
+~$*
+*.tmp
+
+# --- Python -------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# --- Relatórios locais --------------------------------------------------------
+reports/*
+!reports/.gitkeep
+
+# --- Sistema / editor ---------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+node_modules/

@@ -1,0 +1,17 @@
+# Planilhas são binárias: nunca tentar merge textual nem normalizar EOL.
+*.xlsm binary
+*.xlsx binary
+*.xls  binary
+*.parquet binary
+
+# Dados publicados: diffs de CSV são úteis, mas mantenha o EOL estável.
+*.csv text eol=lf
+*.json text eol=lf
+
+# Normalização padrão
+*.py   text eol=lf
+*.md   text eol=lf
+*.yml  text eol=lf
+*.html text eol=lf
+*.css  text eol=lf
+*.js   text eol=lf

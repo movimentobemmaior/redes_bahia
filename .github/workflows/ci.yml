@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  qualidade:
+    name: Estilo, testes e pipeline de ponta a ponta
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install -r requirements-dev.txt
+
+      - name: Checar estilo
+        run: ruff check .
+
+      - name: Rodar testes
+        run: pytest
+
+      # Prova de que o caminho completo (planilha -> base publicada) funciona
+      # nesta versão do código, sem depender de nenhum dado real.
+      - name: Pipeline de ponta a ponta com planilha de exemplo
+        run: |
+          python scripts/gerar_exemplo.py
+          python -m pipeline dados
+
+      - name: Guardar relatórios
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorios
+          path: reports/
+          if-no-files-found: ignore

@@ -1,0 +1,66 @@
+# Rotina diária automatizada.
+#
+# Quando alguém sobe um .xlsm novo em data/raw/ (pelo site do GitHub ou por
+# commit), este fluxo valida a planilha, regera a base publicada e devolve o
+# resultado ao repositório. Assim a pessoa que atualiza os dados não precisa
+# ter Python instalado — só arrastar o arquivo.
+#
+# Se a validação encontrar ERRO de estrutura, nada é publicado: a base do
+# painel continua sendo a da última execução válida e o fluxo falha, avisando.
+name: Atualizar base
+
+on:
+  push:
+    paths:
+      - "data/raw/**"
+      - "config/fontes.yml"
+  workflow_dispatch:
+    inputs:
+      estrito:
+        description: "Tratar avisos como erros"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: atualizar-base-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Processar planilha e publicar base
+        run: python -m pipeline dados ${{ inputs.estrito && '--estrito' || '' }}
+
+      - name: Publicar resultado no repositório
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/processed data/published docs/03-dicionario-de-dados.md
+          if git diff --staged --quiet; then
+            echo "Nada mudou na base — nenhum commit necessário."
+          else
+            git commit -m "dados: atualiza base publicada a partir da planilha do dia"
+            git push
+          fi
+
+      - name: Guardar relatório de validação
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-validacao
+          path: reports/validacao.md
+          if-no-files-found: ignore

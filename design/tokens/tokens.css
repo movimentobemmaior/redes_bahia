@@ -1,0 +1,153 @@
+/* =============================================================================
+   Design tokens — Painel Redes Bahia
+   =============================================================================
+   Fonte única da identidade visual. Nenhum componente do painel deve escrever
+   cor, tamanho de fonte ou espaçamento "na mão": tudo sai daqui.
+
+   A paleta de séries foi validada para daltonismo (protan/deutan/tritan) e
+   contraste, nos dois modos. Ver docs/05-identidade-visual.md antes de mudar
+   qualquer hex — a ORDEM dos slots faz parte da acessibilidade, não é estética.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* --- Superfícies e tinta ------------------------------------------------ */
+  --plano-pagina:    #f9f9f7;
+  --superficie:      #fcfcfb;
+  --superficie-alt:  #f2f2ef;
+  --borda:           rgba(11, 11, 11, 0.10);
+  --grade:           #e1e0d9;
+  --eixo:            #c3c2b7;
+
+  --tinta-1: #0b0b0b;  /* títulos e números de destaque */
+  --tinta-2: #52514e;  /* texto corrente */
+  --tinta-3: #898781;  /* rótulos de eixo, legendas, metadados */
+
+  /* --- Séries categóricas (ordem fixa: nunca embaralhar, nunca ciclar) ---- */
+  --serie-1: #2a78d6;  /* azul     */
+  --serie-2: #eb6834;  /* laranja  */
+  --serie-3: #1baf7a;  /* verde-água */
+  --serie-4: #eda100;  /* amarelo  */
+  --serie-5: #e87ba4;  /* magenta  */
+  --serie-6: #008300;  /* verde    */
+  --serie-7: #4a3aa7;  /* violeta  */
+  --serie-8: #e34948;  /* vermelho */
+
+  /* --- Rampa sequencial (magnitude: mapas, mapas de calor) ---------------- */
+  --seq-100: #cde2fb;
+  --seq-250: #86b6ef;
+  --seq-400: #3987e5;
+  --seq-550: #1c5cab;
+  --seq-700: #0d366b;
+
+  /* --- Status (reservado: nunca usar como cor de série) ------------------- */
+  --status-ok:       #0ca30c;
+  --status-atencao:  #fab219;
+  --status-serio:    #ec835a;
+  --status-critico:  #d03b3b;
+  --delta-positivo:  #006300;
+
+  /* --- Tipografia --------------------------------------------------------- */
+  --fonte-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --fonte-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --texto-xs:  0.75rem;   /* 12px — metadados, notas de rodapé */
+  --texto-sm:  0.875rem;  /* 14px — rótulos, legendas, tabelas */
+  --texto-md:  1rem;      /* 16px — texto corrente */
+  --texto-lg:  1.25rem;   /* 20px — títulos de bloco */
+  --texto-xl:  1.5rem;    /* 24px — título de seção */
+  --texto-2xl: 2rem;      /* 32px — título da página */
+  --texto-hero: 2.75rem;  /* 44px — número de destaque */
+
+  --peso-normal: 400;
+  --peso-medio: 500;
+  --peso-forte: 650;
+
+  --altura-apertada: 1.2;   /* números grandes e títulos */
+  --altura-normal: 1.5;     /* texto corrente */
+
+  /* --- Espaçamento (escala de 4px) ---------------------------------------- */
+  --e-1: 0.25rem;
+  --e-2: 0.5rem;
+  --e-3: 0.75rem;
+  --e-4: 1rem;
+  --e-6: 1.5rem;
+  --e-8: 2rem;
+  --e-12: 3rem;
+
+  /* --- Formas ------------------------------------------------------------- */
+  --raio-sm: 4px;   /* ponta de barra, chips */
+  --raio-md: 8px;   /* cartões */
+  --raio-lg: 12px;  /* blocos maiores */
+  --largura-max: 1200px;
+}
+
+/* Modo escuro: passos próprios, escolhidos para a superfície escura —
+   não é inversão automática das cores do modo claro. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    color-scheme: dark;
+
+    --plano-pagina:   #0d0d0d;
+    --superficie:     #1a1a19;
+    --superficie-alt: #232322;
+    --borda:          rgba(255, 255, 255, 0.10);
+    --grade:          #2c2c2a;
+    --eixo:           #383835;
+
+    --tinta-1: #ffffff;
+    --tinta-2: #c3c2b7;
+    --tinta-3: #898781;
+
+    --serie-1: #3987e5;
+    --serie-2: #d95926;
+    --serie-3: #199e70;
+    --serie-4: #c98500;
+    --serie-5: #d55181;
+    --serie-6: #008300;
+    --serie-7: #9085e9;
+    --serie-8: #e66767;
+
+    --seq-100: #0d366b;
+    --seq-250: #184f95;
+    --seq-400: #256abf;
+    --seq-550: #5598e7;
+    --seq-700: #b7d3f6;
+
+    --delta-positivo: #0ca30c;
+  }
+}
+
+/* O botão de tema vence a preferência do sistema, nos dois sentidos. */
+:root[data-tema="escuro"] {
+  color-scheme: dark;
+
+  --plano-pagina:   #0d0d0d;
+  --superficie:     #1a1a19;
+  --superficie-alt: #232322;
+  --borda:          rgba(255, 255, 255, 0.10);
+  --grade:          #2c2c2a;
+  --eixo:           #383835;
+
+  --tinta-1: #ffffff;
+  --tinta-2: #c3c2b7;
+  --tinta-3: #898781;
+
+  --serie-1: #3987e5;
+  --serie-2: #d95926;
+  --serie-3: #199e70;
+  --serie-4: #c98500;
+  --serie-5: #d55181;
+  --serie-6: #008300;
+  --serie-7: #9085e9;
+  --serie-8: #e66767;
+
+  --seq-100: #0d366b;
+  --seq-250: #184f95;
+  --seq-400: #256abf;
+  --seq-550: #5598e7;
+  --seq-700: #b7d3f6;
+
+  --delta-positivo: #0ca30c;
+}

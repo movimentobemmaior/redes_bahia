@@ -1,0 +1,15 @@
+# Configuração de ferramentas. O pipeline roda como módulo (`python -m pipeline`),
+# não é publicado como pacote — por isso não há [build-system] aqui.
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = ["data", "dashboard", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
