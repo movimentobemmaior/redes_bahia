@@ -13,21 +13,23 @@ Endereço, depois do primeiro deploy:
 https://movimentobemmaior.github.io/redes_bahia/
 ```
 
-Não há login. Qualquer pessoa com o endereço vê nome das organizações,
-município, território, valor solicitado, status, etapa e notas — inclusive de
-propostas ainda em análise. Isso foi decidido conscientemente; as consequências
-estão listadas no ADR.
+Há uma tela de usuário e senha antes do painel
+([ADR 0006](adr/0006-porta-de-entrada-no-painel.md)), mas ela é **cortina, não
+fechadura**: o endereço é público, a conferência roda no navegador e
+`data/published/` responde por URL direta sem passar por ela. Ver
+[Quem entra](#quem-entra).
 
-**O repositório continua privado.** As duas coisas convivem de propósito:
+**O repositório é público**, e as planilhas de origem ficam fora do git por
+causa disso:
 
 | | Onde vive | Quem enxerga |
 |---|---|---|
-| Planilhas originais (`data/raw/`) | repositório privado | quem tem acesso ao repositório |
-| Base interna completa (`data/processed/`) | repositório privado | quem tem acesso ao repositório |
-| Base do painel (`data/published/`) | repositório privado **e** site público | qualquer pessoa |
+| Planilhas originais (`data/raw/`) | só na máquina de quem roda | ninguém, fora do git |
+| Base interna completa (`data/processed/`) | só na máquina de quem roda | ninguém, fora do git |
+| Base do painel (`data/published/`) | repositório público **e** site | qualquer pessoa |
 
-O que separa uma coisa da outra não é a configuração do GitHub — é a montagem
-do pacote, descrita abaixo.
+O que separa uma coisa da outra não é a configuração do GitHub nem a tela de
+entrada — é a montagem do pacote, descrita abaixo, e o `.gitignore`.
 
 ## Ligar pela primeira vez
 
@@ -38,10 +40,9 @@ Passo manual, uma vez só:
 Depois disso o fluxo **Publicar painel** cuida do resto, a cada atualização da
 base.
 
-⚠️ **GitHub Pages em repositório privado exige plano pago.** Se o fluxo falhar
-por isso, a saída é assinar o plano — **não** tornar o repositório público.
-`data/raw/` guarda as planilhas com CNPJ e e-mail; abrir o repositório
-publicaria isso, o que é um problema de outra ordem. Ver
+⚠️ **Se um dia o repositório voltar a ser privado**, o GitHub Pages passa a
+exigir plano pago. A saída é assinar o plano, não abrir o repositório de novo
+com as planilhas versionadas: `data/raw/` guarda CNPJ e e-mail. Ver
 [governança](06-governanca-e-lgpd.md).
 
 ## Como o pacote é montado
@@ -57,7 +58,8 @@ Duas etapas, de propósitos diferentes:
 
    | Origem | Vira |
    |---|---|
-   | `dashboard/index.html` e `dashboard/assets/` | a página |
+   | `dashboard/index.html` | a tela de entrada (usuário e senha) |
+   | `dashboard/painel.html` e `dashboard/assets/` | o painel |
    | `design/tokens/` | cores e tipografia |
    | `data/published/` | os dados (já sem colunas de identificação) |
 
@@ -87,11 +89,27 @@ CI, roda no fluxo de publicação, e tem testes que plantam vazamentos de
 propósito (`tests/test_publicacao.py`). Uma trava que nunca foi vista falhando
 não é trava.
 
+## Quem entra
+
+O painel abre atrás de uma tela de usuário e senha (`dashboard/index.html`). A
+credencial fica com a coordenação do edital; para trocá-la, ver
+[ADR 0006](adr/0006-porta-de-entrada-no-painel.md).
+
+**É uma cortina, não uma fechadura**, e a diferença muda o que pode ser
+publicado. O painel é página estática: não há servidor conferindo nada, quem
+abrir o código-fonte vê como passar, e `data/published/` continua acessível por
+URL direta e no repositório público. A porta evita que o link caia em quem não
+foi convidado — não protege dado sigiloso.
+
+Por isso a regra de sigilo continua sendo a mesma de sempre: **dado que não
+pode vazar não sai de `data/processed/`**, e é `checar_publicacao.py` que cobra
+isso. A porta não afrouxa nenhuma linha desta página.
+
 ## Depois de publicar
 
 1. Abra o endereço em janela anônima e confira que o painel carrega.
-2. Confira que `https://movimentobemmaior.github.io/redes_bahia/data/published/inscricoes.csv`
-   **não** tem colunas de CNPJ nem e-mail.
+2. Confira que `https://movimentobemmaior.github.io/redes_bahia/data/published/credenciamento.csv`
+   **não** tem colunas de nome nem e-mail de pessoa.
 3. Confira que `.../data/raw/` e `.../data/processed/` respondem 404.
 
 O passo 2 não é formalidade. É a verificação de que a trava fez o trabalho dela

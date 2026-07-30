@@ -42,8 +42,16 @@ def repo(tmp_path):
         "<h1>painel</h1>",
         encoding="utf-8",
     )
+    (tmp_path / "dashboard" / "painel.html").write_text(
+        '<link rel="stylesheet" href="assets/painel.css">\n'
+        '<script type="module" src="assets/porteiro.js"></script>\n'
+        '<script type="module" src="assets/painel.js"></script>\n'
+        "<h1>painel</h1>",
+        encoding="utf-8",
+    )
     (tmp_path / "dashboard" / "assets" / "painel.css").write_text("body{}", encoding="utf-8")
     (tmp_path / "dashboard" / "assets" / "painel.js").write_text("// painel", encoding="utf-8")
+    (tmp_path / "dashboard" / "assets" / "porteiro.js").write_text("// porteiro", encoding="utf-8")
     (tmp_path / "dashboard" / "README.md").write_text("doc interna", encoding="utf-8")
 
     (tmp_path / "design" / "tokens").mkdir(parents=True)
@@ -245,3 +253,25 @@ def test_contrato_e_montagem_concordam_sobre_o_que_e_publicado():
     origens = {origem for origem, _ in montar_site.CONTEUDO}
     assert not any(o.startswith(("data/raw", "data/processed")) for o in origens)
     assert yaml.safe_load(CONTRATO.read_text(encoding="utf-8"))["datasets"]
+
+
+def test_as_duas_paginas_entram_no_pacote(repo, tmp_path):
+    """Esquecer painel.html no pacote deixaria a porta abrindo para o vazio."""
+    site = tmp_path / "_site"
+    montar_site.montar(site, raiz=repo)
+    assert (site / "dashboard" / "index.html").exists(), "falta a tela de entrada"
+    assert (site / "dashboard" / "painel.html").exists(), "falta o painel"
+
+
+def test_versao_contra_cache_vale_para_todas_as_paginas(repo, tmp_path):
+    """Versionar só a página inicial deixaria o painel com o cache velho.
+
+    É o mesmo defeito de antes — JS antigo contra manifesto novo —, e ele volta
+    calado assim que o painel deixa de ser a única página do pacote.
+    """
+    site = tmp_path / "_site"
+    montar_site.montar(site, raiz=repo)
+    painel = (site / "dashboard" / "painel.html").read_text(encoding="utf-8")
+    assert 'src="assets/painel.js?v=' in painel
+    assert 'src="assets/porteiro.js?v=' in painel
+    assert 'href="assets/painel.css?v=' in painel

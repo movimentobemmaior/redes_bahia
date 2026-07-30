@@ -34,6 +34,8 @@ se algo que não devia sair aparecer nele.
   `make malhas`.
 - **Cor e tipografia** → `design/tokens/`, derivados de
   `docs/Edital-RedesBahia.pdf`.
+- **Credencial de acesso ao painel** → `dashboard/assets/acesso.js`, como hash.
+  É cortina, não fechadura: ADR 0006 explica o que ela não protege.
 - **Decisão de rumo** → um ADR em `docs/adr/`.
 
 ## Cuidados que já custaram caro

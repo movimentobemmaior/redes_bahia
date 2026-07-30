@@ -27,6 +27,7 @@ RAIZ = Path(__file__).resolve().parents[1]
 # porque a página usa caminhos relativos (../design/, ../data/published/).
 CONTEUDO: list[tuple[str, str]] = [
     ("dashboard/index.html", "dashboard/index.html"),
+    ("dashboard/painel.html", "dashboard/painel.html"),
     ("dashboard/assets", "dashboard/assets"),
     ("design/tokens", "design/tokens"),
     ("data/published", "data/published"),
@@ -35,11 +36,20 @@ CONTEUDO: list[tuple[str, str]] = [
 # Arquivos que nunca entram, mesmo estando dentro de uma pasta permitida.
 NUNCA_COPIAR = {".md", ".xlsm", ".xlsx", ".xls", ".xlsb"}
 
-REDIRECIONADOR = """<!doctype html>
+# O mesmo ícone das páginas do painel, embutido para o redirecionador não pedir
+# um /favicon.ico que não existe (404 no console de quem abre a raiz).
+ICONE = (
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'"
+    "%3E%3Crect width='16' height='16' rx='3' fill='%234f2d71'/%3E%3C/svg%3E"
+)
+
+REDIRECIONADOR = f"""<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <title>Painel Redes Bahia</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="{ICONE}">
   <meta http-equiv="refresh" content="0; url=dashboard/">
   <link rel="canonical" href="dashboard/">
 </head>
@@ -81,24 +91,29 @@ def _versionar(destino: Path) -> int:
     O nome do arquivo não muda (o caminho continua legível); muda a consulta,
     que é o suficiente para o navegador buscar de novo quando o conteúdo mudar.
     """
-    pagina = destino / "dashboard" / "index.html"
-    if not pagina.exists():
-        return 0
+    # Todas as páginas do painel, não só a inicial: desde que existe a porta de
+    # entrada são duas, e versionar só uma deixaria a outra com o cache velho —
+    # exatamente o defeito que esta função existe para evitar.
+    paginas = sorted((destino / "dashboard").glob("*.html"))
+    marcas = {
+        arquivo: hashlib.sha256(arquivo.read_bytes()).hexdigest()[:8]
+        for arquivo in sorted(destino.rglob("*"))
+        if arquivo.suffix in {".css", ".js"}
+    }
 
-    html = pagina.read_text(encoding="utf-8")
     trocas = 0
-    for arquivo in sorted(destino.rglob("*")):
-        if arquivo.suffix not in {".css", ".js"}:
-            continue
-        # relpath e não Path.relative_to: o alvo pode estar acima de dashboard/
-        # (tokens.css está em design/), e walk_up só existe a partir do 3.12.
-        rel = os.path.relpath(arquivo, destino / "dashboard").replace(os.sep, "/")
-        marca = hashlib.sha256(arquivo.read_bytes()).hexdigest()[:8]
-        for atributo in (f'href="{rel}"', f'src="{rel}"'):
-            if atributo in html:
-                html = html.replace(atributo, atributo[:-1] + f'?v={marca}"')
-                trocas += 1
-    pagina.write_text(html, encoding="utf-8")
+    for pagina in paginas:
+        html = pagina.read_text(encoding="utf-8")
+        for arquivo, marca in marcas.items():
+            # relpath e não Path.relative_to: o alvo pode estar acima de
+            # dashboard/ (tokens.css está em design/), e walk_up só existe a
+            # partir do 3.12.
+            rel = os.path.relpath(arquivo, destino / "dashboard").replace(os.sep, "/")
+            for atributo in (f'href="{rel}"', f'src="{rel}"'):
+                if atributo in html:
+                    html = html.replace(atributo, atributo[:-1] + f'?v={marca}"')
+                    trocas += 1
+        pagina.write_text(html, encoding="utf-8")
     return trocas
 
 

@@ -1,362 +1,52 @@
 <!doctype html>
-<html lang="pt-BR" data-tema="">
+<html lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Redes Bahia · Painel do edital</title>
-  <meta name="description" content="Acompanhamento do Edital Redes Bahia, da divulgação ao resultado — Movimento Bem Maior.">
+  <title>Redes Bahia · Entrar no painel</title>
+  <meta name="description" content="Acesso ao painel de acompanhamento do Edital Redes Bahia — Movimento Bem Maior.">
   <meta name="theme-color" content="#4f2d71">
+  <meta name="robots" content="noindex">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%234f2d71'/%3E%3Ccircle cx='8' cy='8' r='4.2' fill='none' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
   <link rel="preload" href="assets/fontes/raleway-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../design/tokens/tokens.css">
   <link rel="stylesheet" href="assets/painel.css">
 </head>
-<body>
-  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
-
-  <header class="cabecalho">
-    <div class="faixa cabecalho-interno">
-      <img class="marca" src="assets/marca/logo-movimento-bem-maior-branco.png"
+<body class="pagina-entrada">
+  <main class="entrada">
+    <div class="entrada-marca">
+      <img src="assets/marca/logo-movimento-bem-maior-branco.png"
            alt="Movimento Bem Maior" width="431" height="120">
-      <button id="alternar-tema" class="botao-tema" type="button" aria-pressed="false">
-        Modo escuro
-      </button>
-
-      <div class="cabecalho-titulo">
-        <p class="sobretitulo">Edital Redes Bahia</p>
-        <h1>Painel do edital</h1>
-        <p class="subtitulo">
-          Acompanhamento das cinco etapas, da divulgação ao resultado.
-        </p>
-      </div>
-
-      <dl class="ficha-edital">
-        <div>
-          <dt>Período de inscrições</dt>
-          <dd id="ficha-inscricoes">—</dd>
-        </div>
-        <div>
-          <dt>Duração da parceria</dt>
-          <dd id="ficha-duracao">—</dd>
-        </div>
-        <div>
-          <dt>Território</dt>
-          <dd id="ficha-territorio">—</dd>
-        </div>
-      </dl>
-    </div>
-  </header>
-
-  <main id="conteudo" class="faixa">
-    <p id="carregando" class="aviso-carregando">Carregando a base…</p>
-
-    <div id="painel" hidden>
-
-      <section class="barra-estado" aria-labelledby="t-atualizacao">
-        <div>
-          <h2 id="t-atualizacao" class="rotulo">Última atualização</h2>
-          <p id="data-atualizacao" class="numero-estado">—</p>
-          <p id="origem" class="meta">—</p>
-        </div>
-        <p id="selo-validacao" class="selo">
-          <span class="selo-icone" aria-hidden="true"></span>
-          <span class="selo-texto">—</span>
-          <a id="selo-detalhe" href="#t-qualidade" hidden>ver detalhes</a>
-        </p>
-      </section>
-
-      <section class="funil" aria-labelledby="t-funil">
-        <h2 id="t-funil" class="oculto">Funil do edital</h2>
-        <ol id="funil-etapas" class="funil-etapas"></ol>
-      </section>
-
-      <div id="etapas">
-      <section class="secao-etapa" data-etapa="cadastramento">
-        <header class="secao-etapa-cabecalho">
-          <span class="secao-etapa-numero"></span>
-          <h2></h2>
-        </header>
-        <p class="secao-etapa-resumo"></p>
-
-      <!-- Os filtros vivem DENTRO da etapa porque é só sobre ela que agem.
-           No topo da página eles pareciam comandar o painel inteiro, inclusive
-           o funil das cinco etapas, que eles não tocam. -->
-      <section class="filtros" aria-labelledby="t-filtros">
-        <p id="t-filtros" class="filtros-titulo">Recorte desta etapa</p>
-        <div class="filtros-campos">
-          <label>
-            <span>Estado</span>
-            <select id="filtro-estado"></select>
-          </label>
-          <label>
-            <span>Resultado</span>
-            <select id="filtro-resultado"></select>
-          </label>
-          <label>
-            <span>Natureza jurídica</span>
-            <select id="filtro-representa"></select>
-          </label>
-          <button id="limpar-filtros" type="button" class="botao-secundario">Limpar filtros</button>
-        </div>
-        <p id="aviso-filtro" class="aviso-filtro" hidden>
-          Os números do cadastramento consideram apenas o recorte selecionado.
-        </p>
-      </section>
-
-      <section class="grade-kpi" aria-label="Números gerais">
-        <article class="kpi" id="kpi-total"><p class="valor">—</p><p class="rotulo-kpi">—</p></article>
-        <article class="kpi" id="kpi-aprovadas"><p class="valor">—</p><p class="rotulo-kpi">—</p></article>
-        <article class="kpi" id="kpi-reprovadas"><p class="valor">—</p><p class="rotulo-kpi">—</p></article>
-        <article class="kpi" id="kpi-semmotivo"><p class="valor">—</p><p class="rotulo-kpi">—</p></article>
-      </section>
-
-      <!-- Duas leituras de uma linha só: onde a etapa chegou (proporção) e para
-           onde ela está indo (ritmo). Lado a lado porque é assim que se lê —
-           "5 não aprovadas" e "faltam 18 dias" decidem juntas. -->
-      <div class="duas-colunas">
-        <section class="bloco painel-coluna" aria-labelledby="t-resultado">
-          <div class="coluna-cabecalho">
-            <p class="etiqueta">Resultado</p>
-            <h2 id="t-resultado">Proporção do credenciamento</h2>
-            <p class="bloco-descricao">
-              A checagem é automática, sobre o que a própria organização
-              declarou. Aprovado aqui não significa verificado: a comprovação
-              vem em etapa posterior.
-            </p>
-          </div>
-          <div class="coluna-figura">
-            <div class="legenda">
-              <span class="chave"><i style="background: var(--serie-1)"></i>Aprovadas automaticamente</span>
-              <span class="chave"><i style="background: var(--serie-2)"></i>Não aprovadas</span>
-            </div>
-            <div id="grafico-resultado" class="area-grafico"></div>
-            <p id="nota-resultado" class="meta"></p>
-          </div>
-        </section>
-
-        <section class="bloco painel-coluna" aria-labelledby="t-evolucao">
-          <div class="coluna-cabecalho">
-            <p class="etiqueta">Ritmo</p>
-            <h2 id="t-evolucao">Respostas por dia</h2>
-            <p class="bloco-descricao">
-              Serve para decidir sobre comunicação: queda no ritmo com prazo
-              longo pela frente é hora de reforçar a divulgação.
-            </p>
-            <p id="prazo-inscricoes" class="cartao-prazo" hidden>
-              <span class="cartao-prazo-valor">—</span>
-              <span class="cartao-prazo-rotulo">—</span>
-            </p>
-          </div>
-          <div class="coluna-figura">
-            <div id="grafico-evolucao" class="area-grafico"></div>
-            <p id="nota-ritmo" class="meta"></p>
-          </div>
-        </section>
-      </div>
-
-      <section class="bloco bloco-destaque" aria-labelledby="t-criterios">
-        <header class="bloco-cabecalho">
-          <div>
-            <p class="etiqueta">Funil de elegibilidade</p>
-            <h2 id="t-criterios">Requisitos não atendidos</h2>
-            <p class="bloco-descricao">
-              Quantas organizações responderam o valor que torna a proposta
-              inelegível em cada requisito do edital.
-            </p>
-          </div>
-          <label class="seletor-escopo">
-            <span>Considerar</span>
-            <select id="escopo-criterios">
-              <option value="reprovadas">só as não aprovadas</option>
-              <option value="todas">todas as respostas</option>
-            </select>
-          </label>
-        </header>
-        <div id="grafico-criterios" class="area-grafico"></div>
-        <p id="nota-criterios" class="meta"></p>
-        <details class="tabela-alternativa">
-          <summary>Ver como tabela</summary>
-          <div id="tabela-criterios" class="rolagem"></div>
-        </details>
-      </section>
-
-      <section class="bloco" aria-labelledby="t-territorio">
-        <header class="bloco-cabecalho">
-          <div>
-            <p class="etiqueta">Território</p>
-            <h2 id="t-territorio">Onde o edital pode atuar</h2>
-            <p id="descricao-territorio" class="bloco-descricao">
-              Um dos requisitos é territorial: a atuação precisa acontecer em
-              municípios baianos de até 200 mil habitantes. O mapa desenha esse
-              recorte município a município. Não depende do filtro acima — é o
-              território do edital, não o das respostas.
-            </p>
-          </div>
-        </header>
-        <div class="mapa-e-tabela">
-          <div id="mapa-municipios" class="area-mapa-caixa"></div>
-          <div class="mapa-lateral">
-            <dl id="numeros-territorio" class="numeros-lado"></dl>
-            <div>
-              <h3 class="titulo-lateral">Municípios fora do recorte</h3>
-              <div id="tabela-fora" class="rolagem"></div>
-            </div>
-            <p id="nota-territorio" class="meta"></p>
-          </div>
-        </div>
-      </section>
-
-      <div class="duas-colunas">
-        <section class="bloco painel-coluna" aria-labelledby="t-origem">
-          <div class="coluna-cabecalho">
-            <p class="etiqueta">Origem</p>
-            <h2 id="t-origem">Estado da sede</h2>
-            <p class="bloco-descricao">
-              O edital é exclusivo para organizações com sede na Bahia, e o
-              formulário aceita respostas de fora. Quem está fora aparece aqui.
-            </p>
-          </div>
-          <div class="coluna-figura">
-            <div id="tabela-territorio" class="rolagem"></div>
-            <p id="nota-origem" class="meta"></p>
-          </div>
-        </section>
-
-        <section class="bloco painel-coluna" aria-labelledby="t-natureza">
-          <div class="coluna-cabecalho">
-            <p class="etiqueta">Perfil</p>
-            <h2 id="t-natureza">Natureza jurídica</h2>
-            <p class="bloco-descricao">
-              "Nenhuma das opções" é a resposta mais informativa da lista: marca
-              quem não se encaixa no desenho do edital.
-            </p>
-          </div>
-          <div class="coluna-figura">
-            <div id="grafico-natureza" class="area-grafico"></div>
-          </div>
-        </section>
-      </div>
-
-      <section class="bloco" aria-labelledby="t-organizacoes">
-        <header class="bloco-cabecalho">
-          <h2 id="t-organizacoes">Organizações</h2>
-          <p id="contagem-tabela" class="meta"></p>
-        </header>
-        <div class="rolagem">
-          <table id="tabela-organizacoes">
-            <caption class="oculto">Organizações que responderam o credenciamento</caption>
-            <thead>
-              <tr>
-                <th scope="col">Organização</th>
-                <th scope="col">Estado</th>
-                <th scope="col">Natureza jurídica</th>
-                <th scope="col">Resposta</th>
-                <th scope="col">Resultado</th>
-                <th scope="col">Requisitos não atendidos</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="bloco" aria-labelledby="t-qualidade">
-        <h2 id="t-qualidade">Qualidade da base</h2>
-        <p class="bloco-descricao">
-          O painel mostra a saúde do próprio dado, para que a leitura dos
-          números venha acompanhada do quanto se pode confiar neles.
-        </p>
-        <h3>Preenchimento</h3>
-        <ul id="qualidade" class="lista-simples"></ul>
-        <p id="sigilo" class="meta"></p>
-
-        <h3>Problemas na última execução</h3>
-        <div class="rolagem">
-          <table id="tabela-problemas">
-            <caption class="oculto">Problemas detectados pela validação</caption>
-            <thead>
-              <tr>
-                <th scope="col">Gravidade</th>
-                <th scope="col">Coluna</th>
-                <th scope="col">Problema</th>
-                <th scope="col" class="num">Linhas</th>
-                <th scope="col">Exemplos</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <p id="sem-problemas" class="meta" hidden>Nenhum problema encontrado nesta execução.</p>
-      </section>
-
-      </section>
-      </div>
-
-      <p id="procedencia" class="procedencia"></p>
     </div>
 
-    <div id="erro" class="caixa-erro" hidden>
-      <h2 id="erro-titulo">A base ainda não foi publicada</h2>
-      <p id="erro-explicacao">
-        Nenhuma planilha foi processada até agora, então não há dados para
-        mostrar. Assim que a primeira atualização rodar, esta página passa a
-        exibir o painel.
+    <div class="entrada-caixa">
+      <p class="sobretitulo">Edital Redes Bahia</p>
+      <h1>Painel do edital</h1>
+      <p class="entrada-texto">
+        Acompanhamento das cinco etapas, da divulgação ao resultado. O acesso é
+        do comitê do edital.
       </p>
-      <details>
-        <summary>Detalhes técnicos</summary>
-        <p id="erro-detalhe" class="meta"></p>
-        <ul>
-          <li>a base ainda não foi gerada — rode <code>make dados</code>;</li>
-          <li>a página foi aberta direto do arquivo, sem servidor — use
-            <code>make painel</code> e acesse
-            <code>http://localhost:8000/dashboard/</code>.</li>
-        </ul>
-      </details>
+
+      <form id="entrar" class="entrada-form" autocomplete="on">
+        <label for="usuario">Usuário</label>
+        <input id="usuario" name="usuario" type="text" autocomplete="username"
+               required autocapitalize="none" spellcheck="false">
+
+        <label for="senha">Senha</label>
+        <input id="senha" name="senha" type="password" autocomplete="current-password" required>
+
+        <p id="aviso-entrada" class="entrada-aviso" role="alert" hidden></p>
+
+        <button id="botao-entrar" type="submit" class="botao-primario">Entrar</button>
+      </form>
     </div>
+
+    <p class="entrada-rodape">
+      Movimento Bem Maior · Redes Bahia<br>
+      Perdeu a credencial? Fale com a coordenação do edital.
+    </p>
   </main>
 
-  <footer class="rodape">
-    <div class="faixa">
-      <div class="coalizao">
-        <div class="grupo-marca grupo-principal">
-          <img src="assets/marca/logo-redes-bahia.png" alt="Redes Bahia" width="935" height="120">
-        </div>
-        <div class="grupo-marca">
-          <p class="etiqueta-grupo">Iniciativa</p>
-          <div class="linha-marcas">
-            <img src="assets/marca/logo-movimento-bem-maior.png" alt="Movimento Bem Maior" width="435" height="120">
-          </div>
-        </div>
-        <div class="grupo-marca">
-          <p class="etiqueta-grupo">Parceria estratégica</p>
-          <div class="linha-marcas">
-            <img src="assets/marca/logo-brainvest.png" alt="Brainvest Wealth Management" width="376" height="120">
-            <img src="assets/marca/logo-instituto-ivete-sangalo.png" alt="Instituto Ivete Sangalo" width="227" height="120">
-            <img src="assets/marca/logo-instituto-lina-galvani.png" alt="Instituto Lina Galvani" width="498" height="120">
-          </div>
-        </div>
-        <div class="grupo-marca">
-          <p class="etiqueta-grupo">Parceria técnica</p>
-          <div class="linha-marcas">
-            <img src="assets/marca/logo-bussola.png" alt="Bússola" width="480" height="120">
-            <img src="assets/marca/logo-instituto-phomenta.png" alt="Instituto Phomenta" width="463" height="120">
-            <img src="assets/marca/logo-phi.png" alt="phi" width="277" height="120">
-          </div>
-        </div>
-      </div>
-
-      <div class="rodape-final">
-        <p class="meta">
-          Dados abertos:
-          <a href="../data/published/credenciamento.csv">CSV</a> ·
-          <a href="../data/published/credenciamento.json">JSON</a> ·
-          <a href="../data/published/manifest.json">manifesto</a>
-        </p>
-        <p class="meta">Painel gerado a partir de <code>data/published/</code>.</p>
-      </div>
-    </div>
-  </footer>
-
-  <script type="module" src="assets/painel.js"></script>
+  <script type="module" src="assets/entrada.js"></script>
 </body>
 </html>

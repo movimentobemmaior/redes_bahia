@@ -12,6 +12,7 @@
 
 import { barrasHorizontais, barraSegmentada, fmt, linhaTempo, tabelaEquivalente } from "./graficos.js";
 import { mapaCoropletico, mapaTerritorio, normalizar } from "./mapa.js";
+import { sair } from "./acesso.js";
 
 const BASE = "../data/published";
 
@@ -720,6 +721,13 @@ async function carregarMalha(nivel) {
   }
 }
 
+function configurarSaida() {
+  $("#sair").addEventListener("click", () => {
+    sair();
+    location.replace("./");
+  });
+}
+
 function configurarTema() {
   const botao = $("#alternar-tema");
   const raiz = document.documentElement;
@@ -750,6 +758,7 @@ function configurarTema() {
 
 async function iniciar() {
   configurarTema();
+  configurarSaida();
   try {
     const [manifesto, linhas] = await Promise.all([
       fetch(`${BASE}/manifest.json`, { cache: "no-store" }).then(exigirOk),
