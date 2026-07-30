@@ -32,7 +32,7 @@ e em `data/published/historico.csv`. Este arquivo registra mudanças de
 - Design tokens (`design/tokens/`) com paleta verificada para daltonismo e
   contraste nos modos claro e escuro.
 - Página de estado da base em `dashboard/`.
-- Automação: subir um `.xlsm` em `data/raw/` dispara validação e publicação.
+- Automação: subir um `.xlsx` em `data/raw/` dispara validação e publicação.
 - Testes cobrindo contrato, padronização, validação, publicação e o caminho
   completo de ponta a ponta.
 - Documentação: arquitetura, rotina de atualização, indicadores, identidade
@@ -62,8 +62,36 @@ e em `data/published/historico.csv`. Este arquivo registra mudanças de
   Repositório tornado privado em 2026-07-30, sem nenhuma planilha exposta no
   intervalo.
 
+### Ajuste ao dado real (30/07/2026)
+
+Primeira planilha de produção: formulário de credenciamento, 13 respostas.
+
+- `config/fontes.yml` reescrito do zero (**versão 2**). O contrato provisório
+  supunha inscrições, avaliações e municípios; a base real é o credenciamento,
+  uma aba só com 22 colunas de perguntas do formulário.
+- Fonte passa a ser `.xlsx` (era `.xlsm`).
+- Colunas sigilosas agora são `respondente_nome` e `respondente_email` — nome
+  de pessoa física e e-mail. O nome não foi apontado pelo perfilador
+  automático, o que confirma por que o rascunho é revisado por gente.
+- Catálogo de indicadores ([04](docs/04-indicadores.md)) reescrito para o que a
+  base permite medir, com destaque para os três critérios de sentido invertido,
+  em que "Sim" exclui.
+- Gerador de exemplo passa a ler os cabeçalhos do próprio contrato, em vez de
+  manter uma cópia que diverge.
+
+### Corrigido no pipeline, a partir do dado real
+
+- **Coluna com nome e sem dado era tratada como ausente.** A coluna `Edital`
+  veio vazia; no perfil ela sumia em silêncio, e na leitura viraria
+  `coluna_ausente` — erro que bloquearia a publicação todos os dias. Agora só
+  colunas-fantasma do Excel (sem nome e sem conteúdo) são descartadas.
+- **Data no formato "29/07/2026 às 12:16" não era reconhecida** e virava vazio,
+  o que apagaria a data de toda a base.
+
 ### Pendente
 
-- Substituir o contrato provisório pelo contrato do `.xlsm` real (fase 2).
-- Fechar o catálogo de indicadores com a coordenação.
-- Decidir se o painel será público ou restrito.
+- Confirmar com a coordenação o sentido de exclusão dos critérios invertidos.
+- Definir se a etapa de inscrição virá em outra planilha (seria um segundo
+  dataset, com contrato próprio).
+- Resolver a exposição do repositório: ele está público e `data/raw/` é o lugar
+  das planilhas originais. Ver [governança](docs/06-governanca-e-lgpd.md).

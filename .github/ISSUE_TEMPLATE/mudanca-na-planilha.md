@@ -1,6 +1,6 @@
 ---
 name: Mudança na planilha
-about: A estrutura do .xlsm mudou (coluna, aba, categoria nova)
+about: A estrutura do .xlsx mudou (coluna, aba, categoria nova)
 title: "[planilha] "
 labels: contrato
 ---

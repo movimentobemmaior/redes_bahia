@@ -141,11 +141,13 @@ def perfilar_arquivo(caminho: Path, max_abas: int = 30) -> list[PerfilAba]:
             continue
 
         linha_cabecalho = _achar_linha_cabecalho(cru)
-        df = (
-            pd.read_excel(excel, sheet_name=aba, header=linha_cabecalho - 1, dtype=object)
-            .dropna(axis=1, how="all")
-            .dropna(axis=0, how="all")
-        )
+        # Sem dropna de colunas aqui: coluna com nome e sem nenhum dado precisa
+        # aparecer no relatório com 0% de preenchimento. Sumir em silêncio é o
+        # pior comportamento possível numa ferramenta cujo trabalho é dizer o
+        # que existe na planilha.
+        df = pd.read_excel(
+            excel, sheet_name=aba, header=linha_cabecalho - 1, dtype=object
+        ).dropna(axis=0, how="all")
 
         colunas, sem_nome = [], 0
         for nome in df.columns:

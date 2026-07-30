@@ -1,4 +1,4 @@
-"""Teste de ponta a ponta: planilha .xlsm -> base publicada.
+"""Teste de ponta a ponta: planilha .xlsx -> base publicada.
 
 É o teste que garante a promessa do piloto — alguém solta o arquivo do dia na
 pasta e um comando produz a base do painel.
@@ -33,7 +33,7 @@ def _gerar_exemplo(destino: Path, linhas: int = 30) -> Path:
 def ambiente(tmp_path, monkeypatch):
     """Repositório de mentira: planilha, contrato e saídas todos em tmp_path."""
     entrada = tmp_path / "raw"
-    _gerar_exemplo(entrada / "exemplo_2026-05-01_redes_bahia.xlsm")
+    _gerar_exemplo(entrada / "exemplo_2026-05-01_redes_bahia.xlsx")
 
     contrato = copy.deepcopy(CONTRATO_REAL)
     contrato["fonte"]["diretorio"] = str(entrada)
@@ -53,12 +53,12 @@ def test_fluxo_completo_publica_a_base(ambiente):
     assert cli.main(["--config", str(contrato), "dados", "--data", "2026-05-01"]) == 0
 
     publicado = tmp_path / "published"
-    for esperado in ("inscricoes.csv", "inscricoes.json", "manifest.json", "historico.csv"):
+    for esperado in ("credenciamento.csv", "credenciamento.json", "manifest.json", "historico.csv"):
         assert (publicado / esperado).exists(), f"faltou publicar {esperado}"
 
     manifesto = json.loads((publicado / "manifest.json").read_text(encoding="utf-8"))
     assert manifesto["data_execucao"] == "2026-05-01"
-    assert {d["nome"] for d in manifesto["datasets"]} == {"inscricoes", "avaliacoes", "municipios"}
+    assert {d["nome"] for d in manifesto["datasets"]} == {"credenciamento"}
     assert manifesto["validacao"]["erros"] == 0
 
 
@@ -83,7 +83,7 @@ def test_erro_de_estrutura_bloqueia_publicacao(ambiente, monkeypatch):
     """Se uma coluna obrigatória sumir da planilha, nada é publicado."""
     tmp_path, contrato = ambiente
     dados = yaml.safe_load(contrato.read_text(encoding="utf-8"))
-    dados["datasets"]["inscricoes"]["colunas"]["organizacao"]["origem"] = "Razão Social"
+    dados["datasets"]["credenciamento"]["colunas"]["organizacao"]["origem"] = "Razão Social"
     contrato.write_text(yaml.safe_dump(dados, allow_unicode=True), encoding="utf-8")
 
     assert cli.main(["--config", str(contrato), "dados"]) == 1
@@ -96,4 +96,4 @@ def test_perfil_gera_relatorio_e_rascunho(ambiente):
     rascunho = tmp_path / "reports" / "rascunho_fontes.yml"
     assert rascunho.exists()
     proposto = yaml.safe_load(rascunho.read_text(encoding="utf-8"))
-    assert set(proposto["datasets"]) == {"inscricoes", "avaliacoes", "municipios"}
+    assert set(proposto["datasets"]) == {"credenciamento_redes_bahia"}

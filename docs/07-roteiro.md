@@ -15,34 +15,48 @@ Entregue:
 - manifesto com procedência e resultado da validação;
 - dicionário de dados gerado a partir do contrato;
 - ferramenta de perfilamento para quando a planilha mudar;
-- automação: subiu o `.xlsm`, a base se atualiza sozinha;
+- automação: subiu o `.xlsx`, a base se atualiza sozinha;
 - tokens de design e regras visuais definidos e verificados;
 - página de estado da base (`dashboard/`);
 - testes cobrindo o caminho completo.
 
-## Fase 2 — Ajuste ao dado real
+## Fase 2 — Ajuste ao dado real (em andamento)
 
-Assunto para o dia em que o `.xlsm` de verdade chegar.
+A primeira planilha real chegou em 30/07/2026: o formulário de credenciamento,
+com 13 respostas. Feito desde então:
 
-1. `make perfil` na planilha real.
-2. Reescrever `config/fontes.yml` a partir do que existe de fato (o contrato
-   atual é uma suposição).
-3. Confirmar com a coordenação: lista de `status`, relação entre `status` e
-   `etapa`, quais colunas são sigilosas, qual é a chave de cada aba.
-4. Rodar com dados reais por alguns dias e ajustar as regras que gerarem ruído.
-5. Fechar o catálogo de indicadores ([04](04-indicadores.md)).
+- ✅ `make perfil` na planilha real;
+- ✅ `config/fontes.yml` reescrito do zero (versão 2) — o contrato provisório
+  supunha inscrições, avaliações e municípios; a base real é o credenciamento,
+  uma aba só, 22 colunas;
+- ✅ dois defeitos do pipeline corrigidos, ambos revelados pelo dado real:
+  coluna com nome e sem dado era tratada como ausente (bloquearia a publicação
+  todo dia por causa de `Edital`), e data no formato "29/07/2026 às 12:16" não
+  era reconhecida;
+- ✅ catálogo de indicadores reescrito para o que existe ([04](04-indicadores.md));
+- ✅ gerador de exemplo e testes realinhados; pipeline roda limpo no dado real.
+
+Falta:
+
+1. Confirmar com a coordenação as pendências do catálogo de indicadores —
+   principalmente o **sentido de exclusão** dos três critérios invertidos.
+2. Rodar com o dado diário por alguns dias e ajustar as regras que gerarem
+   ruído.
+3. Decidir se a etapa de inscrição (propostas) virá em outra planilha; se sim,
+   ela é um segundo dataset, com contrato próprio.
 
 **Critério para sair da fase 2:** uma semana de execuções diárias sem erro de
-estrutura, e o catálogo de indicadores assinado pela coordenação.
+estrutura, e o catálogo de indicadores confirmado pela coordenação.
 
 ## Fase 3 — Painel
 
-1. Telas: visão geral, território, funil, avaliação.
+1. Telas: visão geral e funil de elegibilidade (mapa por território depende de
+   uma coluna de município, que o formulário de credenciamento não coleta).
 2. Gráficos seguindo [05](05-identidade-visual.md), sobre `data/published/`.
-3. Filtros: período, território, eixo, status.
-4. Bloco de qualidade da base sempre visível (E1–E3 do catálogo).
-5. Publicação (GitHub Pages ou hospedagem própria) — depende da decisão sobre
-   painel público ou restrito.
+3. Filtros: período, estado, natureza jurídica, resultado.
+4. Bloco de qualidade da base sempre visível (D1–D3 do catálogo).
+5. ✅ Publicação já resolvida: GitHub Pages, painel público
+   ([ADR 0005](adr/0005-painel-publico-no-github-pages.md)).
 
 ## Fase 4 — Além do piloto
 
@@ -70,4 +84,5 @@ a valer a pena:
 | Dado de identificação chegar ao site público | exposição irreversível: o site é indexável | montagem por lista de permissão + trava com testes de vazamento, rodando no CI e antes de cada publicação |
 | Coluna nova entrar no contrato sem marcação de sigilo | vira dado público sem ninguém decidir isso | revisão do contrato em pull request; a trava barra o marcado, não adivinha o que falta marcar |
 | Chave duplicada | todo total do painel fica errado | erro que bloqueia a publicação |
-| O contrato atual é uma suposição | retrabalho na fase 2 | aviso explícito no topo de `config/fontes.yml` |
+| Critério com sentido invertido lido ao contrário | gráfico exatamente oposto à realidade | sentido registrado na descrição de cada coluna e destacado em [04](04-indicadores.md) B2 |
+| Base pequena (13 respostas) tratada como estatística | percentual instável passando por precisão | painel mostra número absoluto; percentual em segundo plano |

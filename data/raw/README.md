@@ -4,14 +4,14 @@ Esta é a **única pasta** em que se mexe na rotina diária.
 
 ## O que fazer
 
-1. Exporte/salve a planilha do edital como `.xlsm`.
+1. Exporte/salve a planilha do edital como `.xlsx`.
 2. Renomeie usando a data de referência, no formato:
 
    ```
-   AAAA-MM-DD_redes_bahia.xlsm
+   AAAA-MM-DD_redes_bahia.xlsx
    ```
 
-   Exemplo: `2026-08-01_redes_bahia.xlsm`
+   Exemplo: `2026-08-01_redes_bahia.xlsx`
 
 3. Coloque o arquivo aqui e faça o commit (ou arraste pelo site do GitHub).
 4. O fluxo **Atualizar base** roda sozinho e regera `data/published/`.

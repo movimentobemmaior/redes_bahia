@@ -70,6 +70,34 @@ def ds(cfg) -> Dataset:
 
 
 @pytest.fixture
+def contrato_com_referencia(tmp_path, contrato):
+    """Contrato sintético com dois datasets e uma regra `referencia`.
+
+    A regra é testada aqui, e não contra config/fontes.yml, para que o teste
+    da funcionalidade não quebre toda vez que o contrato do projeto mudar.
+    """
+    contrato["datasets"]["avaliacoes"] = {
+        "aba": "Avaliacoes",
+        "descricao": "teste",
+        "linha_cabecalho": 1,
+        "chave": ["id_inscricao"],
+        "colunas": {
+            "id_inscricao": {"origem": "ID", "tipo": "texto", "obrigatorio": True},
+            "nota": {"origem": "Nota", "tipo": "decimal"},
+        },
+        "regras": [
+            {
+                "tipo": "referencia",
+                "coluna": "id_inscricao",
+                "dataset": "inscricoes",
+                "coluna_alvo": "id_inscricao",
+            }
+        ],
+    }
+    return carregar(escrever_contrato(tmp_path, contrato))
+
+
+@pytest.fixture
 def contrato_real():
     """O contrato de verdade do projeto — garante que ele nunca fica inválido."""
     return carregar(RAIZ / "config" / "fontes.yml")

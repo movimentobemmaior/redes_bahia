@@ -45,7 +45,7 @@ def gerar(cfg: Config, hoje: date | None = None) -> str:
         "## Como ler",
         "",
         "- **Coluna** — nome técnico, usado nos arquivos publicados e no painel.",
-        "- **Origem** — cabeçalho correspondente na planilha `.xlsm`.",
+        "- **Origem** — cabeçalho correspondente na planilha de origem.",
         "- **Tipo** — `texto`, `categoria`, `inteiro`, `decimal`, `data`, `booleano`.",
         "- **Obr.** — obrigatória: se vier vazia, a publicação é bloqueada.",
         "- **Sigilo** — dado pessoal/identificação: fica em `data/processed/` e "

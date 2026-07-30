@@ -17,7 +17,7 @@ labels: dados
 
 ## Planilha envolvida
 
-<!-- Nome do arquivo em data/raw/, ex.: 2026-08-01_redes_bahia.xlsm -->
+<!-- Nome do arquivo em data/raw/, ex.: 2026-08-01_redes_bahia.xlsx -->
 
 ## O que o relatório diz
 

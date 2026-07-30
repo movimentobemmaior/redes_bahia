@@ -2,7 +2,7 @@
 
 Monitoramento do Edital Redes Bahia — Movimento Bem Maior.
 
-Todo dia uma planilha `.xlsm` entra em `data/raw/`. Um comando a transforma em
+Todo dia uma planilha `.xlsx` entra em `data/raw/`. Um comando a transforma em
 base validada, documentada e versionada, sobre a qual o painel é construído.
 
 > **Piloto.** As escolhas aqui priorizam funcionar já e ser fácil de refazer.
@@ -23,7 +23,7 @@ base validada, documentada e versionada, sobre a qual o painel é construído.
 
 ```bash
 # 1. coloque a planilha em data/raw/ com a data no nome
-cp planilha.xlsm data/raw/2026-08-01_redes_bahia.xlsm
+cp planilha.xlsx data/raw/2026-08-01_redes_bahia.xlsx
 
 # 2. valide e publique
 make dados
@@ -38,7 +38,7 @@ Detalhes e o que fazer quando dá errado:
 ## Como o dado anda
 
 ```
-data/raw/*.xlsm ──▶ leitura ──▶ padronização ──▶ validação ──▶ publicação
+data/raw/*.xlsx ──▶ leitura ──▶ padronização ──▶ validação ──▶ publicação
                                                      │
                                             erro? nada é publicado;
                                        o painel segue com a base de ontem
@@ -52,16 +52,16 @@ A estrutura esperada da planilha vive em **um arquivo declarativo**,
 dicionário de dados e os metadados publicados. Adaptar o pipeline a uma
 planilha nova é editar esse YAML, não o código.
 
-> ⚠️ O contrato atual foi escrito **antes do primeiro `.xlsm` real**. Quando o
-> arquivo verdadeiro chegar, rode `make perfil`: ele inspeciona a planilha e
-> propõe um contrato para comparar com o atual.
+> O contrato foi escrito a partir da planilha real de 30/07/2026. Se a
+> estrutura do formulário mudar, rode `make perfil`: ele inspeciona a planilha
+> e propõe um contrato para comparar com o atual.
 
 ## Estrutura do repositório
 
 ```
 config/fontes.yml     contrato de dados: o que a planilha tem e o que precisa valer
 pipeline/             leitura, padronização, validação e publicação
-  ingest.py             acha e abre o .xlsm
+  ingest.py             acha e abre o .xlsx
   transform.py          limpa e converte tipos
   validate.py           aplica o contrato
   publish.py            grava as bases + manifesto + histórico
@@ -84,7 +84,7 @@ scripts/              utilitários: planilha de exemplo, montagem e trava do sit
 |---|---|
 | `make dados` | **rotina diária**: valida a planilha e publica a base |
 | `make validar` | confere sem publicar |
-| `make perfil` | inspeciona o `.xlsm` e propõe um contrato de dados |
+| `make perfil` | inspeciona o `.xlsx` e propõe um contrato de dados |
 | `make exemplo` | gera uma planilha sintética para testar sem o arquivo real |
 | `make dicionario` | regera o dicionário de dados |
 | `make painel` | abre a página de estado da base em `localhost:8000` |

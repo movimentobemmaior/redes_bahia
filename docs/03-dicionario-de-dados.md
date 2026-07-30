@@ -2,91 +2,61 @@
 
 > **Arquivo gerado automaticamente — não edite à mão.**
 > Fonte: `config/fontes.yml`. Para atualizar: `make dicionario`.
-> Última geração: 2026-07-30 · versão do contrato: 1
+> Última geração: 2026-07-30 · versão do contrato: 2
 
 ## Como ler
 
 - **Coluna** — nome técnico, usado nos arquivos publicados e no painel.
-- **Origem** — cabeçalho correspondente na planilha `.xlsm`.
+- **Origem** — cabeçalho correspondente na planilha de origem.
 - **Tipo** — `texto`, `categoria`, `inteiro`, `decimal`, `data`, `booleano`.
 - **Obr.** — obrigatória: se vier vazia, a publicação é bloqueada.
 - **Sigilo** — dado pessoal/identificação: fica em `data/processed/` e **não** é publicado.
 - **Preench.** — percentual preenchido na última execução do pipeline.
 
-## `avaliacoes`
+## `credenciamento`
 
-Uma linha por nota atribuída. Grão: inscrição × avaliador × critério. Permite ver dispersão entre avaliadores e desempenho por critério.
+Uma linha por organização que respondeu o formulário de credenciamento. Grão: resposta ao formulário. É o funil de elegibilidade do edital — cada coluna `criterio_*` é um requisito respondido pela própria organização, e o `status_credenciamento` é o resultado da checagem automática desses requisitos.
 
-- Aba na planilha: `Avaliacoes` (cabeçalho na linha 1)
-- Grão / chave: `id_inscricao`, `avaliador`, `criterio`
-
-| Coluna | Origem | Tipo | Obr. | Sigilo | Preench. | Descrição |
-|---|---|---|:-:|:-:|---:|---|
-| `avaliador` | Avaliador | categoria | sim | — | — | Identificação do avaliador (código ou nome). |
-| `criterio` | Critério | categoria | sim | — | — | Critério avaliado, conforme edital. |
-| `data_avaliacao` | Data da Avaliação | data | — | — | — | Data em que a nota foi registrada. |
-| `id_inscricao` | ID Inscrição | texto | sim | — | — | Chave estrangeira para inscricoes.id_inscricao. |
-| `nota` | Nota | decimal | sim | — | — | Nota do critério (0 a 10). |
-
-**Regras de validação**
-
-- **unicidade** em (id_inscricao, avaliador, criterio) — duplicata bloqueia (erro).
-- **faixa** de `nota`: mín. 0, máx. 10 — fora da faixa gera aviso.
-- **referência**: `id_inscricao` deve existir em `inscricoes.id_inscricao` — órfão gera aviso.
-
-## `inscricoes`
-
-Uma linha por proposta inscrita no edital. Grão: inscrição. Base para todos os indicadores de funil, território e valores.
-
-- Aba na planilha: `Inscricoes` (cabeçalho na linha 1)
-- Grão / chave: `id_inscricao`
+- Aba na planilha: `Credenciamento Redes Bahia` (cabeçalho na linha 1)
+- Grão / chave: `id`
 
 | Coluna | Origem | Tipo | Obr. | Sigilo | Preench. | Descrição |
 |---|---|---|:-:|:-:|---:|---|
-| `cnpj` | CNPJ | texto | — | 🔒 | — | CNPJ da proponente. Dado de identificação — não publicado. |
-| `data_inscricao` | Data de Inscrição | data | sim | — | — | Data de envio da proposta. |
-| `eixo` | Eixo | categoria | — | — | — | Eixo temático da proposta. |
-| `email_contato` | E-mail de Contato | texto | — | 🔒 | — | Contato da proponente. Dado pessoal — não publicado. |
-| `etapa` | Etapa | categoria | — | — | — | Etapa do processo em que a proposta se encontra. |
-| `id_inscricao` | ID Inscrição | texto | sim | — | — | Identificador único da proposta no sistema de inscrição. |
-| `municipio` | Município | categoria | sim | — | — | Município-sede da organização. |
-| `nota_final` | Nota Final | decimal | — | — | — | Nota consolidada da avaliação (0 a 10). Vazia até ser avaliada. |
-| `organizacao` | Organização | texto | sim | — | — | Nome da organização proponente. |
-| `status` | Status | categoria | sim | — | — | Situação atual da proposta. |
-| `territorio_identidade` | Território de Identidade | categoria | sim | — | — | Um dos 27 Territórios de Identidade da Bahia. |
-| `valor_solicitado` | Valor Solicitado | decimal | — | — | — | Valor pleiteado em reais. |
+| `id` | ID | texto | sim | — | — | Identificador da resposta no sistema de formulários. |
+| `edital` | Edital | texto | — | — | — | Edital ao qual a resposta se refere. Veio inteiramente vazia na remessa de 30/07/2026 — declarada aqui para não sumir do painel quando começar a ser preenchida. |
+| `formulario` | Formulário | categoria | — | — | — | Nome do formulário de origem. Hoje há só um. |
+| `data_resposta` | Data da Resposta | data | sim | — | — | Data de envio da resposta. Vem como texto no formato "29/07/2026 às 12:16"; o pipeline converte para data. |
+| `organizacao` | Respondente | texto | sim | — | — | Nome da organização ou coletivo respondente. |
+| `estado` | Estado do respondente | categoria | sim | — | — | Estado declarado pela organização. |
+| `respondente_nome` | Usuário que respondeu | texto | — | 🔒 | — | Nome da pessoa física que preencheu o formulário. Dado pessoal — não publicado. |
+| `respondente_email` | E-mail do usuário | texto | — | 🔒 | — | E-mail da pessoa que preencheu. Dado pessoal — não publicado. |
+| `status_credenciamento` | Status do credenciamento | categoria | sim | — | — | Resultado da checagem automática dos critérios. |
+| `representa` | Eu represento: | categoria | sim | — | — | Natureza jurídica declarada pela respondente. |
+| `criterio_estatuto_registrado` | Sua organização social possui a ata de Constituição e Estatuto Social registrada em cartório? | booleano | — | — | — | Ata de constituição e estatuto registrados em cartório. |
+| `criterio_regularidade_credito` | Sua organização social está regularizada nos órgãos fiscalizadores de crédito, tais como: Serasa, SPC, Receita Federal, etc? | booleano | — | — | — | Regularidade em Serasa, SPC, Receita Federal e afins. |
+| `criterio_dois_representantes` | Seu coletivo tem, no mínimo, dois representantes? | categoria | — | — | — | Coletivo com ao menos dois representantes. Não é Sim/Não: organizações formais respondem "Não se aplica". |
+| `criterio_sede_bahia` | Sua organização tem sede no estado da Bahia? | booleano | — | — | — | Sede no estado da Bahia. |
+| `criterio_atuacao_apenas_bahia` | Sua organização ou coletivo atua somente no mesmo estado onde está sediada (Bahia)? | booleano | — | — | — | Atuação restrita ao estado da sede. |
+| `criterio_municipios_ate_200mil` | A sua organização ou coletivo atua em municípios baianos de, no máximo, 200 mil habitantes? | booleano | — | — | — | Atuação em municípios de até 200 mil habitantes. |
+| `criterio_em_atividade` | Sua organização ou coletivo está em atividade e beneficia diretamente pessoas? | booleano | — | — | — | Em atividade, com beneficiários diretos. |
+| `criterio_receita_acima_500mil` | Sua organização ou coletivo teve uma receita anual de mais de 500 mil reais no ano de 2025? | booleano | — | — | — | Receita anual acima de R$ 500 mil em 2025. Atenção ao sentido: "Sim" aqui é critério de EXCLUSÃO, não de aprovação. |
+| `criterio_atuacao_minima_3_anos` | A sua organização ou coletivo, desenvolve comprovadamente atividades no território há, no mínimo, 3 anos? | booleano | — | — | — | Pelo menos três anos de atuação comprovada no território. |
+| `criterio_vinculo_partidario` | Sua organização ou coletivo possui algum vínculo com partidos políticos em todo o território nacional ou seus responsáveis exercem cargos políticos? | booleano | — | — | — | Vínculo partidário ou cargo político. "Sim" é critério de EXCLUSÃO. |
+| `criterio_fins_religiosos` | Sua organização social ou coletivo tem fins religiosos? | booleano | — | — | — | Fins religiosos. "Sim" é critério de EXCLUSÃO. |
+| `ciencia_comprovacao_receita` | Declaro que estou ciente de que serão pedidas comprovações da receita anual. | categoria | — | — | — | Ciência de que a receita declarada será comprovada. |
 
 **Regras de validação**
 
 - **mínimo de 1 linha(s)** — abaixo disso bloqueia (erro).
-- **unicidade** em (id_inscricao) — duplicata bloqueia (erro).
-- **valores previstos** em `status`: `Inscrita`, `Em análise`, `Habilitada`, `Inabilitada`, `Selecionada`, `Não selecionada`, `Desistente` — fora da lista gera aviso.
-- **faixa** de `nota_final`: mín. 0, máx. 10 — fora da faixa gera aviso.
-- **faixa** de `valor_solicitado`: mín. 0, máx. — — fora da faixa gera aviso.
-- **referência**: `municipio` deve existir em `municipios.municipio` — órfão gera aviso.
-
-## `municipios`
-
-Tabela de apoio (dimensão). Grão: município. Usada para mapas, cobertura territorial e cálculos por habitante.
-
-- Aba na planilha: `Municipios` (cabeçalho na linha 1)
-- Grão / chave: `municipio`
-
-| Coluna | Origem | Tipo | Obr. | Sigilo | Preench. | Descrição |
-|---|---|---|:-:|:-:|---:|---|
-| `codigo_ibge` | Código IBGE | texto | — | — | — | Código IBGE de 7 dígitos — chave para bases externas e mapas. |
-| `municipio` | Município | texto | sim | — | — | Nome do município. |
-| `populacao` | População | inteiro | — | — | — | População estimada (fonte IBGE). |
-| `territorio_identidade` | Território de Identidade | categoria | sim | — | — | Território de Identidade ao qual o município pertence. |
-
-**Regras de validação**
-
-- **unicidade** em (municipio) — duplicata bloqueia (erro).
+- **unicidade** em (id) — duplicata bloqueia (erro).
+- **valores previstos** em `status_credenciamento`: `Aprovado automaticamente`, `Não aprovado` — fora da lista gera aviso.
+- **valores previstos** em `representa`: `Associação sem fins lucrativos`, `Coletivo`, `Nenhuma das opções` — fora da lista gera aviso.
+- **valores previstos** em `criterio_dois_representantes`: `Sim`, `Não`, `Não se aplica, pois somos uma organização social (ONG, OSC)` — fora da lista gera aviso.
 
 ## Colunas não publicadas (LGPD)
 
 Estas colunas existem na base interna e são removidas de `data/published/`:
 
-- `inscricoes.cnpj`
-- `inscricoes.email_contato`
+- `credenciamento.respondente_nome`
+- `credenciamento.respondente_email`
 

@@ -86,7 +86,13 @@ def ler_aba(caminho: Path, ds: Dataset) -> pd.DataFrame:
         engine="openpyxl",
         dtype=object,
     )
-    # Remove colunas e linhas totalmente vazias, resíduo comum de planilha manual.
-    df = df.dropna(axis=1, how="all").dropna(axis=0, how="all")
+    df = df.dropna(axis=0, how="all")
     df.columns = [str(c).strip() for c in df.columns]
-    return df.reset_index(drop=True)
+
+    # Descarta só as colunas-fantasma do Excel: sem nome E sem conteúdo.
+    # Coluna COM nome e sem dado é coluna vazia, não coluna ausente — e a
+    # diferença decide a publicação do dia: 'ausente' é erro e bloqueia,
+    # 'vazia' apenas fica nula. Um campo do formulário que ninguém preencheu
+    # ainda não pode derrubar o painel.
+    fantasmas = [c for c in df.columns if c.startswith("Unnamed:") and df[c].isna().all()]
+    return df.drop(columns=fantasmas).reset_index(drop=True)
