@@ -90,14 +90,16 @@ code {
 
 .pagina-entrada {
   min-height: 100vh;
-  display: grid; place-items: center;
-  padding: var(--e-6);
+  display: flex; flex-direction: column;
   background: var(--gradiente-marca);
   color: var(--tinta-sobre-marca);
 }
 .entrada {
+  flex: 1;
   width: 100%; max-width: 26rem;
-  display: flex; flex-direction: column; gap: var(--e-8);
+  margin-inline: auto;
+  padding: var(--e-10) var(--e-6);
+  display: flex; flex-direction: column; justify-content: center; gap: var(--e-8);
 }
 .entrada-marca img { height: 40px; width: auto; }
 .entrada-caixa { display: flex; flex-direction: column; }
@@ -155,6 +157,18 @@ code {
   color: var(--tinta-sobre-marca-fraca);
   line-height: var(--altura-normal);
 }
+.entrada-coalizao { padding: 0 0 var(--e-8); }
+/* No celular a placa encosta nas bordas da tela e vira uma faixa branca de
+   ponta a ponta; a margem devolve a ela a forma de placa. */
+@media (max-width: 640px) {
+  .entrada-coalizao .faixa { padding-inline: var(--e-4); }
+  .entrada-coalizao .coalizao { padding: var(--e-5); }
+}
+/* Na tela de entrada a coalizão vem menor que no rodapé do painel: ali ela
+   fecha a leitura, aqui ela acompanha um formulário e não pode disputar com
+   ele a primeira olhada. */
+.entrada-coalizao .grupo-principal img { height: 26px; }
+.entrada-coalizao .linha-marcas img { height: 20px; }
 
 /* Botão que se comporta como link — usado para sair do painel. */
 .botao-texto {
@@ -752,15 +766,21 @@ td.motivo-ausente { color: var(--tinta-2); font-style: italic; }
 .linha-marcas { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e-6); }
 .linha-marcas img { height: 26px; width: auto; }
 
-/* Os logos vêm em versão para fundo claro. No modo escuro ficam sobre uma
-   placa branca — é o que as marcas dos parceiros pedem, e inverter ou
-   dessaturar logo de terceiro não é opção. Dentro da placa, a tinta volta a
-   ser a do modo claro: rótulo claro sobre branco não se lê. */
+/* Placa branca sob os logos.
+   Os logos vêm em versão para fundo claro, e inverter ou dessaturar marca de
+   terceiro não é opção. Então, onde o fundo não é branco — o painel em modo
+   escuro e a tela de entrada, que é roxa —, eles ganham uma placa. Dentro
+   dela a tinta volta a ser a do modo claro, com valor fixo: rótulo claro
+   sobre branco não se lê, e aqui o token não serve porque o contexto é o
+   oposto do resto da página. */
+.coalizao.placa-clara,
 :root[data-tema="escuro"] .coalizao {
   background: #ffffff;
   padding: var(--e-6);
 }
+.coalizao.placa-clara .etiqueta-grupo,
 :root[data-tema="escuro"] .coalizao .etiqueta-grupo { color: #746a85; }
+.coalizao.placa-clara .grupo-principal,
 :root[data-tema="escuro"] .coalizao .grupo-principal {
   border-right-color: rgba(62, 33, 102, 0.12);
 }
