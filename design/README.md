@@ -22,11 +22,12 @@ acessibilidade) estão em
 ## Antes de mudar uma cor
 
 A paleta de séries foi verificada para daltonismo (protanopia, deuteranopia,
-tritanopia) e contraste, nos modos claro e escuro. **A ordem dos slots faz
-parte dessa verificação**: ela é o que garante que cores vizinhas continuem
-distinguíveis. Reordenar por gosto quebra a acessibilidade sem quebrar nenhum
-teste.
+tritanopia) e contraste sobre o fundo branco do painel — que é o único, porque
+o painel tem um modo só ([ADR 0007](../docs/adr/0007-um-modo-so.md)). **A ordem
+dos slots faz parte dessa verificação**: ela é o que garante que cores vizinhas
+continuem distinguíveis. Reordenar por gosto quebra a acessibilidade sem
+quebrar nenhum teste.
 
-Trocar qualquer hex exige revalidar a paleta inteira nos dois modos. A paleta
-atual vem do regulamento do edital; os números da verificação estão em
+Trocar qualquer hex exige revalidar a paleta inteira. A paleta atual vem do
+regulamento do edital; os números da verificação estão em
 `docs/05-identidade-visual.md`.

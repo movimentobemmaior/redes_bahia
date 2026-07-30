@@ -40,8 +40,8 @@ se algo que não devia sair aparecer nele.
 
 ## Cuidados que já custaram caro
 
-- Trocar hex de série exige revalidar a paleta para daltonismo e contraste nos
-  dois modos. A ordem dos slots faz parte da acessibilidade.
+- Trocar hex de série exige revalidar a paleta para daltonismo e contraste
+  sobre o fundo branco. A ordem dos slots faz parte da acessibilidade.
 - Teste que escreve fora de `tmp_path` suja o repositório. Já aconteceu com o
   dicionário de dados e com a leitura de `data/raw/`.
 - Coluna com nome e sem dado é coluna vazia, não coluna ausente.

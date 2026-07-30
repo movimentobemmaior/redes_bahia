@@ -14,6 +14,7 @@ banco de dados, e sem o registro a discussão recomeça do zero.
 | [0004](0004-painel-restrito-ao-comite.md) | Painel restrito ao comitê | 2026-07-30 | substituído pelo 0005 |
 | [0005](0005-painel-publico-no-github-pages.md) | Painel público no GitHub Pages | 2026-07-30 | vigente |
 | [0006](0006-porta-de-entrada-no-painel.md) | Porta de entrada no painel — cortina, não fechadura | 2026-07-30 | vigente |
+| [0007](0007-um-modo-so.md) | Um modo só, o claro | 2026-07-30 | vigente |
 
 ## Formato
 

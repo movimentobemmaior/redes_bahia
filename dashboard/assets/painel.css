@@ -8,6 +8,10 @@
    abre etapa, e espaço em branco faz o resto. Caixa com fundo é exceção
    reservada a aviso e erro. Regras: docs/05-identidade-visual.md.
 
+   Um modo só, o claro (ADR 0007). Nada aqui responde a
+   `prefers-color-scheme`, e `color-scheme: light` nos tokens impede o
+   navegador de escurecer select e input por conta própria.
+
    Regras de gráfico: docs/05-identidade-visual.md */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -44,7 +48,6 @@ h3 {
 p { margin: 0 0 var(--e-3); }
 
 a { color: var(--roxo-700); text-decoration-thickness: 1px; text-underline-offset: 2px; }
-:root[data-tema="escuro"] a, .rodape a { color: var(--serie-1); }
 
 a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible {
   outline: 2px solid var(--roxo-600);
@@ -185,10 +188,6 @@ code {
   padding: 0; cursor: pointer;
   text-decoration: underline; text-underline-offset: 2px;
 }
-:root[data-tema="escuro"] .botao-texto { color: var(--serie-1); }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tema="claro"]) .botao-texto { color: var(--serie-1); }
-}
 
 /* --- Cabeçalho: o bloco roxo da capa do edital ----------------------------- */
 
@@ -257,19 +256,6 @@ code {
   font-size: var(--texto-sm);
   max-width: 62ch;
 }
-.botao-tema {
-  grid-column: 2; grid-row: 1;
-  justify-self: end;
-  font: inherit; font-size: var(--texto-sm); font-weight: var(--peso-medio);
-  color: var(--tinta-sobre-marca);
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: var(--raio-sm);
-  padding: var(--e-2) var(--e-4);
-  cursor: pointer;
-}
-.botao-tema:hover { background: rgba(255, 255, 255, 0.14); }
-
 main { padding-block: 0 var(--e-16); }
 
 /* --- Barra de estado: uma linha de rosto de jornal, não um cartão ---------- */
@@ -407,7 +393,6 @@ select {
   margin: var(--e-3) 0 0; font-size: var(--texto-sm);
   color: var(--roxo-700); font-weight: var(--peso-medio);
 }
-:root[data-tema="escuro"] .aviso-filtro { color: var(--serie-1); }
 
 /* --- Indicadores: números com fio em cima, como tabela de estatística ------ */
 
@@ -495,7 +480,6 @@ select {
   text-transform: uppercase; letter-spacing: var(--entreletra-rotulo);
   color: var(--roxo-700);
 }
-:root[data-tema="escuro"] .etiqueta { color: var(--serie-1); }
 
 /* --- Abertura de etapa: o fio grosso roxo é a quebra de capítulo -----------
    É o único traço pesado da página — tudo o mais é fio fino. Assim a etapa
@@ -506,20 +490,12 @@ select {
   border-top: 3px solid var(--roxo-800);
   padding-top: var(--e-4);
 }
-:root[data-tema="escuro"] .secao-etapa-cabecalho { border-top-color: var(--serie-1); }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tema="claro"]) .secao-etapa-cabecalho { border-top-color: var(--serie-1); }
-}
 .secao-etapa-cabecalho h2 { margin: var(--e-1) 0 0; font-size: var(--texto-2xl); }
 .secao-etapa-numero {
   display: block;
   font-size: var(--texto-xs); font-weight: var(--peso-forte);
   letter-spacing: var(--entreletra-rotulo); text-transform: uppercase;
   color: var(--roxo-700); font-variant-numeric: tabular-nums;
-}
-:root[data-tema="escuro"] .secao-etapa-numero { color: var(--serie-1); }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tema="claro"]) .secao-etapa-numero { color: var(--serie-1); }
 }
 .secao-etapa-resumo {
   margin: var(--e-3) 0 0; font-size: var(--texto-sm);
@@ -585,14 +561,10 @@ select {
   stroke-linejoin: round;
   pointer-events: none;
 }
-:root[data-tema="escuro"] .mapa .area-destaque { stroke: var(--serie-1); }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tema="claro"]) .mapa .area-destaque { stroke: var(--serie-1); }
-}
 
 /* Halo na cor da superfície em vez de texto que troca de cor conforme o tom do
-   preenchimento: continua legível sobre qualquer passo da rampa e nos dois
-   modos, sem o painel precisar saber qual passo é escuro em qual tema. */
+   preenchimento: continua legível sobre qualquer passo da rampa, do mais claro
+   ao mais escuro, sem o painel precisar saber em qual deles caiu. */
 .mapa .rotulo-mapa text {
   fill: var(--tinta-1);
   stroke: var(--superficie);
@@ -776,32 +748,15 @@ td.motivo-ausente { color: var(--tinta-2); font-style: italic; }
 
 /* Placa branca sob os logos.
    Os logos vêm em versão para fundo claro, e inverter ou dessaturar marca de
-   terceiro não é opção. Então, onde o fundo não é branco — o painel em modo
-   escuro e a tela de entrada, que é roxa —, eles ganham uma placa. Dentro
-   dela a tinta volta a ser a do modo claro, com valor fixo: rótulo claro
-   sobre branco não se lê, e aqui o token não serve porque o contexto é o
-   oposto do resto da página. */
-.coalizao.placa-clara,
-:root[data-tema="escuro"] .coalizao {
+   terceiro não é opção. A tela de entrada é roxa, então lá eles ganham uma
+   placa. Dentro dela a tinta vem com valor fixo e não do token: o contexto é
+   o oposto do resto da página, e rótulo claro sobre branco não se lê. */
+.coalizao.placa-clara {
   background: #ffffff;
   padding: var(--e-6);
 }
-.coalizao.placa-clara .etiqueta-grupo,
-:root[data-tema="escuro"] .coalizao .etiqueta-grupo { color: #746a85; }
-.coalizao.placa-clara .grupo-principal,
-:root[data-tema="escuro"] .coalizao .grupo-principal {
-  border-right-color: rgba(62, 33, 102, 0.12);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tema="claro"]) .coalizao {
-    background: #ffffff;
-    padding: var(--e-6);
-  }
-  :root:not([data-tema="claro"]) .coalizao .etiqueta-grupo { color: #746a85; }
-  :root:not([data-tema="claro"]) .coalizao .grupo-principal {
-    border-right-color: rgba(62, 33, 102, 0.12);
-  }
-}
+.coalizao.placa-clara .etiqueta-grupo { color: #746a85; }
+.coalizao.placa-clara .grupo-principal { border-right-color: rgba(62, 33, 102, 0.12); }
 
 .rodape-final {
   margin-top: var(--e-8); padding-top: var(--e-4);

@@ -266,8 +266,8 @@ export function mapaCoropletico(destino, malha, valores, opcoes = {}) {
       const [lon, lat] = ponto;
       // O rótulo é desenhado com halo da cor da superfície (paint-order no CSS)
       // em vez de trocar de cor conforme o tom do preenchimento: assim ele
-      // continua legível sobre qualquer passo da rampa e nos dois modos, sem o
-      // painel ter que saber qual passo é escuro em qual tema.
+      // continua legível sobre qualquer passo da rampa, do mais claro ao mais
+      // escuro, sem o painel ter que saber em qual deles caiu.
       const grupo = el("g", { class: "rotulo-mapa" });
       grupo.append(
         el("text", { x: px(lon), y: py(lat) - 3, "text-anchor": "middle", class: "rotulo-mapa-valor" },

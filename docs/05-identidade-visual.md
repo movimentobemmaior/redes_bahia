@@ -83,26 +83,25 @@ Quatro posições, **em ordem fixa**, com os hues da coalizão. Uma série receb
 cor pela sua identidade, nunca pela sua posição no ranking: se um filtro muda
 quantas séries aparecem, as que sobraram mantêm a cor que tinham.
 
-| Slot | Cor | Claro | Escuro | Origem |
-|---|---|---|---|---|
-| 1 | roxo | `#6b489b` | `#8f6fbe` | marca do edital |
-| 2 | laranja | `#e2711d` | `#d4701f` | Phomenta, Lina Galvani, phi |
-| 3 | verde | `#0f8a5f` | `#1d9463` | Instituto Lina Galvani |
-| 4 | azul | `#4a7fd4` | `#5a8fdb` | marca Redes Bahia |
+| Slot | Cor | Hex | Origem |
+|---|---|---|---|
+| 1 | roxo | `#6b489b` | marca do edital |
+| 2 | laranja | `#e2711d` | Phomenta, Lina Galvani, phi |
+| 3 | verde | `#0f8a5f` | Instituto Lina Galvani |
+| 4 | azul | `#4a7fd4` | marca Redes Bahia |
 
 A ordem não é estética: ela é o que garante que cores **vizinhas** continuem
 distinguíveis para quem tem daltonismo. Reordenar quebra isso.
 
-Paleta verificada com `scripts/validate_palette.js` nos dois modos
-(protanopia, deuteranopia, tritanopia, faixa de luminosidade, chroma e
-contraste com a superfície):
+Paleta verificada para protanopia, deuteranopia, tritanopia, faixa de
+luminosidade, chroma e contraste com a superfície `#ffffff`: passa em todos os
+pares. Pior par vizinho ΔE 17.8 em CVD e 20.1 em visão normal; pior par entre
+todos, 15.5.
 
-- **claro** (superfície `#ffffff`): passa em todos os pares. Pior par vizinho
-  ΔE 17.8 em CVD e 20.1 em visão normal; pior par entre todos, 15.5.
-- **escuro** (superfície `#1b1526`): passa nos pares vizinhos, com ΔE 17.1 em
-  CVD e 19.9 em visão normal. **Em gráficos que comparam todos os pares**
-  (dispersão, bolhas, coroplético, pequenos múltiplos) o limite no modo escuro
-  é de **três séries**: com as quatro, roxo e azul ficam próximos demais.
+O painel tem **um modo só, o claro** ([ADR 0007](adr/0007-um-modo-so.md)). A
+paleta anterior tinha um segundo conjunto de hexes medido contra fundo escuro,
+e nele o limite caía para três séries em gráficos que comparam todos os pares.
+Com um modo só, as quatro valem sempre.
 
 **Quinta série não existe.** Ao chegar em cinco categorias: agrupar em
 "Outros", quebrar em pequenos múltiplos, ou trocar de recorte. Cor gerada por
@@ -118,8 +117,8 @@ suficiente para oito categorias seguras. Quatro cobrem o que o painel usa.
 Um tom só, do claro ao escuro (`--seq-100` a `--seq-700`). Mapa da Bahia,
 mapa de calor, intensidade. Nunca arco-íris.
 
-Em escala **ordinal** (etapas do funil, faixas), o passo mais claro no modo
-claro é o `--seq-250`: abaixo disso a forma some no fundo.
+Em escala **ordinal** (etapas do funil, faixas), o passo mais claro utilizável
+é o `--seq-250`: abaixo disso a forma some no fundo branco.
 
 ### Mapas
 
@@ -134,8 +133,8 @@ organização" nunca se confunda com "nenhuma".
 **Toda unidade com dado leva o número escrito** — quando são poucas. O tom
 sozinho não diz quanto, e a diferença entre dois passos vizinhos é invisível
 para parte das pessoas. O rótulo é desenhado com halo na cor da superfície
-(`paint-order: stroke fill`), que resolve o contraste em qualquer passo e nos
-dois modos. Acima de oito unidades rotuladas ficam as maiores, e o resto
+(`paint-order: stroke fill`), que resolve o contraste em qualquer passo da
+rampa. Acima de oito unidades rotuladas ficam as maiores, e o resto
 continua no `<title>` e na tabela ao lado.
 
 **Com centenas de unidades, o texto migra para a tabela.** Nos 417 municípios da
@@ -202,8 +201,8 @@ colorido sobre fundo claro é a receita mais comum de painel ilegível.
   Barra, ponto e célula: tooltip por marca.
 - **Tabela sempre acessível.** Todo gráfico tem uma tabela equivalente
   alcançável — pelos arquivos em `data/published/` no mínimo.
-- **Modo escuro é escolhido, não invertido.** Os passos escuros da tabela acima
-  foram medidos contra o fundo escuro.
+- **A cor é medida contra o fundo em que aparece.** Os hexes acima foram
+  verificados sobre `#ffffff`, que é o fundo de todo o painel.
 
 ### Quando não fazer gráfico
 
@@ -228,10 +227,10 @@ A estrutura vem de três traços, e só três:
 
 Todo o resto é espaço em branco e hierarquia tipográfica. Regras derivadas:
 
-- **Fundo é um só.** `--plano-pagina` e `--superficie` têm o mesmo valor nos
-  dois modos; nada "flutua" sobre a página. Fundo diferente do plano é exceção
-  com significado: aviso, erro, hover de tabela e a placa branca dos logos no
-  modo escuro.
+- **Fundo é um só.** `--plano-pagina` e `--superficie` têm o mesmo valor;
+  nada "flutua" sobre a página. Fundo diferente do plano é exceção com
+  significado: aviso, erro, hover de tabela e a placa branca sob os logos na
+  tela de entrada, que é roxa.
 - **Raio quase zero.** 4px em controle de formulário (select, botão), porque
   controle é UI e não conteúdo. Conteúdo não tem canto arredondado.
 - **KPI e funil são colunas de estatística**: fio de acento em cima, número
@@ -258,10 +257,9 @@ Todo o resto é espaço em branco e hierarquia tipográfica. Regras derivadas:
 
 ## Antes de mudar qualquer cor
 
-1. Trocar hex de série exige revalidar a paleta inteira nos dois modos
-   (contraste, faixa de luminosidade, separação para daltonismo entre pares
-   vizinhos). Os números da última verificação estão registrados acima —
-   substitua-os pelos novos.
+1. Trocar hex de série exige revalidar a paleta inteira (contraste, faixa de
+   luminosidade, separação para daltonismo entre pares vizinhos). Os números da
+   última verificação estão registrados acima — substitua-os pelos novos.
 2. Reordenar os slots é mudança de acessibilidade, não de gosto.
 3. Mudar `tokens.css` sem mudar `tokens.json` (ou o contrário) deixa gráfico e
    tela com cores diferentes.

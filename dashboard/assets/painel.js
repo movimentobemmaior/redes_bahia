@@ -728,36 +728,7 @@ function configurarSaida() {
   });
 }
 
-function configurarTema() {
-  const botao = $("#alternar-tema");
-  const raiz = document.documentElement;
-  const aplicar = (tema) => {
-    raiz.dataset.tema = tema;
-    const escuro = tema === "escuro";
-    botao.textContent = escuro ? "Modo claro" : "Modo escuro";
-    botao.setAttribute("aria-pressed", String(escuro));
-  };
-
-  const salvo = localStorage.getItem("tema-painel");
-  if (salvo) {
-    aplicar(salvo);
-  } else {
-    const escuro = matchMedia("(prefers-color-scheme: dark)").matches;
-    botao.textContent = escuro ? "Modo claro" : "Modo escuro";
-    botao.setAttribute("aria-pressed", String(escuro));
-  }
-
-  botao.addEventListener("click", () => {
-    const preferenciaEscura = matchMedia("(prefers-color-scheme: dark)").matches;
-    const atual = raiz.dataset.tema || (preferenciaEscura ? "escuro" : "claro");
-    const novo = atual === "escuro" ? "claro" : "escuro";
-    aplicar(novo);
-    localStorage.setItem("tema-painel", novo);
-  });
-}
-
 async function iniciar() {
-  configurarTema();
   configurarSaida();
   try {
     const [manifesto, linhas] = await Promise.all([

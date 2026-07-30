@@ -7,9 +7,10 @@
    Fonte única da identidade visual. Nenhum componente do painel deve escrever
    cor, tamanho de fonte ou espaçamento "na mão": tudo sai daqui.
 
-   As cores de série foram verificadas para daltonismo e contraste nos dois
-   modos. Ver docs/05-identidade-visual.md antes de mudar qualquer hex — a
-   ORDEM dos slots faz parte da acessibilidade, não é estética.
+   O painel tem um modo só, o claro (ADR 0007). As cores de série foram
+   verificadas para daltonismo e contraste sobre fundo branco. Ver
+   docs/05-identidade-visual.md antes de mudar qualquer hex — a ORDEM dos slots
+   faz parte da acessibilidade, não é estética.
    ========================================================================== */
 
 /* --- Tipografia do edital: Raleway, hospedada no próprio repositório -------
@@ -54,7 +55,11 @@
   /* --- Superfícies e tinta ------------------------------------------------
      Página e superfície são a MESMA cor de propósito: o painel é plano, sem
      cartões — a estrutura vem de fios (--borda, --eixo) e espaço, não de
-     caixas. Ver docs/05-identidade-visual.md, "Layout do painel". */
+     caixas. Ver docs/05-identidade-visual.md, "Layout do painel".
+
+     `color-scheme: light` acima não é decoração: é o que impede o navegador de
+     desenhar select e input no esquema escuro do sistema, o que devolveria
+     campo preto no meio de uma página branca. */
   --plano-pagina:    #ffffff;
   --superficie:      #ffffff;
   --superficie-alt:  #f7f4fb;
@@ -135,79 +140,4 @@
   --raio-lg: 16px;
   --raio-pilula: 999px;
   --largura-max: 1160px;
-}
-
-/* Modo escuro: passos próprios sobre uma superfície roxo-escura, escolhidos
-   para essa superfície — não é inversão automática do modo claro. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tema="claro"]) {
-    color-scheme: dark;
-
-    --plano-pagina:   #130f1b;
-    --superficie:     #130f1b;
-    --superficie-alt: #241c31;
-    --borda:          rgba(255, 255, 255, 0.12);
-    --grade:          #2f2740;
-    --eixo:           #453a5c;
-
-    --tinta-1: #f6f3fb;
-    --tinta-2: #cfc7dc;
-    --tinta-3: #9d93ae;
-
-    --roxo-050: #241c31;
-    --roxo-100: #2f2542;
-
-    --serie-1: #8f6fbe;
-    --serie-2: #d4701f;
-    --serie-3: #1d9463;
-    --serie-4: #5a8fdb;
-
-    --seq-100: #2f2542;
-    --seq-250: #4a3a68;
-    --seq-400: #6b489b;
-    --seq-550: #9678c4;
-    --seq-700: #c9b4e2;
-
-    --status-ok:       #1d9463;
-    --status-atencao:  #e0a52a;
-    --status-serio:    #e08544;
-    --status-critico:  #e05c4b;
-    --delta-positivo:  #1d9463;
-  }
-}
-
-/* O botão de tema vence a preferência do sistema, nos dois sentidos. */
-:root[data-tema="escuro"] {
-  color-scheme: dark;
-
-  --plano-pagina:   #130f1b;
-  --superficie:     #130f1b;
-  --superficie-alt: #241c31;
-  --borda:          rgba(255, 255, 255, 0.12);
-  --grade:          #2f2740;
-  --eixo:           #453a5c;
-
-  --tinta-1: #f6f3fb;
-  --tinta-2: #cfc7dc;
-  --tinta-3: #9d93ae;
-
-  --roxo-050: #241c31;
-  --roxo-100: #2f2542;
-
-  --serie-1: #8f6fbe;
-  --serie-2: #d4701f;
-  --serie-3: #1d9463;
-  --serie-4: #5a8fdb;
-
-  --seq-100: #2f2542;
-  --seq-250: #4a3a68;
-  --seq-400: #6b489b;
-  --seq-550: #9678c4;
-  --seq-700: #c9b4e2;
-
-  --status-ok:       #1d9463;
-  --status-atencao:  #e0a52a;
-  --status-serio:    #e08544;
-  --status-critico:  #e05c4b;
-  --delta-positivo:  #1d9463;
 }
