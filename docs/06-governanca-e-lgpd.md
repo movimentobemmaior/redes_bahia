@@ -32,7 +32,8 @@ Ver [publicação do painel](08-publicacao-do-painel.md).
 ### 1. `data/raw/` guarda as planilhas originais
 
 Isso é proposital: é o que permite refazer qualquer publicação passada. E é
-justamente o que **exige repositório privado** (ver a pendência no topo).
+justamente o que **exige repositório privado**, mesmo com o painel sendo
+público — são camadas diferentes.
 
 Se o repositório for tornado público mais tarde, `data/raw/` e
 `data/processed/` precisam sair antes — e sair do histórico do git, não só da
@@ -57,29 +58,38 @@ seção "Colunas não publicadas".
 Existe um teste automatizado que falha se uma coluna sigilosa aparecer na
 camada publicada (`tests/test_publish.py`).
 
-### 3. Só `data/published/` alimenta o painel
+### 3. Só `data/published/` alimenta o painel — e ela agora é pública
 
-O painel não lê `data/raw/` nem `data/processed/`. Se um dia o painel for
-hospedado, é essa pasta — e só ela — que sai.
+O painel não lê `data/raw/` nem `data/processed/`. Com o painel publicado no
+GitHub Pages ([ADR 0005](adr/0005-painel-publico-no-github-pages.md)), tudo que
+está em `data/published/` é **acessível a qualquer pessoa na internet**.
 
-### 4. Nome de organização aparece no painel
+Consequência prática: acrescentar uma coluna ao contrato sem marcá-la como
+`sensivel` passou a ser uma decisão de publicação. A trava de `make site` barra
+o que está marcado; ela não adivinha o que deveria estar.
 
-`organizacao` não está marcada como sigilosa: sem ela o painel perde sentido.
-Como o painel é restrito ao comitê ([ADR 0004](adr/0004-painel-restrito-ao-comite.md)),
-o nome circula apenas entre quem já decide sobre as propostas.
+### 4. Nome de organização, status e notas são públicos
 
-Se um dia houver versão pública, isso volta a ser **ponto para validação
-jurídica** — junto com status e notas de propostas ainda em análise.
+`organizacao`, `status`, `etapa`, `valor_solicitado`, `nota_final` e a tabela
+inteira de `avaliacoes` não estão marcadas como sigilosas, e portanto aparecem
+no painel público.
+
+**Ponto aberto para o jurídico**, e o mais relevante deste documento: uma
+organização aparece como "Inabilitada" para qualquer pessoa possivelmente antes
+de ser comunicada, e as notas por avaliador são avaliação identificável de
+terceiros. A decisão de publicar está registrada no
+[ADR 0005](adr/0005-painel-publico-no-github-pages.md), com as alternativas que
+foram descartadas caso ela precise ser revista.
 
 ## O que ainda precisa de decisão
 
 | Questão | Impacto |
 |---|---|
-| **Onde hospedar o painel restrito** | sem hospedagem com controle de acesso, não há link — ver [publicação](08-publicacao-do-painel.md) |
-| Notas por avaliador podem circular no comitê? | avaliação identificável de terceiros, mesmo em círculo fechado |
+| **O edital coletou consentimento para divulgação?** | base legal para o painel público — a pergunta mais urgente da lista |
+| Status de proposta em análise pode ser público antes da comunicação à organização? | hoje é |
+| Notas por avaliador podem ser públicas? | hoje são; avaliação identificável de terceiros |
 | Por quanto tempo guardar as planilhas em `data/raw/`? | hoje: indefinidamente |
 | Quem pode dar acesso ao repositório? | hoje: sem processo escrito |
-| O edital coletou consentimento para divulgação dos dados? | base legal do tratamento |
 
 ## Se um dado sigiloso vazar para a camada publicada
 

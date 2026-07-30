@@ -40,8 +40,10 @@ e em `data/published/historico.csv`. Este arquivo registra mudanças de
 
 ### Publicação do painel
 
-- Decidido: o painel é **restrito ao comitê**
-  ([ADR 0004](docs/adr/0004-painel-restrito-ao-comite.md)).
+- Decidido: o painel é **público**, no GitHub Pages
+  ([ADR 0005](docs/adr/0005-painel-publico-no-github-pages.md), que substitui o
+  0004). O repositório segue privado — o que separa uma coisa da outra é a
+  montagem do pacote.
 - `make site` monta o pacote para hospedagem por **lista de permissão** — só
   entram a página, os tokens de design e `data/published/`.
 - Trava de sigilo (`scripts/checar_publicacao.py`) confere o pacote contra o

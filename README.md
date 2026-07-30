@@ -9,10 +9,12 @@ base validada, documentada e versionada, sobre a qual o painel é construído.
 > O que foi deliberadamente deixado de fora, e o gatilho para reconsiderar cada
 > item, está em [`docs/07-roteiro.md`](docs/07-roteiro.md).
 
-> **Repositório privado, e precisa continuar sendo:** `data/raw/` versiona as
-> planilhas originais, com CNPJ e e-mail. O painel é restrito ao comitê
-> ([ADR 0004](docs/adr/0004-painel-restrito-ao-comite.md)) — e repositório
-> privado **não** torna um site privado, ver
+> **Repositório privado, painel público.** As duas coisas convivem de
+> propósito: `data/raw/` versiona as planilhas originais com CNPJ e e-mail e
+> nunca sai do repositório; o painel publicado no GitHub Pages mostra apenas
+> `data/published/`, sem colunas de identificação
+> ([ADR 0005](docs/adr/0005-painel-publico-no-github-pages.md)). O que separa
+> um do outro é a trava de `make site` — ver
 > [publicação do painel](docs/08-publicacao-do-painel.md).
 
 ---
@@ -103,7 +105,7 @@ scripts/              utilitários: planilha de exemplo, montagem e trava do sit
 | [Identidade visual](docs/05-identidade-visual.md) | cor, tipografia e regras de gráfico |
 | [Governança e LGPD](docs/06-governanca-e-lgpd.md) | o que é sigiloso e o que ainda precisa de decisão |
 | [Roteiro](docs/07-roteiro.md) | fases, riscos e o que ficou fora do piloto |
-| [Publicação do painel](docs/08-publicacao-do-painel.md) | como o painel chega ao comitê sem virar público |
+| [Publicação do painel](docs/08-publicacao-do-painel.md) | como o painel vai ao ar e o que nunca vai junto |
 | [Decisões (ADR)](docs/adr/) | por que as coisas são como são |
 
 ## Duas regras que o projeto não abre mão

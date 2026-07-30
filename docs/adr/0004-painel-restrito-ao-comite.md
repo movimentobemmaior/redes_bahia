@@ -1,7 +1,11 @@
 # ADR 0004 — Painel restrito ao comitê
 
 - **Data:** 2026-07-30
-- **Situação:** vigente
+- **Situação:** **substituído** por
+  [ADR 0005 — Painel público no GitHub Pages](0005-painel-publico-no-github-pages.md),
+  na mesma data. Mantido no repositório porque o raciocínio sobre o que a
+  audiência muda continua válido, e porque a alternativa restrita segue
+  disponível caso a decisão seja revista.
 
 ## Contexto
 

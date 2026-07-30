@@ -67,6 +67,7 @@ a valer a pena:
 | Ninguém sobe a planilha por vários dias | painel desatualizado sem parecer | data da última atualização em destaque na tela |
 | Dado sigiloso vazar para a camada publicada | incidente de LGPD | remoção automática + teste que falha se acontecer |
 | Repositório voltar a ser público com planilha em `data/raw/` | publicação de dado pessoal, irreversível pelo histórico do git | repositório privado desde 2026-07-30; a condição está registrada em [governança](06-governanca-e-lgpd.md) |
-| Painel hospedado sem controle de acesso | comitê vira público sem ninguém perceber | montagem por lista de permissão + trava conferida em CI; hospedagem documentada em [publicação](08-publicacao-do-painel.md) |
+| Dado de identificação chegar ao site público | exposição irreversível: o site é indexável | montagem por lista de permissão + trava com testes de vazamento, rodando no CI e antes de cada publicação |
+| Coluna nova entrar no contrato sem marcação de sigilo | vira dado público sem ninguém decidir isso | revisão do contrato em pull request; a trava barra o marcado, não adivinha o que falta marcar |
 | Chave duplicada | todo total do painel fica errado | erro que bloqueia a publicação |
 | O contrato atual é uma suposição | retrabalho na fase 2 | aviso explícito no topo de `config/fontes.yml` |
