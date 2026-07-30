@@ -51,8 +51,11 @@
 
   --gradiente-marca: linear-gradient(135deg, var(--roxo-600) 0%, var(--roxo-900) 100%);
 
-  /* --- Superfícies e tinta ------------------------------------------------ */
-  --plano-pagina:    #f6f4f9;
+  /* --- Superfícies e tinta ------------------------------------------------
+     Página e superfície são a MESMA cor de propósito: o painel é plano, sem
+     cartões — a estrutura vem de fios (--borda, --eixo) e espaço, não de
+     caixas. Ver docs/05-identidade-visual.md, "Layout do painel". */
+  --plano-pagina:    #ffffff;
   --superficie:      #ffffff;
   --superficie-alt:  #f7f4fb;
   --borda:           rgba(62, 33, 102, 0.12);
@@ -124,9 +127,12 @@
   --e-16: 4rem;
 
   /* --- Formas ------------------------------------------------------------- */
+  /* Raio é para controle de formulário, não para conteúdo: o painel é plano
+     (docs/05-identidade-visual.md, "Layout"). md/lg/pílula ficam declarados
+     para material impresso e telas futuras, mas o painel não os usa. */
   --raio-sm: 4px;
   --raio-md: 10px;
-  --raio-lg: 16px;   /* blocos de conteúdo, como no edital */
+  --raio-lg: 16px;
   --raio-pilula: 999px;
   --largura-max: 1160px;
 }
@@ -138,7 +144,7 @@
     color-scheme: dark;
 
     --plano-pagina:   #130f1b;
-    --superficie:     #1b1526;
+    --superficie:     #130f1b;
     --superficie-alt: #241c31;
     --borda:          rgba(255, 255, 255, 0.12);
     --grade:          #2f2740;
@@ -175,7 +181,7 @@
   color-scheme: dark;
 
   --plano-pagina:   #130f1b;
-  --superficie:     #1b1526;
+  --superficie:     #130f1b;
   --superficie-alt: #241c31;
   --borda:          rgba(255, 255, 255, 0.12);
   --grade:          #2f2740;

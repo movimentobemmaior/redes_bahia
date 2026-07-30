@@ -196,13 +196,37 @@ distribuição.
 
 ## Layout
 
-- Largura máxima do conteúdo: 1160px.
-- Espaçamento na escala de 4px (`--e-1` a `--e-16`).
-- Cantos: 4px em elementos pequenos, 10px em cartões, 16px em blocos grandes —
-  o mesmo raio generoso dos blocos do regulamento.
-- Cabeçalho em gradiente roxo, conteúdo sobre plano claro, rodapé branco com a
-  faixa da coalizão. É a estrutura da capa do edital, na vertical.
-- Filtros ficam em uma faixa única acima dos gráficos, nunca espalhados.
+O painel é **plano**, no estilo de relatório de dados (Banco Mundial, Our
+World in Data): fundo branco, sem cartão, sem sombra, quase sem raio. A
+primeira versão organizava tudo em caixas arredondadas; caixa dentro de caixa
+vira moldura, e moldura compete com o dado.
+
+A estrutura vem de três traços, e só três:
+
+| Traço | O que marca |
+|---|---|
+| fio grosso roxo (3px, `--roxo-800`) | abertura de etapa — a quebra de capítulo |
+| fio de acento (3px, `--grade` ou cor) | topo de coluna de estatística (funil, KPIs) |
+| fio fino (1px, `--borda`) | separação entre blocos, linhas de tabela, faixa de filtros |
+
+Todo o resto é espaço em branco e hierarquia tipográfica. Regras derivadas:
+
+- **Fundo é um só.** `--plano-pagina` e `--superficie` têm o mesmo valor nos
+  dois modos; nada "flutua" sobre a página. Fundo diferente do plano é exceção
+  com significado: aviso, erro, hover de tabela e a placa branca dos logos no
+  modo escuro.
+- **Raio quase zero.** 4px em controle de formulário (select, botão), porque
+  controle é UI e não conteúdo. Conteúdo não tem canto arredondado.
+- **KPI e funil são colunas de estatística**: fio de acento em cima, número
+  grande, rótulo miúdo embaixo. Nunca cartões.
+- **Tabela**: fio de 2px no topo, cabeçalho em versalete, fios finos entre
+  linhas, sem borda lateral nem moldura.
+- Largura máxima do conteúdo: 1160px; espaçamento na escala de 4px
+  (`--e-1` a `--e-16`).
+- Cabeçalho em gradiente roxo (a capa do edital), conteúdo sobre branco,
+  rodapé com a faixa da coalizão sobre fio fino.
+- Filtros ficam numa faixa única entre dois fios, dentro da etapa sobre a qual
+  agem, nunca espalhados.
 - A tela precisa funcionar em 360px de largura: tabela e gráfico largo rolam
   dentro do próprio contêiner, a página nunca rola na horizontal.
 
