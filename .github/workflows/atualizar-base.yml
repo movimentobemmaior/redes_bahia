@@ -34,18 +34,37 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Este fluxo também dispara quando o contrato muda, e o contrato pode
+      # mudar antes de existir qualquer planilha (é o caso da primeira semana).
+      # Sem planilha não há o que publicar: isso é "nada a fazer", não falha.
+      - name: Verificar se há planilha para processar
+        id: fonte
+        run: |
+          if ls data/raw/*.xlsm > /dev/null 2>&1; then
+            echo "existe=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "existe=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Nenhum .xlsm em data/raw/ — nada a publicar."
+          fi
+
       - uses: actions/setup-python@v5
+        if: steps.fonte.outputs.existe == 'true'
         with:
           python-version: "3.11"
           cache: pip
 
       - name: Instalar dependências
+        if: steps.fonte.outputs.existe == 'true'
         run: pip install -r requirements.txt
 
+      # Aqui a falha é intencional: com planilha presente, erro de estrutura
+      # precisa deixar o fluxo vermelho e não publicar nada.
       - name: Processar planilha e publicar base
+        if: steps.fonte.outputs.existe == 'true'
         run: python -m pipeline dados ${{ inputs.estrito && '--estrito' || '' }}
 
       - name: Publicar resultado no repositório
+        if: steps.fonte.outputs.existe == 'true'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
