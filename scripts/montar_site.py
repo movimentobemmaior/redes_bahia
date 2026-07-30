@@ -16,6 +16,8 @@ Uso:  python scripts/montar_site.py [--destino _site]
 from __future__ import annotations
 
 import argparse
+import hashlib
+import os
 import shutil
 from pathlib import Path
 
@@ -68,6 +70,38 @@ def _copiar(origem: Path, destino: Path) -> list[Path]:
     return copiados
 
 
+def _versionar(destino: Path) -> int:
+    """Acrescenta a impressão do conteúdo às referências de CSS e JS.
+
+    Sem isso, o navegador guarda `painel.js` e `painel.css` pelo nome e continua
+    servindo a versão antiga contra o HTML novo. Já aconteceu: o JS em cache
+    lia um campo que o manifesto tinha renomeado, dava erro e a tela dizia que a
+    base não fora publicada — com a base publicada e correta no servidor.
+
+    O nome do arquivo não muda (o caminho continua legível); muda a consulta,
+    que é o suficiente para o navegador buscar de novo quando o conteúdo mudar.
+    """
+    pagina = destino / "dashboard" / "index.html"
+    if not pagina.exists():
+        return 0
+
+    html = pagina.read_text(encoding="utf-8")
+    trocas = 0
+    for arquivo in sorted(destino.rglob("*")):
+        if arquivo.suffix not in {".css", ".js"}:
+            continue
+        # relpath e não Path.relative_to: o alvo pode estar acima de dashboard/
+        # (tokens.css está em design/), e walk_up só existe a partir do 3.12.
+        rel = os.path.relpath(arquivo, destino / "dashboard").replace(os.sep, "/")
+        marca = hashlib.sha256(arquivo.read_bytes()).hexdigest()[:8]
+        for atributo in (f'href="{rel}"', f'src="{rel}"'):
+            if atributo in html:
+                html = html.replace(atributo, atributo[:-1] + f'?v={marca}"')
+                trocas += 1
+    pagina.write_text(html, encoding="utf-8")
+    return trocas
+
+
 def montar(destino: Path, raiz: Path = RAIZ) -> list[Path]:
     if destino.exists():
         shutil.rmtree(destino)
@@ -84,6 +118,10 @@ def montar(destino: Path, raiz: Path = RAIZ) -> list[Path]:
     indice = destino / "index.html"
     indice.write_text(REDIRECIONADOR, encoding="utf-8")
     copiados.append(indice)
+
+    versionadas = _versionar(destino)
+    if versionadas:
+        print(f"  {versionadas} referência(s) de CSS/JS versionada(s) contra cache")
     return copiados
 
 
