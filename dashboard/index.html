@@ -18,19 +18,32 @@
     <div class="faixa cabecalho-interno">
       <img class="marca" src="assets/marca/logo-movimento-bem-maior-branco.png"
            alt="Movimento Bem Maior" width="431" height="120">
+      <button id="alternar-tema" class="botao-tema" type="button" aria-pressed="false">
+        Modo escuro
+      </button>
+
       <div class="cabecalho-titulo">
         <p class="sobretitulo">Edital Redes Bahia</p>
         <h1>Painel do edital</h1>
         <p class="subtitulo">
-          Acompanhamento das cinco etapas do edital, da divulgação ao resultado.
-          Apoio a organizações da sociedade civil e coletivos de pequeno porte
-          no estado da Bahia, com investimento financeiro e desenvolvimento
-          institucional ao longo de dois anos.
+          Acompanhamento das cinco etapas, da divulgação ao resultado.
         </p>
       </div>
-      <button id="alternar-tema" class="botao-tema" type="button" aria-pressed="false">
-        Modo escuro
-      </button>
+
+      <dl class="ficha-edital">
+        <div>
+          <dt>Período de inscrições</dt>
+          <dd id="ficha-inscricoes">—</dd>
+        </div>
+        <div>
+          <dt>Duração da parceria</dt>
+          <dd id="ficha-duracao">—</dd>
+        </div>
+        <div>
+          <dt>Território</dt>
+          <dd id="ficha-territorio">—</dd>
+        </div>
+      </dl>
     </div>
   </header>
 
@@ -46,7 +59,9 @@
           <p id="origem" class="meta">—</p>
         </div>
         <p id="selo-validacao" class="selo">
-          <span class="selo-icone" aria-hidden="true"></span><span class="selo-texto">—</span>
+          <span class="selo-icone" aria-hidden="true"></span>
+          <span class="selo-texto">—</span>
+          <a id="selo-detalhe" href="#t-qualidade" hidden>ver detalhes</a>
         </p>
       </section>
 

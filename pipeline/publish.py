@@ -227,6 +227,12 @@ def publicar(
         "data_execucao": data_execucao.isoformat(),
         "versao_pipeline": versao_pipeline,
         "versao_contrato": cfg.versao,
+        "edital": {
+            "nome": cfg.edital.nome,
+            "periodo_inscricoes": cfg.edital.periodo_inscricoes,
+            "duracao_parceria": cfg.edital.duracao_parceria,
+            "territorio": cfg.edital.territorio,
+        },
         "etapas": _resumo_etapas(cfg, tabelas),
         "fontes": {
             nome: {

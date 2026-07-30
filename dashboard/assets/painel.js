@@ -14,11 +14,10 @@ import { barrasHorizontais, barraSegmentada, fmt, linhaTempo, tabelaEquivalente 
 
 const BASE = "../data/published";
 
-const TEXTO_STATUS = {
-  aprovado: "Validação aprovada — nenhum problema encontrado",
-  com_avisos: "Publicada com avisos",
-  reprovado: "Reprovada — esta base não deveria estar publicada",
-};
+/** Plural sem o "(s)" entre parênteses, que é gíria de formulário. */
+function plural(n, singular, plural_) {
+  return `${fmt.format(n)} ${n === 1 ? singular : plural_}`;
+}
 
 const estado = {
   manifesto: null,
@@ -95,11 +94,33 @@ function montarCabecalho() {
     `${idadeEmTexto(m.data_execucao)} · ${fontes.length === 1 ? "origem" : "origens"}: ` +
     (fontes.join(", ") || "—");
 
+  const edital = m.edital ?? {};
+  $("#ficha-inscricoes").textContent = edital.periodo_inscricoes || "—";
+  $("#ficha-duracao").textContent = edital.duracao_parceria || "—";
+  $("#ficha-territorio").textContent = edital.territorio || "—";
+
+  // O selo diz uma coisa só. Quando está tudo certo, "base validada" basta —
+  // repetir "nenhum problema, 0 erros, 0 avisos" ocupa a barra inteira para
+  // não acrescentar nada. Quando há o que ver, o número é a informação, e o
+  // detalhe fica onde ele já mora, na seção de qualidade.
+  const { status, erros, avisos } = m.validacao;
   const selo = $("#selo-validacao");
-  selo.dataset.status = m.validacao.status;
-  const detalhe = `${m.validacao.erros} erro(s), ${m.validacao.avisos} aviso(s)`;
-  selo.querySelector(".selo-texto").textContent =
-    `${TEXTO_STATUS[m.validacao.status] ?? m.validacao.status} · ${detalhe}`;
+  selo.dataset.status = status;
+
+  let texto;
+  if (erros) {
+    texto = plural(erros, "erro na validação", "erros na validação");
+  } else if (avisos) {
+    texto = plural(avisos, "aviso na validação", "avisos na validação");
+  } else {
+    texto = "Base validada";
+  }
+  selo.querySelector(".selo-texto").textContent = texto;
+  selo.title =
+    status === "aprovado"
+      ? "A base passou em todas as regras do contrato de dados."
+      : "Abra a seção Qualidade da base para ver o que foi apontado.";
+  $("#selo-detalhe").hidden = !(erros || avisos);
 
   const hashes = Object.entries(m.fontes ?? {})
     .map(([nome, f]) => `${nome}: ${f.hash_sha256.slice(0, 12)}…`)
@@ -411,7 +432,8 @@ function montarQualidade() {
 
   const omitidas = ds.colunas_omitidas_por_sigilo;
   $("#sigilo").textContent = omitidas.length
-    ? `${omitidas.length} coluna(s) retida(s) por sigilo e ausente(s) desta publicação: ${omitidas.join(", ")}.`
+    ? `${plural(omitidas.length, "coluna retida", "colunas retidas")} por sigilo e ` +
+      `fora desta publicação: ${omitidas.join(", ")}.`
     : "Nenhuma coluna retida por sigilo.";
 
   const problemas = estado.manifesto.validacao.problemas ?? [];

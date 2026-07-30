@@ -16,9 +16,15 @@ data/raw/*/exemplo_*
 # em aberto (docs/06-governanca-e-lgpd.md).
 #
 # O painel não depende disso: ele lê data/published/, que não tem dado de
-# identificação. Para voltar ao desenho original, apague as duas linhas abaixo.
+# identificação. Para voltar ao desenho original, apague as linhas abaixo.
 data/raw/*/*.xlsx
 data/raw/*/*.xlsm
+
+# processed/ é a base completa, com as colunas sensíveis ainda dentro — é dela
+# que publish.py deriva published/ removendo o que identifica pessoa. Enquanto
+# raw/ estiver fora do git, processed/ também precisa estar: são o mesmo dado.
+data/processed/*
+!data/processed/README.md
 
 # Lixo de planilha (arquivos temporários do Excel)
 ~$*

@@ -80,12 +80,34 @@ code {
 }
 .cabecalho-interno {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--e-6) var(--e-8);
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: var(--e-6) var(--e-10);
   align-items: start;
 }
 .marca { height: 44px; width: auto; grid-column: 1; }
-.cabecalho-titulo { grid-column: 1 / -1; max-width: 60ch; }
+.cabecalho-titulo { grid-column: 1; max-width: 46ch; }
+
+/* Ficha do edital, como no bloco inferior da capa do regulamento: rótulo em
+   caixa alta espaçada e o valor logo abaixo. Ocupa a metade direita com
+   informação, no lugar de deixá-la vazia. */
+.ficha-edital {
+  grid-column: 2; grid-row: 2 / 4;
+  align-self: end;
+  margin: 0;
+  display: grid; gap: var(--e-5);
+  padding-left: var(--e-8);
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+}
+.ficha-edital dt {
+  font-size: var(--texto-xs); font-weight: var(--peso-forte);
+  letter-spacing: var(--entreletra-rotulo); text-transform: uppercase;
+  color: var(--tinta-sobre-marca-fraca);
+}
+.ficha-edital dd {
+  margin: var(--e-1) 0 0;
+  font-size: var(--texto-md); font-weight: var(--peso-forte);
+  color: var(--tinta-sobre-marca);
+}
 .cabecalho h1 { color: var(--tinta-sobre-marca); margin-bottom: var(--e-3); }
 .sobretitulo {
   margin: 0 0 var(--e-2);
@@ -146,18 +168,20 @@ main { padding-block: 0 var(--e-16); }
   overflow-wrap: anywhere;
 }
 
+/* Sem pílula nem caixa: um ponto, uma frase curta e, quando há o que ver, um
+   link para onde o detalhe já mora. O estado cabe em duas palavras. */
 .selo {
-  display: inline-flex; align-items: center; gap: var(--e-2);
-  margin: 0; padding: var(--e-2) var(--e-4);
-  border-radius: var(--raio-pilula);
-  background: var(--superficie-alt);
-  border: 1px solid var(--borda);
-  font-size: var(--texto-sm); font-weight: var(--peso-medio); color: var(--tinta-1);
+  display: inline-flex; align-items: baseline; gap: var(--e-2);
+  margin: 0;
+  font-size: var(--texto-sm); color: var(--tinta-2);
 }
+.selo-texto { font-weight: var(--peso-medio); color: var(--tinta-1); }
 .selo-icone {
-  width: 8px; height: 8px; border-radius: 50%;
+  width: 7px; height: 7px; border-radius: 50%;
   background: var(--tinta-3); flex: none;
+  transform: translateY(-1px);
 }
+#selo-detalhe { font-size: var(--texto-sm); }
 .selo[data-status="aprovado"] .selo-icone   { background: var(--status-ok); }
 .selo[data-status="com_avisos"] .selo-icone { background: var(--status-atencao); }
 .selo[data-status="reprovado"] .selo-icone  { background: var(--status-critico); }
@@ -486,6 +510,16 @@ td.motivo-ausente { color: var(--tinta-2); font-style: italic; }
 .rodape-final .meta { margin: 0; }
 
 /* --- Responsivo ------------------------------------------------------------ */
+
+@media (max-width: 860px) {
+  .cabecalho-interno { grid-template-columns: 1fr; }
+  .ficha-edital {
+    grid-column: 1; grid-row: auto;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    padding-left: 0; padding-top: var(--e-5);
+    border-left: none; border-top: 1px solid rgba(255, 255, 255, 0.18);
+  }
+}
 
 @media (max-width: 640px) {
   .faixa { padding-inline: var(--e-4); }
