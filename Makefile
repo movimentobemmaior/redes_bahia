@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := ajuda
 PY ?= python3
 
-.PHONY: ajuda instalar exemplo perfil validar dados dicionario teste lint formatar painel site limpar tudo
+.PHONY: ajuda instalar exemplo perfil validar dados dicionario malhas teste lint formatar painel site limpar tudo
 
 ajuda:  ## mostra esta ajuda
 	@echo "Painel Redes Bahia — comandos disponíveis:"
@@ -28,6 +28,9 @@ dados:  ## ROTINA DIÁRIA: valida a planilha e publica a base do painel
 
 dicionario:  ## regera docs/03-dicionario-de-dados.md a partir do contrato
 	$(PY) -m pipeline dicionario
+
+malhas:  ## refaz as malhas do mapa a partir das fontes públicas (precisa de rede)
+	$(PY) scripts/gerar_malhas.py
 
 teste:  ## roda os testes
 	$(PY) -m pytest

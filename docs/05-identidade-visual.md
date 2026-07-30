@@ -121,6 +121,32 @@ mapa de calor, intensidade. Nunca arco-íris.
 Em escala **ordinal** (etapas do funil, faixas), o passo mais claro no modo
 claro é o `--seq-250`: abaixo disso a forma some no fundo.
 
+### Mapa coroplético
+
+Vale a rampa sequencial acima, com três regras próprias — mapa é o formato mais
+fácil de comunicar só por cor, e o mais fácil de mentir por escala.
+
+**O primeiro passo é do vazio, não do menor valor.** A rampa do mapa começa em
+`--seq-250`. Unidade sem nenhuma resposta usa `--grade`: presente como contexto,
+longe o bastante do primeiro passo para que "uma organização" nunca se confunda
+com "nenhuma".
+
+**Toda unidade com dado leva o número escrito.** O tom sozinho não diz quanto,
+e a diferença entre dois passos vizinhos é invisível para parte das pessoas. O
+rótulo é desenhado com halo na cor da superfície (`paint-order: stroke fill`),
+que resolve o contraste em qualquer passo e nos dois modos. Acima de oito
+unidades rotuladas ficam as maiores, e o resto continua no `<title>` e na
+tabela ao lado.
+
+**A tabela vem junto, não escondida.** Nos gráficos de barra a tabela
+equivalente pode ficar num `<details>`; no mapa ela fica visível ao lado, porque
+ler valor exato num mapa é impossível mesmo para quem enxerga a cor.
+
+O enquadramento acompanha os dados: o mapa recorta a área que tem resposta mais
+o território do edital, com folga, em vez de desenhar a malha inteira. As
+unidades de fora continuam desenhadas e são cortadas na borda — dão o vizinho
+sem gastar tela.
+
 ### Variação com sinal (divergente)
 
 Roxo ↔ laranja, com cinza no meio. O ponto neutro é cinza porque precisa ler

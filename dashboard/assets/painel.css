@@ -237,9 +237,24 @@ main { padding-block: 0 var(--e-16); }
   font-variant-numeric: tabular-nums;
 }
 
-/* --- Filtros --------------------------------------------------------------- */
+/* --- Filtros ---------------------------------------------------------------
+   Vivem dentro da seção da etapa, e a caixa é o que diz isso: solto no topo da
+   página, o mesmo controle parecia comandar o painel inteiro — inclusive o
+   funil das cinco etapas, sobre o qual ele não tem efeito nenhum. */
 
-.filtros { margin-top: var(--e-8); }
+.filtros {
+  margin-top: var(--e-5);
+  padding: var(--e-4) var(--e-5);
+  background: var(--superficie-alt);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-md);
+}
+.filtros-titulo {
+  margin: 0 0 var(--e-3);
+  font-size: var(--texto-xs); font-weight: var(--peso-forte);
+  text-transform: uppercase; letter-spacing: var(--entreletra-rotulo);
+  color: var(--tinta-3);
+}
 .filtros-campos {
   display: flex; flex-wrap: wrap; gap: var(--e-4); align-items: flex-end;
 }
@@ -306,6 +321,14 @@ select {
   margin-top: var(--e-4);
 }
 .bloco-destaque { border-left: 3px solid var(--serie-1); }
+/* Bloco que existe só para dar forma a um número já mostrado nos KPIs: título
+   miúdo e descrição depois do gráfico, para não competir com a seção. */
+.bloco-compacto { padding-block: var(--e-5); }
+.titulo-compacto {
+  margin: 0 0 var(--e-3);
+  font-size: var(--texto-md); font-weight: var(--peso-forte); color: var(--tinta-2);
+}
+.bloco-compacto .bloco-descricao { margin: var(--e-4) 0 0; }
 .bloco-cabecalho {
   display: flex; flex-wrap: wrap; gap: var(--e-4);
   align-items: flex-start; justify-content: space-between;
@@ -367,6 +390,96 @@ select {
 .grafico .linha { stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 .grafico .marcador { stroke: var(--superficie); stroke-width: 2; }
 .grafico .barra:hover rect { opacity: 0.82; }
+
+/* --- Mapa ------------------------------------------------------------------
+   Coroplético em SVG, desenhado por assets/mapa.js sobre a malha em
+   assets/geo/. O preenchimento vem inline (rampa sequencial dos tokens); aqui
+   ficam só traço, tipografia e arranjo. */
+
+.mapa-e-tabela {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: var(--e-6);
+  align-items: start;
+}
+.mapa-lateral { display: flex; flex-direction: column; gap: var(--e-4); }
+.mapa-lateral .meta { margin: 0; }
+.area-mapa-caixa { min-width: 0; }
+.mapa { display: block; width: 100%; height: auto; }
+
+.mapa .area-mapa {
+  stroke: var(--superficie);
+  stroke-width: 0.6;
+  stroke-linejoin: round;
+}
+/* Só a unidade com dado ganha contorno próprio: o resto é fundo, e contorno
+   forte em 27 estados vazios rouba a leitura de quem tem número. */
+.mapa .area-com-dado { stroke: var(--borda); stroke-width: 0.9; }
+.mapa .area-com-dado:hover { stroke: var(--tinta-1); stroke-width: 1.4; }
+.mapa .area-destaque {
+  stroke: var(--roxo-700);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+:root[data-tema="escuro"] .mapa .area-destaque { stroke: var(--serie-1); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .mapa .area-destaque { stroke: var(--serie-1); }
+}
+
+/* Halo na cor da superfície em vez de texto que troca de cor conforme o tom do
+   preenchimento: continua legível sobre qualquer passo da rampa e nos dois
+   modos, sem o painel precisar saber qual passo é escuro em qual tema. */
+.mapa .rotulo-mapa text {
+  fill: var(--tinta-1);
+  stroke: var(--superficie);
+  stroke-width: 3px;
+  paint-order: stroke fill;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.mapa .rotulo-mapa-valor {
+  font-size: 14px; font-weight: var(--peso-extra);
+  font-variant-numeric: tabular-nums;
+}
+.mapa .rotulo-mapa-nome { font-size: 11px; font-weight: var(--peso-medio); }
+
+.legenda-mapa {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--e-2) var(--e-4);
+  margin-top: var(--e-3); font-size: var(--texto-xs); color: var(--tinta-3);
+}
+.legenda-mapa-titulo {
+  text-transform: uppercase; letter-spacing: var(--entreletra-rotulo);
+  font-weight: var(--peso-forte);
+}
+.legenda-mapa-passos { display: flex; align-items: center; gap: var(--e-3); }
+.legenda-mapa-passo { display: inline-flex; align-items: center; gap: var(--e-1); }
+.legenda-mapa-passo i {
+  width: 14px; height: 10px; border-radius: 2px;
+  border: 1px solid var(--borda); display: inline-block; flex: none;
+}
+
+/* --- Prazo ------------------------------------------------------------------ */
+
+.cartao-prazo {
+  margin: 0; text-align: right; flex: none;
+  padding: var(--e-3) var(--e-4);
+  border: 1px solid var(--borda); border-radius: var(--raio-md);
+  background: var(--superficie-alt);
+}
+.cartao-prazo-valor {
+  display: block;
+  font-size: var(--texto-2xl); font-weight: var(--peso-extra);
+  line-height: var(--altura-apertada); color: var(--tinta-1);
+  font-variant-numeric: tabular-nums;
+}
+.cartao-prazo-rotulo {
+  display: block; margin-top: var(--e-1);
+  font-size: var(--texto-xs); color: var(--tinta-3); max-width: 22ch;
+}
+.cartao-prazo[data-situacao="reta-final"] { border-color: var(--status-atencao); }
+.cartao-prazo[data-situacao="reta-final"] .cartao-prazo-valor { color: var(--status-atencao); }
+.cartao-prazo[data-situacao="encerrado"] .cartao-prazo-valor { font-size: var(--texto-xl); }
 
 .legenda {
   display: flex; flex-wrap: wrap; gap: var(--e-5);
@@ -519,6 +632,11 @@ td.motivo-ausente { color: var(--tinta-2); font-style: italic; }
     padding-left: 0; padding-top: var(--e-5);
     border-left: none; border-top: 1px solid rgba(255, 255, 255, 0.18);
   }
+  /* Mapa em coluna estreita fica pequeno demais para o rótulo caber; largo e
+     com a tabela embaixo, continua legível. */
+  .mapa-e-tabela { grid-template-columns: 1fr; }
+  .cartao-prazo { text-align: left; }
+  .cartao-prazo-rotulo { max-width: none; }
 }
 
 @media (max-width: 640px) {

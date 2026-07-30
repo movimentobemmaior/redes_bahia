@@ -10,6 +10,7 @@ import pandas as pd
 import pytest
 
 from pipeline import publish
+from pipeline.config import Geografia
 from pipeline.ingest import Arquivo
 from pipeline.problemas import AVISO, Problema
 
@@ -125,3 +126,25 @@ def test_historico_conta_por_categoria(saidas, cfg_temp, tabelas):
     por_status = hist[hist["agrupamento"] == "status"].set_index("categoria")["valor"]
     assert por_status["Inscrita"] == 1
     assert hist[hist["agrupamento"] == "total"]["valor"].iloc[0] == 2
+
+
+def test_manifesto_leva_geografia_e_prazo_do_edital(saidas, cfg_temp, tabelas):
+    """O mapa e a contagem regressiva são desenhados a partir do manifesto.
+
+    Sem `geografia`, o painel esconde o bloco do mapa; sem `fim_inscricoes`, o
+    cartão de prazo some. Nos dois casos sem erro nenhum — daí o teste.
+    """
+    cfg = dataclasses.replace(
+        cfg_temp,
+        geografia=Geografia(coluna="status", nivel="estado", destaque="BA"),
+        edital=dataclasses.replace(cfg_temp.edital, fim_inscricoes="2026-08-17"),
+    )
+    manifesto = _publicar(cfg, tabelas, [])
+    assert manifesto["geografia"] == {"coluna": "status", "nivel": "estado", "destaque": "BA"}
+    assert manifesto["edital"]["fim_inscricoes"] == "2026-08-17"
+
+
+def test_manifesto_sem_geografia_nao_quebra(saidas, cfg_temp, tabelas):
+    """Contrato sem o bloco: o campo vai nulo e o painel esconde o mapa."""
+    manifesto = _publicar(cfg_temp, tabelas, [])
+    assert manifesto["geografia"] is None

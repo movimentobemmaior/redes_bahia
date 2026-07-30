@@ -70,7 +70,19 @@
         <ol id="funil-etapas" class="funil-etapas"></ol>
       </section>
 
-      <section class="filtros" aria-label="Filtros">
+      <div id="etapas">
+      <section class="secao-etapa" data-etapa="cadastramento">
+        <header class="secao-etapa-cabecalho">
+          <span class="secao-etapa-numero"></span>
+          <h2></h2>
+        </header>
+        <p class="secao-etapa-resumo"></p>
+
+      <!-- Os filtros vivem DENTRO da etapa porque é só sobre ela que agem.
+           No topo da página eles pareciam comandar o painel inteiro, inclusive
+           o funil das cinco etapas, que eles não tocam. -->
+      <section class="filtros" aria-labelledby="t-filtros">
+        <p id="t-filtros" class="filtros-titulo">Recorte desta etapa</p>
         <div class="filtros-campos">
           <label>
             <span>Estado</span>
@@ -87,17 +99,9 @@
           <button id="limpar-filtros" type="button" class="botao-secundario">Limpar filtros</button>
         </div>
         <p id="aviso-filtro" class="aviso-filtro" hidden>
-          Os números abaixo consideram apenas o recorte selecionado.
+          Os números do cadastramento consideram apenas o recorte selecionado.
         </p>
       </section>
-
-      <div id="etapas">
-      <section class="secao-etapa" data-etapa="cadastramento">
-        <header class="secao-etapa-cabecalho">
-          <span class="secao-etapa-numero"></span>
-          <h2></h2>
-        </header>
-        <p class="secao-etapa-resumo"></p>
 
       <section class="grade-kpi" aria-label="Números gerais">
         <article class="kpi" id="kpi-total"><p class="valor">—</p><p class="rotulo-kpi">—</p></article>
@@ -106,22 +110,37 @@
         <article class="kpi" id="kpi-semmotivo"><p class="valor">—</p><p class="rotulo-kpi">—</p></article>
       </section>
 
-      <section class="bloco" aria-labelledby="t-resultado">
-        <header class="bloco-cabecalho">
-          <div>
-            <h2 id="t-resultado">Resultado do credenciamento</h2>
-            <p class="bloco-descricao">
-              A checagem é automática, sobre o que a própria organização
-              declarou. Aprovado aqui não significa verificado: a comprovação
-              vem em etapa posterior.
-            </p>
-          </div>
-        </header>
+      <section class="bloco bloco-compacto" aria-labelledby="t-resultado">
+        <h2 id="t-resultado" class="titulo-compacto">Proporção do resultado</h2>
         <div class="legenda">
           <span class="chave"><i style="background: var(--serie-1)"></i>Aprovadas automaticamente</span>
           <span class="chave"><i style="background: var(--serie-2)"></i>Não aprovadas</span>
         </div>
         <div id="grafico-resultado" class="area-grafico"></div>
+        <p class="bloco-descricao">
+          A checagem é automática, sobre o que a própria organização declarou.
+          Aprovado aqui não significa verificado: a comprovação vem em etapa
+          posterior.
+        </p>
+      </section>
+
+      <section class="bloco" aria-labelledby="t-evolucao">
+        <header class="bloco-cabecalho">
+          <div>
+            <p class="etiqueta">Ritmo</p>
+            <h2 id="t-evolucao">Respostas por dia</h2>
+            <p class="bloco-descricao">
+              Serve para decidir sobre comunicação: queda no ritmo com prazo
+              longo pela frente é hora de reforçar a divulgação.
+            </p>
+          </div>
+          <p id="prazo-inscricoes" class="cartao-prazo" hidden>
+            <span class="cartao-prazo-valor">—</span>
+            <span class="cartao-prazo-rotulo">—</span>
+          </p>
+        </header>
+        <div id="grafico-evolucao" class="area-grafico"></div>
+        <p id="nota-ritmo" class="meta"></p>
       </section>
 
       <section class="bloco bloco-destaque" aria-labelledby="t-criterios">
@@ -150,32 +169,33 @@
         </details>
       </section>
 
-      <div class="duas-colunas">
-        <section class="bloco" aria-labelledby="t-estado">
-          <h2 id="t-estado">Origem por estado</h2>
-          <p class="bloco-descricao">
-            O edital é exclusivo para organizações com sede na Bahia, e o
-            formulário aceita respostas de fora. Quem está fora aparece aqui.
-          </p>
-          <div id="grafico-estado" class="area-grafico"></div>
-        </section>
+      <section class="bloco" aria-labelledby="t-territorio">
+        <header class="bloco-cabecalho">
+          <div>
+            <p class="etiqueta">Território</p>
+            <h2 id="t-territorio">Origem das organizações</h2>
+            <p id="descricao-territorio" class="bloco-descricao">
+              O edital é exclusivo para organizações com sede na Bahia, e o
+              formulário aceita respostas de fora. Quem está fora aparece aqui.
+            </p>
+          </div>
+        </header>
+        <div class="mapa-e-tabela">
+          <div id="mapa-territorio" class="area-mapa-caixa"></div>
+          <div class="mapa-lateral">
+            <div id="tabela-territorio" class="rolagem"></div>
+            <p id="nota-territorio" class="meta"></p>
+          </div>
+        </div>
+      </section>
 
-        <section class="bloco" aria-labelledby="t-natureza">
-          <h2 id="t-natureza">Natureza jurídica</h2>
-          <p class="bloco-descricao">
-            "Nenhuma das opções" é a resposta mais informativa da lista: marca
-            quem não se encaixa no desenho do edital.
-          </p>
-          <div id="grafico-natureza" class="area-grafico"></div>
-        </section>
-      </div>
-
-      <section class="bloco" aria-labelledby="t-evolucao">
-        <h2 id="t-evolucao">Respostas por dia</h2>
+      <section class="bloco" aria-labelledby="t-natureza">
+        <h2 id="t-natureza">Natureza jurídica</h2>
         <p class="bloco-descricao">
-          Cobre apenas o período em que o formulário esteve aberto.
+          "Nenhuma das opções" é a resposta mais informativa da lista: marca
+          quem não se encaixa no desenho do edital.
         </p>
-        <div id="grafico-evolucao" class="area-grafico"></div>
+        <div id="grafico-natureza" class="area-grafico"></div>
       </section>
 
       <section class="bloco" aria-labelledby="t-organizacoes">
