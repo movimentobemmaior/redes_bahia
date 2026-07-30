@@ -115,6 +115,28 @@ def test_etapa_sem_planilha_nao_impede_as_outras(ambiente):
     assert len(manifesto["etapas"]) == 5
 
 
+def test_gerador_de_exemplo_escreve_onde_o_pipeline_procura():
+    """Regressão: o gerador escrevia em data/raw/ enquanto a fonte passou a vir
+    de data/raw/<etapa>/. O CI gerava o exemplo e o pipeline não achava nada,
+    saindo com código 2. Gerador e pipeline têm de concordar sobre o caminho,
+    e os dois tiram essa informação do contrato."""
+    spec = importlib.util.spec_from_file_location(
+        "gerar_exemplo", RAIZ / "scripts" / "gerar_exemplo.py"
+    )
+    modulo = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(modulo)
+
+    from pipeline.config import carregar
+
+    cfg = carregar()
+    destino = modulo.destino_padrao()
+    pastas = {e.pasta for e in cfg.etapas if e.dataset}
+    assert destino.parent in pastas, (
+        f"o exemplo cairia em {destino.parent}, que não é pasta de nenhuma etapa com dataset"
+    )
+    assert destino.match(cfg.fonte.padrao_arquivo), "o nome não casa com fonte.padrao_arquivo"
+
+
 def test_erro_de_estrutura_bloqueia_publicacao(ambiente, monkeypatch):
     """Se uma coluna obrigatória sumir da planilha, nada é publicado."""
     tmp_path, contrato = ambiente
