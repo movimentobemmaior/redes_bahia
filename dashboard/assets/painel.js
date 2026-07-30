@@ -524,14 +524,34 @@ async function iniciar() {
       tempo = setTimeout(desenhar, 150);
     });
   } catch (erro) {
+    // Distinguir as duas falhas importa: "não há base" é estado normal do
+    // primeiro dia; "a base veio e a tela quebrou" é defeito, e chamá-lo de
+    // "base não publicada" manda quem lê procurar no lugar errado. Foi o que
+    // aconteceu quando um JS em cache encontrou um manifesto novo.
+    const semBase = erro instanceof RespostaFaltando;
     $("#carregando").hidden = true;
     $("#erro").hidden = false;
+    $("#erro").dataset.tipo = semBase ? "sem-base" : "falha";
+    $("#erro-titulo").textContent = semBase
+      ? "A base ainda não foi publicada"
+      : "A base foi publicada, mas o painel não conseguiu montar a tela";
+    $("#erro-explicacao").textContent = semBase
+      ? "Nenhuma planilha foi processada até agora, então não há dados para mostrar. " +
+        "Assim que a primeira atualização rodar, esta página passa a exibir o painel."
+      : "Os dados chegaram do servidor, então o problema está na página e não na base. " +
+        "A causa mais comum é uma versão antiga do painel guardada em cache: " +
+        "recarregue com Ctrl+F5 (ou Cmd+Shift+R).";
     $("#erro-detalhe").textContent = String(erro);
   }
 }
 
+/** Erro de busca dos dados, separado de qualquer outra falha de montagem. */
+class RespostaFaltando extends Error {}
+
 async function exigirOk(resposta) {
-  if (!resposta.ok) throw new Error(`HTTP ${resposta.status} ao buscar ${resposta.url}`);
+  if (!resposta.ok) {
+    throw new RespostaFaltando(`HTTP ${resposta.status} ao buscar ${resposta.url}`);
+  }
   return resposta.json();
 }
 

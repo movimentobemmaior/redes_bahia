@@ -33,8 +33,17 @@ CONTRATO = RAIZ / "config" / "fontes.yml"
 def repo(tmp_path):
     """Repositório de mentira com o mínimo que a montagem espera encontrar."""
     (tmp_path / "dashboard" / "assets").mkdir(parents=True)
-    (tmp_path / "dashboard" / "index.html").write_text("<h1>painel</h1>", encoding="utf-8")
+    # As referências precisam ser as mesmas da página real: é sobre elas que a
+    # montagem aplica a versão contra cache.
+    (tmp_path / "dashboard" / "index.html").write_text(
+        '<link rel="stylesheet" href="../design/tokens/tokens.css">\n'
+        '<link rel="stylesheet" href="assets/painel.css">\n'
+        '<script type="module" src="assets/painel.js"></script>\n'
+        "<h1>painel</h1>",
+        encoding="utf-8",
+    )
     (tmp_path / "dashboard" / "assets" / "painel.css").write_text("body{}", encoding="utf-8")
+    (tmp_path / "dashboard" / "assets" / "painel.js").write_text("// painel", encoding="utf-8")
     (tmp_path / "dashboard" / "README.md").write_text("doc interna", encoding="utf-8")
 
     (tmp_path / "design" / "tokens").mkdir(parents=True)
@@ -100,6 +109,31 @@ def test_monta_apenas_o_que_esta_na_lista(site):
     assert (site / "design" / "tokens" / "tokens.css").exists()
     assert (site / "data" / "published" / "credenciamento.csv").exists()
     assert (site / "index.html").exists(), "falta o redirecionador na raiz"
+
+
+def test_css_e_js_saem_versionados_contra_cache(site):
+    """Regressão: os nomes dos arquivos nunca mudam, então o navegador servia
+    `painel.js` antigo contra HTML e manifesto novos. O JS em cache procurava um
+    campo já renomeado, quebrava, e a tela dizia que a base não fora publicada —
+    com a base publicada e correta no servidor."""
+    html = (site / "dashboard" / "index.html").read_text(encoding="utf-8")
+    for referencia in ('href="assets/painel.css', 'src="assets/painel.js',
+                       'href="../design/tokens/tokens.css'):
+        assert f"{referencia}?v=" in html, f"{referencia} saiu sem versão"
+
+
+def test_versao_muda_quando_o_conteudo_muda(repo, tmp_path):
+    """A versão precisa acompanhar o conteúdo; fixa não serve para nada."""
+    import re
+
+    def versao_do_css(destino):
+        montar_site.montar(destino, raiz=repo)
+        html = (destino / "dashboard" / "index.html").read_text(encoding="utf-8")
+        return re.search(r'painel\.css\?v=(\w+)', html).group(1)
+
+    antes = versao_do_css(tmp_path / "site1")
+    (repo / "dashboard" / "assets" / "painel.css").write_text("body{color:red}", encoding="utf-8")
+    assert versao_do_css(tmp_path / "site2") != antes
 
 
 def test_planilha_e_base_interna_ficam_de_fora(site):
