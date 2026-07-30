@@ -3,6 +3,16 @@
 > Este documento descreve as decisões técnicas tomadas e o que ainda precisa de
 > validação jurídica. Não substitui parecer do jurídico.
 
+> 🔴 **PENDÊNCIA BLOQUEANTE — o repositório está público.**
+>
+> Verificado em 2026-07-30. Nada vazou: `data/raw/` ainda só tem um README.
+> Mas a rotina descrita neste projeto coloca as planilhas originais — com CNPJ
+> e e-mail — dentro de `data/raw/`, versionadas. **Em repositório público, a
+> primeira planilha subida é uma publicação de dados pessoais**, e o histórico
+> do git a mantém acessível mesmo depois de apagada.
+>
+> **Não suba nenhum `.xlsm` até resolver isso.** Ver "Como destravar" abaixo.
+
 ## O que está em jogo
 
 A planilha do edital contém dados que identificam organizações e pessoas: CNPJ,
@@ -10,16 +20,34 @@ e-mail de contato, e possivelmente nome de responsável e telefone. A partir do
 momento em que esse arquivo entra em um repositório, ele passa a ter cópia,
 histórico e (dependendo da configuração) alcance.
 
+## Como destravar
+
+O projeto foi desenhado assumindo repositório privado. Como ele está público,
+uma destas três escolhas precisa ser feita **antes da primeira planilha**:
+
+| Opção | O que fazer | O que se ganha e o que se perde |
+|---|---|---|
+| **A. Tornar o repositório privado** | Settings → General → Danger Zone → Change visibility | Nada muda no projeto; é a opção que preserva o desenho original (planilha versionada, publicação refazível). Perde-se a vitrine pública do código. |
+| **B. Manter público e tirar os dados do git** | `data/raw/` e `data/processed/` passam a viver fora do repositório (Drive, S3, storage interno); o pipeline lê de lá | Código público, dado fora. Perde-se a versão em conjunto entre dado e código, que é o principal benefício do [ADR 0001](adr/0001-base-estatica-versionada.md) — refazer uma publicação antiga deixa de ser automático. |
+| **C. Manter público e não guardar identificação** | Remover CNPJ e e-mail já na origem, antes de a planilha entrar em `data/raw/` | Simples, mas perde-se a capacidade de desduplicar organização por CNPJ (indicador A2) e de conferir dado com a fonte. |
+
+**A é a recomendação**, por ser a única que não desmonta nada do que já está
+construído. B exige reescrever o ADR 0001 e a camada de leitura. C exige um
+passo manual diário, que é justamente o tipo de coisa que se esquece.
+
+Enquanto a decisão não sai, o repositório pode ficar como está: sem `.xlsm` em
+`data/raw/`, não há dado pessoal exposto.
+
 ## Decisões em vigor
 
-### 1. O repositório é privado
+### 1. `data/raw/` guarda as planilhas originais
 
-`data/raw/` guarda as planilhas originais, com os dados de identificação. Isso
-é proposital — é o que permite refazer qualquer publicação passada — e é o que
-obriga o repositório a ser privado.
+Isso é proposital: é o que permite refazer qualquer publicação passada. E é
+justamente o que **exige repositório privado** (ver a pendência no topo).
 
-**Se o repositório for tornado público, `data/raw/` e `data/processed/` precisam
-sair antes**, e sair do histórico do git, não só da última versão.
+Se o repositório for tornado público mais tarde, `data/raw/` e
+`data/processed/` precisam sair antes — e sair do histórico do git, não só da
+última versão.
 
 ### 2. Coluna sigilosa não chega à camada publicada
 

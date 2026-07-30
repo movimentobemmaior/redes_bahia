@@ -1,5 +1,14 @@
 # `data/raw/` — a planilha do dia entra aqui
 
+> 🔴 **PARE antes de subir a primeira planilha: o repositório está público.**
+>
+> Os arquivos desta pasta ficam versionados no git. Com o repositório público,
+> subir a planilha aqui publica CNPJ e e-mail das organizações para qualquer
+> pessoa — e o histórico do git mantém isso acessível mesmo depois de apagado.
+>
+> Resolva a pendência em [`docs/06-governanca-e-lgpd.md`](../../docs/06-governanca-e-lgpd.md)
+> (seção "Como destravar") antes de usar esta pasta.
+
 Esta é a **única pasta** em que se mexe na rotina diária.
 
 ## O que fazer
@@ -30,6 +39,9 @@ Esta é a **única pasta** em que se mexe na rotina diária.
 ## Atenção — LGPD
 
 Os arquivos desta pasta contêm dados de identificação (CNPJ, e-mail) e ficam
-versionados no repositório. Por isso o repositório **é privado**, e as colunas
-marcadas como `sensivel: true` no contrato nunca chegam a `data/published/`.
-Ver `docs/06-governanca-e-lgpd.md`.
+versionados no repositório. O desenho do projeto pressupõe repositório
+**privado** — condição que ainda não está atendida (ver o alerta no topo).
+
+As colunas marcadas como `sensivel: true` no contrato nunca chegam a
+`data/published/`, mas isso protege a camada publicada, **não** esta pasta:
+aqui o arquivo fica como veio. Ver `docs/06-governanca-e-lgpd.md`.

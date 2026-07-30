@@ -9,6 +9,12 @@ base validada, documentada e versionada, sobre a qual o painel é construído.
 > O que foi deliberadamente deixado de fora, e o gatilho para reconsiderar cada
 > item, está em [`docs/07-roteiro.md`](docs/07-roteiro.md).
 
+> 🔴 **Antes da primeira planilha:** o projeto pressupõe repositório privado,
+> porque `data/raw/` versiona as planilhas originais com CNPJ e e-mail. O
+> repositório está **público**. Nada vazou ainda, mas subir um `.xlsm` agora
+> publicaria dado pessoal. Ver [governança e LGPD](docs/06-governanca-e-lgpd.md),
+> seção "Como destravar".
+
 ---
 
 ## A rotina do dia
@@ -108,8 +114,9 @@ fica registrada no manifesto e visível na tela. O porquê está no
 
 **Dado sigiloso não sai.** Coluna marcada como `sensivel` no contrato fica em
 `data/processed/` e nunca chega a `data/published/`. Existe teste que falha se
-isso for violado. O repositório é privado porque `data/raw/` guarda as
-planilhas originais — ver [governança](docs/06-governanca-e-lgpd.md).
+isso for violado. Isso protege a camada publicada — `data/raw/` guarda as
+planilhas como vieram, e é por isso que o repositório precisa ser privado
+(pendência aberta, ver [governança](docs/06-governanca-e-lgpd.md)).
 
 ## Instalação (desenvolvimento)
 
