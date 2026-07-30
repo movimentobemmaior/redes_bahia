@@ -1,0 +1,8 @@
+data_execucao,arquivo_fonte,dataset,agrupamento,categoria,metrica,valor
+2026-07-30,2026-07-30_redes_bahia.xlsx,credenciamento,estado,Bahia,n_linhas,12
+2026-07-30,2026-07-30_redes_bahia.xlsx,credenciamento,estado,Pernambuco,n_linhas,1
+2026-07-30,2026-07-30_redes_bahia.xlsx,credenciamento,representa,Associação sem fins lucrativos,n_linhas,12
+2026-07-30,2026-07-30_redes_bahia.xlsx,credenciamento,representa,Nenhuma das opções,n_linhas,1
+2026-07-30,2026-07-30_redes_bahia.xlsx,credenciamento,status_credenciamento,Aprovado automaticamente,n_linhas,8
+2026-07-30,2026-07-30_redes_bahia.xlsx,credenciamento,status_credenciamento,Não aprovado,n_linhas,5
+2026-07-30,2026-07-30_redes_bahia.xlsx,credenciamento,total,todos,n_linhas,13

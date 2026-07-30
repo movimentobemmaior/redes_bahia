@@ -19,31 +19,32 @@ Uma linha por organização que respondeu o formulário de credenciamento. Grão
 
 - Aba na planilha: `Credenciamento Redes Bahia` (cabeçalho na linha 1)
 - Grão / chave: `id`
+- Linhas na última execução: **13**
 
 | Coluna | Origem | Tipo | Obr. | Sigilo | Preench. | Descrição |
 |---|---|---|:-:|:-:|---:|---|
-| `id` | ID | texto | sim | — | — | Identificador da resposta no sistema de formulários. |
-| `edital` | Edital | texto | — | — | — | Edital ao qual a resposta se refere. Veio inteiramente vazia na remessa de 30/07/2026 — declarada aqui para não sumir do painel quando começar a ser preenchida. |
-| `formulario` | Formulário | categoria | — | — | — | Nome do formulário de origem. Hoje há só um. |
-| `data_resposta` | Data da Resposta | data | sim | — | — | Data de envio da resposta. Vem como texto no formato "29/07/2026 às 12:16"; o pipeline converte para data. |
-| `organizacao` | Respondente | texto | sim | — | — | Nome da organização ou coletivo respondente. |
-| `estado` | Estado do respondente | categoria | sim | — | — | Estado declarado pela organização. |
-| `respondente_nome` | Usuário que respondeu | texto | — | 🔒 | — | Nome da pessoa física que preencheu o formulário. Dado pessoal — não publicado. |
-| `respondente_email` | E-mail do usuário | texto | — | 🔒 | — | E-mail da pessoa que preencheu. Dado pessoal — não publicado. |
-| `status_credenciamento` | Status do credenciamento | categoria | sim | — | — | Resultado da checagem automática dos critérios. |
-| `representa` | Eu represento: | categoria | sim | — | — | Natureza jurídica declarada pela respondente. |
-| `criterio_estatuto_registrado` | Sua organização social possui a ata de Constituição e Estatuto Social registrada em cartório? | booleano | — | — | — | Ata de constituição e estatuto registrados em cartório. |
-| `criterio_regularidade_credito` | Sua organização social está regularizada nos órgãos fiscalizadores de crédito, tais como: Serasa, SPC, Receita Federal, etc? | booleano | — | — | — | Regularidade em Serasa, SPC, Receita Federal e afins. |
-| `criterio_dois_representantes` | Seu coletivo tem, no mínimo, dois representantes? | categoria | — | — | — | Coletivo com ao menos dois representantes. Não é Sim/Não: organizações formais respondem "Não se aplica". |
-| `criterio_sede_bahia` | Sua organização tem sede no estado da Bahia? | booleano | — | — | — | Sede no estado da Bahia. |
-| `criterio_atuacao_apenas_bahia` | Sua organização ou coletivo atua somente no mesmo estado onde está sediada (Bahia)? | booleano | — | — | — | Atuação restrita ao estado da sede. |
-| `criterio_municipios_ate_200mil` | A sua organização ou coletivo atua em municípios baianos de, no máximo, 200 mil habitantes? | booleano | — | — | — | Atuação em municípios de até 200 mil habitantes. |
-| `criterio_em_atividade` | Sua organização ou coletivo está em atividade e beneficia diretamente pessoas? | booleano | — | — | — | Em atividade, com beneficiários diretos. |
-| `criterio_receita_acima_500mil` | Sua organização ou coletivo teve uma receita anual de mais de 500 mil reais no ano de 2025? | booleano | — | — | — | Receita anual acima de R$ 500 mil em 2025. Atenção ao sentido: "Sim" aqui é critério de EXCLUSÃO, não de aprovação. |
-| `criterio_atuacao_minima_3_anos` | A sua organização ou coletivo, desenvolve comprovadamente atividades no território há, no mínimo, 3 anos? | booleano | — | — | — | Pelo menos três anos de atuação comprovada no território. |
-| `criterio_vinculo_partidario` | Sua organização ou coletivo possui algum vínculo com partidos políticos em todo o território nacional ou seus responsáveis exercem cargos políticos? | booleano | — | — | — | Vínculo partidário ou cargo político. "Sim" é critério de EXCLUSÃO. |
-| `criterio_fins_religiosos` | Sua organização social ou coletivo tem fins religiosos? | booleano | — | — | — | Fins religiosos. "Sim" é critério de EXCLUSÃO. |
-| `ciencia_comprovacao_receita` | Declaro que estou ciente de que serão pedidas comprovações da receita anual. | categoria | — | — | — | Ciência de que a receita declarada será comprovada. |
+| `id` | ID | texto | sim | — | 100% | Identificador da resposta no sistema de formulários. |
+| `edital` | Edital | texto | — | — | 0% | Edital ao qual a resposta se refere. Veio inteiramente vazia na remessa de 30/07/2026 — declarada aqui para não sumir do painel quando começar a ser preenchida. |
+| `formulario` | Formulário | categoria | — | — | 100% | Nome do formulário de origem. Hoje há só um. |
+| `data_resposta` | Data da Resposta | data | sim | — | 100% | Data de envio da resposta. Vem como texto no formato "29/07/2026 às 12:16"; o pipeline converte para data. |
+| `organizacao` | Respondente | texto | sim | — | 100% | Nome da organização ou coletivo respondente. |
+| `estado` | Estado do respondente | categoria | sim | — | 100% | Estado declarado pela organização. |
+| `respondente_nome` | Usuário que respondeu | texto | — | 🔒 | 100% | Nome da pessoa física que preencheu o formulário. Dado pessoal — não publicado. |
+| `respondente_email` | E-mail do usuário | texto | — | 🔒 | 100% | E-mail da pessoa que preencheu. Dado pessoal — não publicado. |
+| `status_credenciamento` | Status do credenciamento | categoria | sim | — | 100% | Resultado da checagem automática dos critérios. |
+| `representa` | Eu represento: | categoria | sim | — | 100% | Natureza jurídica declarada pela respondente. |
+| `criterio_estatuto_registrado` | Sua organização social possui a ata de Constituição e Estatuto Social registrada em cartório? | booleano | — | — | 100% | Ata de constituição e estatuto registrados em cartório. |
+| `criterio_regularidade_credito` | Sua organização social está regularizada nos órgãos fiscalizadores de crédito, tais como: Serasa, SPC, Receita Federal, etc? | booleano | — | — | 100% | Regularidade em Serasa, SPC, Receita Federal e afins. |
+| `criterio_dois_representantes` | Seu coletivo tem, no mínimo, dois representantes? | categoria | — | — | 100% | Coletivo com ao menos dois representantes. Não é Sim/Não: organizações formais respondem "Não se aplica". |
+| `criterio_sede_bahia` | Sua organização tem sede no estado da Bahia? | booleano | — | — | 100% | Sede no estado da Bahia. |
+| `criterio_atuacao_apenas_bahia` | Sua organização ou coletivo atua somente no mesmo estado onde está sediada (Bahia)? | booleano | — | — | 100% | Atuação restrita ao estado da sede. |
+| `criterio_municipios_ate_200mil` | A sua organização ou coletivo atua em municípios baianos de, no máximo, 200 mil habitantes? | booleano | — | — | 100% | Atuação em municípios de até 200 mil habitantes. |
+| `criterio_em_atividade` | Sua organização ou coletivo está em atividade e beneficia diretamente pessoas? | booleano | — | — | 100% | Em atividade, com beneficiários diretos. |
+| `criterio_receita_acima_500mil` | Sua organização ou coletivo teve uma receita anual de mais de 500 mil reais no ano de 2025? | booleano | — | — | 100% | Receita anual acima de R$ 500 mil em 2025. Atenção ao sentido: "Sim" aqui é critério de EXCLUSÃO, não de aprovação. |
+| `criterio_atuacao_minima_3_anos` | A sua organização ou coletivo, desenvolve comprovadamente atividades no território há, no mínimo, 3 anos? | booleano | — | — | 100% | Pelo menos três anos de atuação comprovada no território. |
+| `criterio_vinculo_partidario` | Sua organização ou coletivo possui algum vínculo com partidos políticos em todo o território nacional ou seus responsáveis exercem cargos políticos? | booleano | — | — | 100% | Vínculo partidário ou cargo político. "Sim" é critério de EXCLUSÃO. |
+| `criterio_fins_religiosos` | Sua organização social ou coletivo tem fins religiosos? | booleano | — | — | 100% | Fins religiosos. "Sim" é critério de EXCLUSÃO. |
+| `ciencia_comprovacao_receita` | Declaro que estou ciente de que serão pedidas comprovações da receita anual. | categoria | — | — | 100% | Ciência de que a receita declarada será comprovada. |
 
 **Regras de validação**
 

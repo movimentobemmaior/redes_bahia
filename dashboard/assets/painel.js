@@ -1,144 +1,357 @@
-/* Página de estado da base.
+/* Painel Redes Bahia — credenciamento.
  *
- * Lê apenas data/published/manifest.json — nunca os dados em si. É essa a
- * razão de o manifesto existir: dá para dizer se a base pode ser confiada
- * sem carregar uma linha sequer.
+ * Lê data/published/: o manifesto (metadados, semântica das colunas, resultado
+ * da validação) e credenciamento.json (as linhas). Nunca toca em data/raw/ ou
+ * data/processed/.
+ *
+ * Regra de negócio importante mora no MANIFESTO, não aqui: qual valor de cada
+ * critério torna a organização inelegível (`exclui_quando`). Parte dos
+ * critérios do edital tem sentido invertido — "Sim" exclui —, e codificar isso
+ * no painel seria a forma mais fácil de publicar um gráfico ao contrário.
  */
 
-const CAMINHO_MANIFESTO = "../data/published/manifest.json";
+import { barrasHorizontais, barraSegmentada, fmt, linhaTempo, tabelaEquivalente } from "./graficos.js";
+
+const BASE = "../data/published";
 
 const TEXTO_STATUS = {
   aprovado: "Validação aprovada — nenhum problema encontrado",
-  com_avisos: "Publicada com avisos — confira a lista abaixo",
+  com_avisos: "Publicada com avisos",
   reprovado: "Reprovada — esta base não deveria estar publicada",
 };
 
-const fmtInteiro = new Intl.NumberFormat("pt-BR");
+const estado = {
+  manifesto: null,
+  linhas: [],
+  criterios: [],
+  filtros: { estado: "", resultado: "", representa: "" },
+};
+
+// --- utilidades ---------------------------------------------------------------
+
+const $ = (sel) => document.querySelector(sel);
 
 function formatarData(iso) {
   if (!iso) return "—";
-  const [ano, mes, dia] = iso.slice(0, 10).split("-");
+  const [ano, mes, dia] = String(iso).slice(0, 10).split("-");
   return `${dia}/${mes}/${ano}`;
 }
 
-function diasDesde(iso) {
-  const alvo = new Date(`${iso.slice(0, 10)}T00:00:00`);
+function idadeEmTexto(iso) {
+  const alvo = new Date(`${String(iso).slice(0, 10)}T00:00:00`);
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
-  return Math.round((hoje - alvo) / 86400000);
-}
-
-function idadeEmTexto(iso) {
-  const dias = diasDesde(iso);
+  const dias = Math.round((hoje - alvo) / 86400000);
   if (dias <= 0) return "atualizada hoje";
   if (dias === 1) return "atualizada ontem";
   return `atualizada há ${dias} dias`;
 }
 
-function elemento(tag, classe, texto) {
-  const el = document.createElement(tag);
-  if (classe) el.className = classe;
-  if (texto !== undefined) el.textContent = texto;
-  return el;
+function contar(linhas, campo) {
+  const mapa = new Map();
+  for (const l of linhas) {
+    const chave = l[campo] ?? "(não informado)";
+    mapa.set(chave, (mapa.get(chave) || 0) + 1);
+  }
+  return [...mapa.entries()]
+    .map(([rotulo, valor]) => ({ rotulo, valor }))
+    .sort((a, b) => b.valor - a.valor);
 }
 
-function preencherDestaque(m) {
-  document.getElementById("data-atualizacao").textContent = formatarData(m.data_execucao);
+/** Normaliza o valor de um critério para comparar com `exclui_quando`.
+ *  Colunas booleanas chegam como true/false no JSON; categóricas, como texto. */
+function comoTexto(valor) {
+  if (valor === true) return "Sim";
+  if (valor === false) return "Não";
+  return valor == null ? null : String(valor);
+}
 
-  const origem = document.getElementById("origem");
-  origem.textContent =
-    `${idadeEmTexto(m.data_execucao)} · origem: ${m.fonte.arquivo}`;
+function aprovada(linha) {
+  return String(linha.status_credenciamento || "").toLowerCase().startsWith("aprovado");
+}
 
-  const selo = document.getElementById("selo-validacao");
-  const status = m.validacao.status;
-  selo.dataset.status = status;
+/** Requisitos que a linha deixou de atender, segundo o contrato. */
+function naoAtendidos(linha) {
+  return estado.criterios.filter((c) => comoTexto(linha[c.nome]) === c.exclui_quando);
+}
+
+function aplicarFiltros(linhas) {
+  const { estado: uf, resultado, representa } = estado.filtros;
+  return linhas.filter(
+    (l) =>
+      (!uf || l.estado === uf) &&
+      (!resultado || l.status_credenciamento === resultado) &&
+      (!representa || l.representa === representa)
+  );
+}
+
+// --- blocos da tela -----------------------------------------------------------
+
+function montarCabecalho() {
+  const m = estado.manifesto;
+  $("#data-atualizacao").textContent = formatarData(m.data_execucao);
+  $("#origem").textContent = `${idadeEmTexto(m.data_execucao)} · origem: ${m.fonte.arquivo}`;
+
+  const selo = $("#selo-validacao");
+  selo.dataset.status = m.validacao.status;
   const detalhe = `${m.validacao.erros} erro(s), ${m.validacao.avisos} aviso(s)`;
   selo.querySelector(".selo-texto").textContent =
-    `${TEXTO_STATUS[status] ?? status} (${detalhe})`;
+    `${TEXTO_STATUS[m.validacao.status] ?? m.validacao.status} · ${detalhe}`;
 
-  document.getElementById("procedencia").textContent =
-    `Gerada em ${m.gerado_em} pelo pipeline ${m.versao_pipeline}, ` +
-    `contrato versão ${m.versao_contrato}. SHA-256 da planilha: ${m.fonte.hash_sha256}.`;
+  $("#procedencia").textContent =
+    `Gerada em ${m.gerado_em} pelo pipeline ${m.versao_pipeline}, contrato versão ` +
+    `${m.versao_contrato}. SHA-256 da planilha: ${m.fonte.hash_sha256}.`;
 }
 
-function preencherCartoes(m) {
-  const destino = document.getElementById("cartoes");
-  for (const ds of m.datasets) {
-    const cartao = elemento("article", "cartao");
-    cartao.append(elemento("h3", null, ds.nome));
+function montarFiltros() {
+  const campos = [
+    ["#filtro-estado", "estado", "Todos os estados"],
+    ["#filtro-resultado", "status_credenciamento", "Todos os resultados"],
+    ["#filtro-representa", "representa", "Todas as naturezas"],
+  ];
+  const chaves = { "#filtro-estado": "estado", "#filtro-resultado": "resultado", "#filtro-representa": "representa" };
 
-    const valor = elemento("p", "valor", fmtInteiro.format(ds.n_linhas));
-    valor.append(elemento("span", "unidade", "linhas"));
-    cartao.append(valor);
-
-    cartao.append(
-      elemento("p", "descricao", ds.descricao || `Aba “${ds.aba}” da planilha.`)
-    );
-    cartao.append(
-      elemento(
-        "p",
-        "retido",
-        `${ds.n_colunas_publicadas} coluna(s) publicada(s)` +
-          (ds.colunas_omitidas_por_sigilo.length
-            ? ` · ${ds.colunas_omitidas_por_sigilo.length} retida(s) por sigilo`
-            : "")
-      )
-    );
-    destino.append(cartao);
+  for (const [sel, campo, rotuloVazio] of campos) {
+    const select = $(sel);
+    const valores = [...new Set(estado.linhas.map((l) => l[campo]).filter(Boolean))].sort();
+    select.replaceChildren();
+    select.append(new Option(rotuloVazio, ""));
+    valores.forEach((v) => select.append(new Option(v, v)));
+    select.addEventListener("change", () => {
+      estado.filtros[chaves[sel]] = select.value;
+      desenhar();
+    });
   }
+
+  $("#limpar-filtros").addEventListener("click", () => {
+    estado.filtros = { estado: "", resultado: "", representa: "" };
+    campos.forEach(([sel]) => ($(sel).value = ""));
+    desenhar();
+  });
 }
 
-function preencherProblemas(m) {
-  const problemas = m.validacao.problemas ?? [];
-  const tabela = document.getElementById("tabela-problemas");
-  const vazio = document.getElementById("sem-problemas");
+function montarIndicadores(linhas) {
+  const total = linhas.length;
+  const aprovadas = linhas.filter(aprovada).length;
+  const naoAprovadas = total - aprovadas;
+  // Não aprovada cujas respostas atendem a todos os requisitos: o motivo está
+  // fora das colunas do formulário. É anomalia a investigar, não ruído — por
+  // isso ocupa um dos quatro números do topo.
+  const semMotivo = linhas.filter((l) => !aprovada(l) && naoAtendidos(l).length === 0).length;
 
+  const tiles = [
+    ["#kpi-total", total, "respostas ao formulário"],
+    ["#kpi-aprovadas", aprovadas, "aprovadas automaticamente"],
+    ["#kpi-reprovadas", naoAprovadas, "não aprovadas"],
+    ["#kpi-semmotivo", semMotivo, semMotivo === 1
+      ? "não aprovada sem requisito não atendido"
+      : "não aprovadas sem requisito não atendido"],
+  ];
+  for (const [sel, valor, rotulo] of tiles) {
+    $(`${sel} .valor`).textContent = fmt.format(valor);
+    $(`${sel} .rotulo-kpi`).textContent = rotulo;
+  }
+  $("#kpi-semmotivo").classList.toggle("kpi-alerta", semMotivo > 0);
+
+  barraSegmentada(
+    $("#grafico-resultado"),
+    [
+      { rotulo: "Aprovadas automaticamente", valor: aprovadas, cor: "var(--serie-1)" },
+      { rotulo: "Não aprovadas", valor: naoAprovadas, cor: "var(--serie-2)" },
+    ],
+    { rotulo: "Resultado do credenciamento" }
+  );
+}
+
+/** O gráfico central: qual requisito está barrando quem.
+ *
+ *  Conta, para cada critério, quantas organizações responderam o valor que o
+ *  contrato marca como excludente. Uma organização pode falhar em mais de um
+ *  critério — por isso a soma das barras é maior que o total de não aprovadas,
+ *  e o texto abaixo do gráfico diz isso. */
+function montarCriterios(linhas) {
+  const escopo = $("#escopo-criterios").value;
+  const base = escopo === "reprovadas" ? linhas.filter((l) => !aprovada(l)) : linhas;
+
+  const dados = estado.criterios
+    .map((c) => ({
+      rotulo: c.rotulo,
+      valor: base.filter((l) => comoTexto(l[c.nome]) === c.exclui_quando).length,
+    }))
+    .filter((d) => d.valor > 0)
+    .sort((a, b) => b.valor - a.valor);
+
+  barrasHorizontais($("#grafico-criterios"), dados, {
+    rotulo: "Critérios não atendidos",
+    cor: "var(--serie-2)",
+    total: base.length,
+  });
+
+  $("#nota-criterios").textContent = base.length
+    ? `Entre ${fmt.format(base.length)} ${escopo === "reprovadas" ? "não aprovadas" : "respostas"}. ` +
+      "Uma organização pode deixar de atender a mais de um requisito, então a soma das barras é " +
+      "maior que o total."
+    : "Nenhuma organização no filtro atual.";
+
+  $("#tabela-criterios").replaceChildren(
+    tabelaEquivalente(dados, ["Requisito não atendido", "Organizações"])
+  );
+}
+
+function montarDistribuicoes(linhas) {
+  const porEstado = contar(linhas, "estado");
+  barrasHorizontais($("#grafico-estado"), porEstado, {
+    rotulo: "Origem por estado",
+    larguraRotulo: 160,
+    total: linhas.length,
+  });
+
+  const porNatureza = contar(linhas, "representa");
+  barrasHorizontais($("#grafico-natureza"), porNatureza, {
+    rotulo: "Natureza jurídica",
+    larguraRotulo: 280,
+    total: linhas.length,
+  });
+}
+
+function montarEvolucao(linhas) {
+  const porDia = new Map();
+  for (const l of linhas) {
+    if (!l.data_resposta) continue;
+    const dia = String(l.data_resposta).slice(0, 10);
+    porDia.set(dia, (porDia.get(dia) || 0) + 1);
+  }
+  const pontos = [...porDia.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([dia, valor]) => ({ rotulo: formatarData(dia), valor }));
+
+  linhaTempo($("#grafico-evolucao"), pontos, { rotulo: "Respostas por dia" });
+}
+
+function montarTabela(linhas) {
+  const corpo = $("#tabela-organizacoes tbody");
+  corpo.replaceChildren();
+
+  const ordenadas = [...linhas].sort((a, b) =>
+    String(a.organizacao || "").localeCompare(String(b.organizacao || ""), "pt-BR")
+  );
+
+  for (const l of ordenadas) {
+    const tr = document.createElement("tr");
+    const ok = aprovada(l);
+    const faltas = naoAtendidos(l).map((c) => c.rotulo);
+
+    const celulas = [
+      l.organizacao ?? "—",
+      l.estado ?? "—",
+      l.representa ?? "—",
+      formatarData(l.data_resposta),
+    ];
+    celulas.forEach((texto) => {
+      const td = document.createElement("td");
+      td.textContent = texto;
+      tr.append(td);
+    });
+
+    const tdStatus = document.createElement("td");
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    tag.dataset.resultado = ok ? "aprovada" : "reprovada";
+    tag.textContent = l.status_credenciamento ?? "—";
+    tdStatus.append(tag);
+    tr.append(tdStatus);
+
+    const tdMotivo = document.createElement("td");
+    tdMotivo.className = "motivo";
+    if (faltas.length) {
+      tdMotivo.textContent = faltas.join("; ");
+    } else if (!ok) {
+      tdMotivo.textContent = "nenhum — motivo fora das colunas do formulário";
+      tdMotivo.classList.add("motivo-ausente");
+    } else {
+      tdMotivo.textContent = "—";
+    }
+    tr.append(tdMotivo);
+
+    corpo.append(tr);
+  }
+
+  $("#contagem-tabela").textContent =
+    `${fmt.format(ordenadas.length)} de ${fmt.format(estado.linhas.length)} organizações`;
+}
+
+function montarQualidade() {
+  const ds = estado.manifesto.datasets[0];
+  const lista = $("#qualidade");
+  lista.replaceChildren();
+
+  const incompletas = ds.colunas
+    .filter((c) => c.publicada && c.preenchimento < 1)
+    .sort((a, b) => a.preenchimento - b.preenchimento);
+
+  if (!incompletas.length) {
+    const li = document.createElement("li");
+    li.textContent = "Todas as colunas publicadas estão 100% preenchidas.";
+    lista.append(li);
+  } else {
+    for (const c of incompletas) {
+      const li = document.createElement("li");
+      li.innerHTML = `<code>${c.nome}</code> — ${Math.round(c.preenchimento * 100)}% preenchida`;
+      lista.append(li);
+    }
+  }
+
+  const omitidas = ds.colunas_omitidas_por_sigilo;
+  $("#sigilo").textContent = omitidas.length
+    ? `${omitidas.length} coluna(s) retida(s) por sigilo e ausente(s) desta publicação: ${omitidas.join(", ")}.`
+    : "Nenhuma coluna retida por sigilo.";
+
+  const problemas = estado.manifesto.validacao.problemas ?? [];
+  const tabela = $("#tabela-problemas");
+  const vazio = $("#sem-problemas");
   if (!problemas.length) {
     tabela.hidden = true;
     vazio.hidden = false;
     return;
   }
-
   const corpo = tabela.querySelector("tbody");
-  const ordenados = [...problemas].sort(
-    (a, b) => (b.gravidade === "erro") - (a.gravidade === "erro")
-  );
-
-  for (const p of ordenados) {
-    const linha = document.createElement("tr");
-
-    const celulaTag = document.createElement("td");
-    const tag = elemento("span", "tag", p.gravidade);
+  corpo.replaceChildren();
+  for (const p of [...problemas].sort((a, b) => (b.gravidade === "erro") - (a.gravidade === "erro"))) {
+    const tr = document.createElement("tr");
+    const tdTag = document.createElement("td");
+    const tag = document.createElement("span");
+    tag.className = "tag";
     tag.dataset.gravidade = p.gravidade;
-    celulaTag.append(tag);
-    linha.append(celulaTag);
-
-    linha.append(elemento("td", null, p.dataset));
-    linha.append(elemento("td", null, p.coluna ?? "—"));
-    linha.append(elemento("td", null, p.mensagem));
-    linha.append(elemento("td", "num", p.linhas_afetadas ? fmtInteiro.format(p.linhas_afetadas) : "—"));
-    linha.append(elemento("td", null, (p.exemplos ?? []).join(", ") || "—"));
-
-    corpo.append(linha);
+    tag.textContent = p.gravidade;
+    tdTag.append(tag);
+    tr.append(tdTag);
+    [p.coluna ?? "—", p.mensagem, p.linhas_afetadas || "—", (p.exemplos ?? []).join(", ") || "—"].forEach(
+      (texto, i) => {
+        const td = document.createElement("td");
+        td.textContent = texto;
+        if (i === 2) td.className = "num";
+        tr.append(td);
+      }
+    );
+    corpo.append(tr);
   }
 }
 
-function preencherArquivos(m) {
-  const lista = document.getElementById("arquivos");
-  for (const caminho of m.arquivos.publicados) {
-    const item = document.createElement("li");
-    const link = document.createElement("a");
-    link.href = `../${caminho}`;
-    link.textContent = caminho.split("/").pop();
-    item.append(link);
-    lista.append(item);
-  }
+function desenhar() {
+  const linhas = aplicarFiltros(estado.linhas);
+  const filtrando = Object.values(estado.filtros).some(Boolean);
+  $("#aviso-filtro").hidden = !filtrando;
+
+  montarIndicadores(linhas);
+  montarCriterios(linhas);
+  montarDistribuicoes(linhas);
+  montarEvolucao(linhas);
+  montarTabela(linhas);
 }
 
 function configurarTema() {
-  const botao = document.getElementById("alternar-tema");
+  const botao = $("#alternar-tema");
   const raiz = document.documentElement;
-
   const aplicar = (tema) => {
     raiz.dataset.tema = tema;
     const escuro = tema === "escuro";
@@ -150,8 +363,6 @@ function configurarTema() {
   if (salvo) {
     aplicar(salvo);
   } else {
-    // Sem escolha salva, quem manda é o sistema — mas o rótulo do botão
-    // precisa refletir isso, senão ele oferece "Modo escuro" já no escuro.
     const escuro = matchMedia("(prefers-color-scheme: dark)").matches;
     botao.textContent = escuro ? "Modo claro" : "Modo escuro";
     botao.setAttribute("aria-pressed", String(escuro));
@@ -169,22 +380,49 @@ function configurarTema() {
 async function iniciar() {
   configurarTema();
   try {
-    const resposta = await fetch(CAMINHO_MANIFESTO, { cache: "no-store" });
-    if (!resposta.ok) throw new Error(`HTTP ${resposta.status} ao buscar o manifesto`);
-    const manifesto = await resposta.json();
+    const [manifesto, linhas] = await Promise.all([
+      fetch(`${BASE}/manifest.json`, { cache: "no-store" }).then(exigirOk),
+      fetch(`${BASE}/credenciamento.json`, { cache: "no-store" }).then(exigirOk),
+    ]);
 
-    preencherDestaque(manifesto);
-    preencherCartoes(manifesto);
-    preencherProblemas(manifesto);
-    preencherArquivos(manifesto);
+    estado.manifesto = manifesto;
+    estado.linhas = linhas;
+    // A semântica de exclusão vem do contrato, via manifesto.
+    estado.criterios = manifesto.datasets[0].colunas
+      .filter((c) => c.publicada && c.exclui_quando)
+      .map((c) => ({
+        nome: c.nome,
+        exclui_quando: c.exclui_quando,
+        rotulo: c.descricao ? c.descricao.split(".")[0] : c.nome,
+      }));
 
-    document.getElementById("carregando").hidden = true;
-    document.getElementById("painel").hidden = false;
+    montarCabecalho();
+    montarFiltros();
+    montarQualidade();
+    $("#escopo-criterios").addEventListener("change", () => montarCriterios(aplicarFiltros(estado.linhas)));
+
+    // Mostrar antes de desenhar: os gráficos medem a largura do contêiner, e
+    // contêiner escondido mede zero.
+    $("#carregando").hidden = true;
+    $("#painel").hidden = false;
+    desenhar();
+
+    // Redesenhar ao mudar a largura, pela mesma razão.
+    let tempo;
+    addEventListener("resize", () => {
+      clearTimeout(tempo);
+      tempo = setTimeout(desenhar, 150);
+    });
   } catch (erro) {
-    document.getElementById("carregando").hidden = true;
-    document.getElementById("erro").hidden = false;
-    document.getElementById("erro-detalhe").textContent = String(erro);
+    $("#carregando").hidden = true;
+    $("#erro").hidden = false;
+    $("#erro-detalhe").textContent = String(erro);
   }
+}
+
+async function exigirOk(resposta) {
+  if (!resposta.ok) throw new Error(`HTTP ${resposta.status} ao buscar ${resposta.url}`);
+  return resposta.json();
 }
 
 iniciar();

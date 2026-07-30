@@ -88,10 +88,33 @@ Primeira planilha de produção: formulário de credenciamento, 13 respostas.
 - **Data no formato "29/07/2026 às 12:16" não era reconhecida** e virava vazio,
   o que apagaria a data de toda a base.
 
+### Painel (30/07/2026)
+
+Primeira versão do painel propriamente dito, no lugar da página de estado da
+base.
+
+- Funil de elegibilidade como bloco central: **qual requisito está barrando
+  quem**, alternando entre "só as não aprovadas" e "todas as respostas".
+- Números gerais, resultado do credenciamento, origem por estado, natureza
+  jurídica, respostas por dia e a tabela completa com o motivo linha a linha.
+- Filtros de estado, resultado e natureza jurídica recalculam tudo.
+- Gráficos em SVG escrito à mão (`dashboard/assets/graficos.js`), sem
+  dependência externa nem build: barras horizontais, barra segmentada e linha
+  no tempo.
+- `exclui_quando` passa a ser declarado no contrato e publicado no manifesto.
+  O painel lê de lá qual resposta torna a organização inelegível, em vez de
+  carregar a regra no JavaScript — três critérios do edital têm sentido
+  invertido, e errar isso publicaria um gráfico ao contrário.
+- Painel destaca **não aprovadas sem requisito não atendido**: nos dados reais
+  há um caso assim, em que o motivo está fora das colunas do formulário.
+
 ### Pendente
 
 - Confirmar com a coordenação o sentido de exclusão dos critérios invertidos.
 - Definir se a etapa de inscrição virá em outra planilha (seria um segundo
   dataset, com contrato próprio).
-- Resolver a exposição do repositório: ele está público e `data/raw/` é o lugar
-  das planilhas originais. Ver [governança](docs/06-governanca-e-lgpd.md).
+- Repositório está público por decisão consciente durante o piloto. `data/raw/`
+  e `data/processed/` não são versionados enquanto isso; só `data/published/`,
+  que não tem dado de identificação. Ver
+  [governança](docs/06-governanca-e-lgpd.md).
+- Investigar a não aprovada cujo motivo não está nas colunas do formulário.

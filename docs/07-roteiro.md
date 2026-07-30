@@ -48,15 +48,24 @@ Falta:
 **Critério para sair da fase 2:** uma semana de execuções diárias sem erro de
 estrutura, e o catálogo de indicadores confirmado pela coordenação.
 
-## Fase 3 — Painel
+## Fase 3 — Painel (primeira versão no ar)
 
-1. Telas: visão geral e funil de elegibilidade (mapa por território depende de
-   uma coluna de município, que o formulário de credenciamento não coleta).
-2. Gráficos seguindo [05](05-identidade-visual.md), sobre `data/published/`.
-3. Filtros: período, estado, natureza jurídica, resultado.
-4. Bloco de qualidade da base sempre visível (D1–D3 do catálogo).
-5. ✅ Publicação já resolvida: GitHub Pages, painel público
-   ([ADR 0005](adr/0005-painel-publico-no-github-pages.md)).
+- ✅ Tela única com funil de elegibilidade, distribuições, evolução e tabela
+  completa, sobre `data/published/`.
+- ✅ Filtros de estado, resultado e natureza jurídica.
+- ✅ Bloco de qualidade da base sempre visível (D1–D3 do catálogo).
+- ✅ Gráficos em SVG próprio, seguindo [05](05-identidade-visual.md), sem
+  dependência externa.
+- ✅ Publicação: GitHub Pages
+  ([ADR 0005](adr/0005-painel-publico-no-github-pages.md)).
+
+Fica para as próximas rodadas:
+
+1. Mapa por território — depende de uma coluna de município, que o formulário
+   de credenciamento não coleta.
+2. Comparação entre dias usando `historico.csv` (hoje a evolução vem da data de
+   resposta, não do histórico de execuções).
+3. Telas da etapa de inscrição, quando essa base existir.
 
 ## Fase 4 — Além do piloto
 
@@ -85,4 +94,5 @@ a valer a pena:
 | Coluna nova entrar no contrato sem marcação de sigilo | vira dado público sem ninguém decidir isso | revisão do contrato em pull request; a trava barra o marcado, não adivinha o que falta marcar |
 | Chave duplicada | todo total do painel fica errado | erro que bloqueia a publicação |
 | Critério com sentido invertido lido ao contrário | gráfico exatamente oposto à realidade | sentido registrado na descrição de cada coluna e destacado em [04](04-indicadores.md) B2 |
-| Base pequena (13 respostas) tratada como estatística | percentual instável passando por precisão | painel mostra número absoluto; percentual em segundo plano |
+| Base pequena (13 respostas) tratada como estatística | percentual instável passando por precisão | painel mostra número absoluto; percentual só no tooltip |
+| Status automático não explicado pelos critérios | decisão sem motivo rastreável | painel conta e destaca as não aprovadas sem requisito não atendido |

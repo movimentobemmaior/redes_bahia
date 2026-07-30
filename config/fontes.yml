@@ -12,6 +12,11 @@
 # rascunho deste arquivo em reports/rascunho_fontes.yml, além de um relatório
 # em reports/perfil_*.md. Compare, ajuste aqui e só então rode `make dados`.
 #
+# `exclui_quando` marca o valor que torna a organização INELEGÍVEL. Parte dos
+# critérios do edital tem sentido invertido — "Sim" exclui —, e essa informação
+# precisa estar em um lugar só, revisável, e não espalhada pelo código do
+# painel. O painel lê isso do manifesto.
+#
 # Tipos aceitos: texto | inteiro | decimal | data | booleano | categoria
 # Regras aceitas: unico | valores_permitidos | intervalo | nao_nulo | minimo_linhas |
 #                 referencia (chave estrangeira entre datasets)
@@ -122,10 +127,12 @@ datasets:
       criterio_estatuto_registrado:
         origem: "Sua organização social possui a ata de Constituição e Estatuto Social registrada em cartório?"
         tipo: booleano
+        exclui_quando: "Não"
         descricao: Ata de constituição e estatuto registrados em cartório.
       criterio_regularidade_credito:
         origem: "Sua organização social está regularizada nos órgãos fiscalizadores de crédito, tais como: Serasa, SPC, Receita Federal, etc?"
         tipo: booleano
+        exclui_quando: "Não"
         descricao: Regularidade em Serasa, SPC, Receita Federal e afins.
       criterio_dois_representantes:
         origem: "Seu coletivo tem, no mínimo, dois representantes?"
@@ -136,37 +143,45 @@ datasets:
       criterio_sede_bahia:
         origem: "Sua organização tem sede no estado da Bahia?"
         tipo: booleano
+        exclui_quando: "Não"
         descricao: Sede no estado da Bahia.
       criterio_atuacao_apenas_bahia:
         origem: "Sua organização ou coletivo atua somente no mesmo estado onde está sediada (Bahia)?"
         tipo: booleano
+        exclui_quando: "Não"
         descricao: Atuação restrita ao estado da sede.
       criterio_municipios_ate_200mil:
         origem: "A sua organização ou coletivo atua em municípios baianos de, no máximo, 200 mil habitantes?"
         tipo: booleano
+        exclui_quando: "Não"
         descricao: Atuação em municípios de até 200 mil habitantes.
       criterio_em_atividade:
         origem: "Sua organização ou coletivo está em atividade e beneficia diretamente pessoas?"
         tipo: booleano
+        exclui_quando: "Não"
         descricao: Em atividade, com beneficiários diretos.
       criterio_receita_acima_500mil:
         origem: "Sua organização ou coletivo teve uma receita anual de mais de 500 mil reais no ano de 2025?"
         tipo: booleano
+        exclui_quando: "Sim"
         descricao: >-
           Receita anual acima de R$ 500 mil em 2025. Atenção ao sentido:
           "Sim" aqui é critério de EXCLUSÃO, não de aprovação.
       criterio_atuacao_minima_3_anos:
         origem: "A sua organização ou coletivo, desenvolve comprovadamente atividades no território há, no mínimo, 3 anos?"
         tipo: booleano
+        exclui_quando: "Não"
         descricao: Pelo menos três anos de atuação comprovada no território.
       criterio_vinculo_partidario:
         origem: "Sua organização ou coletivo possui algum vínculo com partidos políticos em todo o território nacional ou seus responsáveis exercem cargos políticos?"
         tipo: booleano
+        exclui_quando: "Sim"
         descricao: >-
           Vínculo partidário ou cargo político. "Sim" é critério de EXCLUSÃO.
       criterio_fins_religiosos:
         origem: "Sua organização social ou coletivo tem fins religiosos?"
         tipo: booleano
+        exclui_quando: "Sim"
         descricao: Fins religiosos. "Sim" é critério de EXCLUSÃO.
       ciencia_comprovacao_receita:
         origem: "Declaro que estou ciente de que serão pedidas comprovações da receita anual."
