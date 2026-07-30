@@ -47,7 +47,9 @@ CONTRATO_MINIMO = {
 
 def escrever_contrato(tmp_path: Path, contrato: dict) -> Path:
     caminho = tmp_path / "fontes.yml"
-    caminho.write_text(yaml.safe_dump(contrato, allow_unicode=True), encoding="utf-8")
+    caminho.write_text(
+        yaml.safe_dump(contrato, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    )
     return caminho
 
 
