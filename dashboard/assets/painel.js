@@ -11,16 +11,26 @@
  */
 
 import { barrasHorizontais, barraSegmentada, fmt, linhaTempo, tabelaEquivalente } from "./graficos.js";
-import { mapaCoropletico, normalizar } from "./mapa.js";
+import { mapaCoropletico, mapaTerritorio, normalizar } from "./mapa.js";
 
 const BASE = "../data/published";
 
-// Qual malha desenhar em cada nível declarado no contrato (`geografia.nivel`).
-// Trocar o nível no contrato troca o mapa; nada aqui precisa mudar.
+// As malhas que o painel sabe desenhar, por nível territorial. O contrato
+// escolhe (`geografia.territorio.malha` e `geografia.nivel`); trocar lá troca o
+// mapa, sem mudar nada aqui.
+//
+// Não há malha de estado: com o formulário perguntando só a UF, as respostas se
+// concentram em duas ou três — e para duas ou três linhas uma tabela diz mais
+// que um mapa do Brasil com 24 estados vazios. O mapa existe onde há território
+// para mostrar, que é o municipal.
 const MALHAS = {
-  estado: { arquivo: "geo/brasil-estados.json", unidade: "organizações", maxRotulos: 8 },
   municipio: { arquivo: "geo/bahia-municipios.json", unidade: "organizações", maxRotulos: 12 },
 };
+
+/** "200000" vira "200 mil": o número redondo do edital, do jeito que se fala. */
+function emMilhares(n) {
+  return n >= 1000 ? `${fmt.format(Math.round(n / 1000))} mil` : fmt.format(n);
+}
 
 /** Plural sem o "(s)" entre parênteses, que é gíria de formulário. */
 function plural(n, singular, plural_) {
@@ -32,6 +42,7 @@ const estado = {
   linhas: [],
   criterios: [],
   malha: null,
+  territorio: null,
   filtros: { estado: "", resultado: "", representa: "" },
 };
 
@@ -364,48 +375,125 @@ function montarNatureza(linhas) {
  *  vêm de fora do território do edital" — que já é decisão, porque sede fora da
  *  Bahia é critério de exclusão. Quando a coluna de município chegar, muda o
  *  `geografia.nivel` do contrato e o mesmo bloco passa a desenhar municípios. */
+/** O território do edital, município a município.
+ *
+ *  Um dos requisitos do edital é territorial — atuação em município baiano de
+ *  até 200 mil habitantes —, e é o único que se lê melhor num mapa que numa
+ *  barra: ele não fala de quantidade, fala de onde. O corte e a malha vêm do
+ *  contrato (`geografia.territorio`), e a população vem junto da própria malha.
+ *
+ *  Não depende do filtro: é o território do edital, não o das respostas. No dia
+ *  em que a planilha trouxer o município de cada organização, o mesmo bloco
+ *  passa a colorir por contagem — daí o desvio para o coroplético abaixo. */
 function montarTerritorio(linhas) {
   const geo = estado.manifesto.geografia;
-  const bloco = $("#mapa-territorio").closest(".bloco");
-  if (!geo || !estado.malha) {
+  const bloco = $("#mapa-municipios").closest(".bloco");
+  const recorte = geo?.territorio;
+  if (!recorte || !estado.territorio) {
+    bloco.hidden = true;
+    return;
+  }
+  bloco.hidden = false;
+
+  const limite = recorte.limite_populacao;
+  const dentro = (p) => typeof p.populacao === "number" && p.populacao <= limite;
+  const municipios = estado.territorio.features.map((f) => f.properties);
+  const noRecorte = municipios.filter(dentro);
+  const fora = municipios.filter((p) => !dentro(p)).sort((a, b) => b.populacao - a.populacao);
+  const popTotal = municipios.reduce((s, p) => s + (p.populacao || 0), 0);
+  const popDentro = noRecorte.reduce((s, p) => s + p.populacao, 0);
+
+  // Quando o nível dos dados coincide com o da malha do território, o mapa
+  // deixa de responder "onde o edital pode atuar" e passa a responder "onde as
+  // organizações estão" — que é a pergunta melhor, assim que houver resposta.
+  const porContagem = geo.nivel === recorte.malha && estado.malha;
+  if (porContagem) {
+    const contagem = contar(linhas, geo.coluna).filter((d) => d.rotulo !== "(não informado)");
+    mapaCoropletico($("#mapa-municipios"), estado.malha, new Map(contagem.map((d) => [normalizar(d.rotulo), d.valor])), {
+      rotulo: "Organizações por município",
+      unidade: MALHAS[geo.nivel]?.unidade ?? "organizações",
+      maxRotulos: MALHAS[geo.nivel]?.maxRotulos ?? 12,
+    });
+  } else {
+    mapaTerritorio($("#mapa-municipios"), estado.territorio, dentro, {
+      rotulo: `Municípios da Bahia dentro e fora do recorte de ${fmt.format(limite)} habitantes`,
+      valor: (p) => p.populacao,
+      unidadeValor: "habitantes",
+      rotuloFora: `acima de ${emMilhares(limite)} — fora do recorte`,
+      descrever: (p) => `${p.nome}: ${fmt.format(p.populacao)} habitantes`,
+    });
+  }
+
+  const pct = (parte, todo) => (todo ? Math.round((parte / todo) * 100) : 0);
+  numerosLaterais($("#numeros-territorio"), [
+    [fmt.format(noRecorte.length), `municípios no recorte, de ${fmt.format(municipios.length)} da Bahia`],
+    [`${(popDentro / 1e6).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} mi`,
+      `habitantes no território — ${pct(popDentro, popTotal)}% do estado`],
+    [fmt.format(fora.length), "municípios fora, por população"],
+  ]);
+
+  $("#tabela-fora").replaceChildren(
+    tabelaEquivalente(
+      fora.map((p) => ({ rotulo: p.nome, valor: p.populacao })),
+      ["Município", "Habitantes"]
+    )
+  );
+
+  // O contraste entre as duas porcentagens é a leitura que o mapa sozinho não
+  // entrega: o edital cobre quase todos os municípios e deixa de fora a maior
+  // parte da população, porque o que ele exclui são as cidades grandes.
+  $("#nota-territorio").textContent =
+    `O recorte alcança ${pct(noRecorte.length, municipios.length)}% dos municípios baianos e ` +
+    `${pct(popDentro, popTotal)}% da população do estado. População estimada pelo IBGE; ` +
+    "a fonte da malha está em dashboard/assets/geo/README.md.";
+}
+
+/** Estatísticas em coluna, ao lado de uma figura: valor grande, rótulo miúdo. */
+function numerosLaterais(destino, itens) {
+  destino.replaceChildren();
+  for (const [valor, rotulo] of itens) {
+    const caixa = document.createElement("div");
+    const dt = document.createElement("dt");
+    dt.textContent = valor;
+    const dd = document.createElement("dd");
+    dd.textContent = rotulo;
+    caixa.append(dt, dd);
+    destino.append(caixa);
+  }
+}
+
+/** De onde vêm as respostas, por estado da sede.
+ *
+ *  Tabela e não mapa: com o formulário perguntando a UF, as respostas se
+ *  concentram em duas ou três, e um mapa do Brasil com 24 estados vazios gasta
+ *  meia tela para dizer o que duas linhas dizem melhor. */
+function montarOrigem(linhas) {
+  const geo = estado.manifesto.geografia;
+  const bloco = $("#tabela-territorio").closest(".bloco");
+  if (!geo) {
     bloco.hidden = true;
     return;
   }
   bloco.hidden = false;
 
   const contagem = contar(linhas, geo.coluna).filter((d) => d.rotulo !== "(não informado)");
-  const valores = new Map(contagem.map((d) => [normalizar(d.rotulo), d.valor]));
-
-  mapaCoropletico($("#mapa-territorio"), estado.malha, valores, {
-    rotulo: "Organizações por unidade territorial",
-    destaque: geo.destaque,
-    unidade: MALHAS[geo.nivel]?.unidade ?? "organizações",
-    maxRotulos: MALHAS[geo.nivel]?.maxRotulos ?? 8,
-  });
-
   $("#tabela-territorio").replaceChildren(
     tabelaEquivalente(contagem, [geo.nivel === "municipio" ? "Município" : "Estado", "Organizações"])
   );
 
-  // Quem está fora do território do edital. O nome da unidade destacada sai da
-  // própria malha, para a frase não depender de uma sigla escrita à mão aqui.
   // A frase diz "território do edital" e põe o nome entre parênteses de
   // propósito: "fora de Bahia" e "fora do Ceará" pedem artigos diferentes, e
   // não há como acertar a crase de um nome que vem de um arquivo.
-  const alvo = (estado.malha.features ?? []).find(
-    (f) => normalizar(f.properties.chave) === normalizar(geo.destaque)
-  );
-  const dentro = new Set([normalizar(geo.destaque), normalizar(alvo?.properties.nome)]);
+  const territorio = estado.manifesto.edital?.territorio || geo.destaque;
+  const dentro = new Set([normalizar(geo.destaque), normalizar(territorio.replace(/^estado d[aeo]s? /i, ""))]);
   const fora = contagem.filter((d) => !dentro.has(normalizar(d.rotulo)));
   const nFora = fora.reduce((s, d) => s + d.valor, 0);
-  const territorio =
-    estado.manifesto.edital?.territorio || alvo?.properties.nome || geo.destaque;
+  const total = contagem.reduce((s, d) => s + d.valor, 0);
 
   // Recorte vazio precisa dizer que está vazio: "todas declararam sede no
   // território" com zero respostas é verdadeiro por vacuidade e lido como
   // afirmação sobre a base.
-  const total = contagem.reduce((s, d) => s + d.valor, 0);
-  $("#nota-territorio").textContent = !total
+  $("#nota-origem").textContent = !total
     ? "Nenhuma organização no recorte atual."
     : nFora
       ? `${plural(nFora, "organização declarou sede fora", "organizações declararam sede fora")} ` +
@@ -608,6 +696,7 @@ function desenhar() {
   montarEvolucao(linhas);
   montarCriterios(linhas);
   montarTerritorio(linhas);
+  montarOrigem(linhas);
   montarNatureza(linhas);
   montarTabela(linhas);
 }
@@ -617,8 +706,8 @@ function desenhar() {
  *  Falha aqui não derruba o painel: o mapa é um bloco entre outros, e uma
  *  malha ausente não pode apagar os números. O bloco simplesmente não aparece.
  */
-async function carregarMalha(geografia) {
-  const escolha = MALHAS[geografia?.nivel];
+async function carregarMalha(nivel) {
+  const escolha = MALHAS[nivel];
   if (!escolha) return null;
   try {
     // Resolvido contra o módulo, não contra a página: a malha mora ao lado
@@ -678,7 +767,14 @@ async function iniciar() {
         rotulo: c.descricao ? c.descricao.split(".")[0] : c.nome,
       }));
 
-    estado.malha = await carregarMalha(manifesto.geografia);
+    // Duas malhas, dois papéis: a do território desenha onde o edital pode
+    // atuar (sempre); a do nível dos dados desenha as contagens, quando a
+    // planilha passar a trazer o lugar nesse nível.
+    const geo = manifesto.geografia;
+    [estado.territorio, estado.malha] = await Promise.all([
+      carregarMalha(geo?.territorio?.malha),
+      carregarMalha(geo?.nivel),
+    ]);
 
     montarCabecalho();
     montarFunil();

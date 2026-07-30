@@ -184,30 +184,58 @@
         <header class="bloco-cabecalho">
           <div>
             <p class="etiqueta">Território</p>
-            <h2 id="t-territorio">Origem das organizações</h2>
+            <h2 id="t-territorio">Onde o edital pode atuar</h2>
             <p id="descricao-territorio" class="bloco-descricao">
-              O edital é exclusivo para organizações com sede na Bahia, e o
-              formulário aceita respostas de fora. Quem está fora aparece aqui.
+              Um dos requisitos é territorial: a atuação precisa acontecer em
+              municípios baianos de até 200 mil habitantes. O mapa desenha esse
+              recorte município a município. Não depende do filtro acima — é o
+              território do edital, não o das respostas.
             </p>
           </div>
         </header>
         <div class="mapa-e-tabela">
-          <div id="mapa-territorio" class="area-mapa-caixa"></div>
+          <div id="mapa-municipios" class="area-mapa-caixa"></div>
           <div class="mapa-lateral">
-            <div id="tabela-territorio" class="rolagem"></div>
+            <dl id="numeros-territorio" class="numeros-lado"></dl>
+            <div>
+              <h3 class="titulo-lateral">Municípios fora do recorte</h3>
+              <div id="tabela-fora" class="rolagem"></div>
+            </div>
             <p id="nota-territorio" class="meta"></p>
           </div>
         </div>
       </section>
 
-      <section class="bloco" aria-labelledby="t-natureza">
-        <h2 id="t-natureza">Natureza jurídica</h2>
-        <p class="bloco-descricao">
-          "Nenhuma das opções" é a resposta mais informativa da lista: marca
-          quem não se encaixa no desenho do edital.
-        </p>
-        <div id="grafico-natureza" class="area-grafico"></div>
-      </section>
+      <div class="duas-colunas">
+        <section class="bloco painel-coluna" aria-labelledby="t-origem">
+          <div class="coluna-cabecalho">
+            <p class="etiqueta">Origem</p>
+            <h2 id="t-origem">Estado da sede</h2>
+            <p class="bloco-descricao">
+              O edital é exclusivo para organizações com sede na Bahia, e o
+              formulário aceita respostas de fora. Quem está fora aparece aqui.
+            </p>
+          </div>
+          <div class="coluna-figura">
+            <div id="tabela-territorio" class="rolagem"></div>
+            <p id="nota-origem" class="meta"></p>
+          </div>
+        </section>
+
+        <section class="bloco painel-coluna" aria-labelledby="t-natureza">
+          <div class="coluna-cabecalho">
+            <p class="etiqueta">Perfil</p>
+            <h2 id="t-natureza">Natureza jurídica</h2>
+            <p class="bloco-descricao">
+              "Nenhuma das opções" é a resposta mais informativa da lista: marca
+              quem não se encaixa no desenho do edital.
+            </p>
+          </div>
+          <div class="coluna-figura">
+            <div id="grafico-natureza" class="area-grafico"></div>
+          </div>
+        </section>
+      </div>
 
       <section class="bloco" aria-labelledby="t-organizacoes">
         <header class="bloco-cabecalho">

@@ -7,10 +7,15 @@ qualquer outro ativo — e este script é o registro de **de onde ela veio e o q
 foi feito com ela**, para que alguém possa refazer o arquivo em vez de ter que
 confiar num JSON de 200 KB que apareceu num commit.
 
-Fontes (as duas derivadas da malha do IBGE):
+Fontes:
 
-  estados     luizpedone/municipal-brazilian-geodata · MIT
-  municípios  tbrugz/geodata-br · CC0 1.0
+  municípios  tbrugz/geodata-br · CC0 1.0    (malha do IBGE)
+  população   wcota/covid19br · CC BY 4.0    (estimativa do IBGE)
+
+A população entra na malha municipal porque um critério do edital é
+territorial: só vale atuação em município baiano de até 200 mil habitantes. Sem
+o número junto do contorno, o painel não teria como desenhar onde o edital pode
+atuar — e a alternativa, uma lista escrita à mão, envelhece em silêncio.
 
 O que o script faz com elas:
 
@@ -27,6 +32,7 @@ Uso:  python scripts/gerar_malhas.py
 
 from __future__ import annotations
 
+import csv
 import json
 import math
 import urllib.request
@@ -36,16 +42,6 @@ RAIZ = Path(__file__).resolve().parents[1]
 DESTINO = RAIZ / "dashboard" / "assets" / "geo"
 
 FONTES = {
-    "brasil-estados.json": {
-        "url": "https://raw.githubusercontent.com/luizpedone/"
-        "municipal-brazilian-geodata/master/data/Brasil.json",
-        "credito": "luizpedone/municipal-brazilian-geodata (MIT), a partir do IBGE",
-        "chave": lambda p: p.get("UF"),
-        "nome": lambda p: p.get("ESTADO"),
-        # ~5,5 km. O contorno do Brasil inteiro cabe em 1000px: detalhe menor
-        # que isso não chega a virar pixel.
-        "tolerancia": 0.05,
-    },
     "bahia-municipios.json": {
         "url": "https://raw.githubusercontent.com/tbrugz/geodata-br/"
         "master/geojson/geojs-29-mun.json",
@@ -56,6 +52,16 @@ FONTES = {
         # contorno some, acima dele os 417 polígonos ficam retos demais.
         "tolerancia": 0.01,
     },
+}
+
+# População estimada pelo IBGE, distribuída por wcota/covid19br. A coluna é a
+# estimativa mais recente do arquivo; trocar de ano é trocar esta constante.
+POPULACAO = {
+    "url": "https://raw.githubusercontent.com/wcota/covid19br/master/cities_info.csv",
+    "coluna": "pop2021",
+    "uf": "BA",
+    "credito": "população estimada pelo IBGE (2021), via wcota/covid19br (CC BY 4.0)",
+    "aplica_em": "bahia-municipios.json",
 }
 
 CASAS = 4
@@ -130,6 +136,25 @@ def _geometria(geo: dict, tolerancia: float) -> dict | None:
     raise ValueError(f"geometria não suportada: {geo['type']}")
 
 
+def _populacao_por_codigo() -> tuple[dict[str, int], str]:
+    """Código IBGE -> habitantes, só da UF que interessa."""
+    with urllib.request.urlopen(POPULACAO["url"], timeout=120) as resposta:
+        linhas = resposta.read().decode("utf-8").splitlines()
+
+    leitor = csv.DictReader(linhas)
+    coluna = POPULACAO["coluna"]
+    tabela: dict[str, int] = {}
+    for linha in leitor:
+        if linha.get("state") != POPULACAO["uf"]:
+            continue
+        valor = (linha.get(coluna) or "").strip()
+        if valor.isdigit():
+            tabela[str(linha["ibge"])] = int(valor)
+    if not tabela:
+        raise ValueError(f"nenhuma população lida de {POPULACAO['url']} (coluna {coluna})")
+    return tabela, POPULACAO["credito"]
+
+
 def _baixar(url: str) -> dict:
     with urllib.request.urlopen(url, timeout=120) as resposta:
         # A fonte dos estados vem em latin-1; a dos municípios, em utf-8.
@@ -146,25 +171,39 @@ def gerar(nome_arquivo: str, receita: dict, destino: Path) -> Path:
     print(f"  {nome_arquivo}: baixando…")
     origem = _baixar(receita["url"])
 
+    populacao: dict[str, int] = {}
+    credito_populacao = ""
+    if nome_arquivo == POPULACAO["aplica_em"]:
+        populacao, credito_populacao = _populacao_por_codigo()
+
     features = []
+    sem_populacao = []
     for f in origem["features"]:
         geometria = _geometria(f["geometry"], receita["tolerancia"])
         if geometria is None:
             continue
-        features.append(
-            {
-                "type": "Feature",
-                "properties": {
-                    "chave": str(receita["chave"](f["properties"])),
-                    "nome": receita["nome"](f["properties"]),
-                },
-                "geometry": geometria,
-            }
+        chave = str(receita["chave"](f["properties"]))
+        props = {"chave": chave, "nome": receita["nome"](f["properties"])}
+        if populacao:
+            if chave in populacao:
+                props["populacao"] = populacao[chave]
+            else:
+                # Município sem número é município que o painel não sabe
+                # classificar. Falha alto: silenciosamente ele viraria "fora do
+                # território" no mapa, que é o oposto do que se quer dizer.
+                sem_populacao.append(props["nome"])
+        features.append({"type": "Feature", "properties": props, "geometry": geometria})
+
+    if sem_populacao:
+        raise ValueError(
+            f"{nome_arquivo}: sem população para {len(sem_populacao)} município(s): "
+            f"{', '.join(sem_populacao[:5])}…"
         )
 
     saida = {
         "type": "FeatureCollection",
         "credito": receita["credito"],
+        "credito_populacao": credito_populacao or None,
         "gerado_por": "scripts/gerar_malhas.py",
         "features": features,
     }

@@ -140,7 +140,12 @@ def test_manifesto_leva_geografia_e_prazo_do_edital(saidas, cfg_temp, tabelas):
         edital=dataclasses.replace(cfg_temp.edital, fim_inscricoes="2026-08-17"),
     )
     manifesto = _publicar(cfg, tabelas, [])
-    assert manifesto["geografia"] == {"coluna": "status", "nivel": "estado", "destaque": "BA"}
+    assert manifesto["geografia"] == {
+        "coluna": "status",
+        "nivel": "estado",
+        "destaque": "BA",
+        "territorio": None,
+    }
     assert manifesto["edital"]["fim_inscricoes"] == "2026-08-17"
 
 

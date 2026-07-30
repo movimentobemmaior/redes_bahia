@@ -240,6 +240,15 @@ def publicar(
                 "coluna": cfg.geografia.coluna,
                 "nivel": cfg.geografia.nivel,
                 "destaque": cfg.geografia.destaque,
+                "territorio": (
+                    {
+                        "malha": cfg.geografia.territorio.malha,
+                        "limite_populacao": cfg.geografia.territorio.limite_populacao,
+                        "rotulo": cfg.geografia.territorio.rotulo,
+                    }
+                    if cfg.geografia.territorio
+                    else None
+                ),
             }
             if cfg.geografia
             else None

@@ -121,31 +121,48 @@ mapa de calor, intensidade. Nunca arco-íris.
 Em escala **ordinal** (etapas do funil, faixas), o passo mais claro no modo
 claro é o `--seq-250`: abaixo disso a forma some no fundo.
 
-### Mapa coroplético
+### Mapas
 
-Vale a rampa sequencial acima, com três regras próprias — mapa é o formato mais
-fácil de comunicar só por cor, e o mais fácil de mentir por escala.
+Vale a rampa sequencial acima, com regras próprias — mapa é o formato mais fácil
+de comunicar só por cor, e o mais fácil de mentir por escala.
 
-**O primeiro passo é do vazio, não do menor valor.** A rampa do mapa começa em
-`--seq-250`. Unidade sem nenhuma resposta usa `--grade`: presente como contexto,
-longe o bastante do primeiro passo para que "uma organização" nunca se confunda
-com "nenhuma".
+**O primeiro passo é do vazio, não do menor valor.** Num mapa de contagem, a
+rampa começa em `--seq-250` e a unidade sem nenhuma resposta usa `--grade`:
+presente como contexto, longe o bastante do primeiro passo para que "uma
+organização" nunca se confunda com "nenhuma".
 
-**Toda unidade com dado leva o número escrito.** O tom sozinho não diz quanto,
-e a diferença entre dois passos vizinhos é invisível para parte das pessoas. O
-rótulo é desenhado com halo na cor da superfície (`paint-order: stroke fill`),
-que resolve o contraste em qualquer passo e nos dois modos. Acima de oito
-unidades rotuladas ficam as maiores, e o resto continua no `<title>` e na
-tabela ao lado.
+**Toda unidade com dado leva o número escrito** — quando são poucas. O tom
+sozinho não diz quanto, e a diferença entre dois passos vizinhos é invisível
+para parte das pessoas. O rótulo é desenhado com halo na cor da superfície
+(`paint-order: stroke fill`), que resolve o contraste em qualquer passo e nos
+dois modos. Acima de oito unidades rotuladas ficam as maiores, e o resto
+continua no `<title>` e na tabela ao lado.
+
+**Com centenas de unidades, o texto migra para a tabela.** Nos 417 municípios da
+Bahia é impossível rotular cada um: a leitura sem cor passa a ser a lista
+nominal ao lado do mapa, e quem está fora do recorte leva **trama** além de cor.
+A trama é o que separa uma categoria da outra para quem não distingue os tons.
 
 **A tabela vem junto, não escondida.** Nos gráficos de barra a tabela
 equivalente pode ficar num `<details>`; no mapa ela fica visível ao lado, porque
 ler valor exato num mapa é impossível mesmo para quem enxerga a cor.
 
+**Classe por quantil quando a distribuição é torta.** População municipal é
+muito assimétrica: com intervalos iguais, quase tudo cai na primeira classe e o
+mapa fica de uma cor só. Os cortes saem dos quartis e são arredondados para
+1, 2 ou 5 vezes uma potência de dez — "até 10 mil" se lê, "até 10.732" não. Em
+contagem pequena vale o contrário: intervalo igual, porque com quantil a maioria
+das unidades (que tem zero) apagaria a única diferença que interessa.
+
 O enquadramento acompanha os dados: o mapa recorta a área que tem resposta mais
 o território do edital, com folga, em vez de desenhar a malha inteira. As
 unidades de fora continuam desenhadas e são cortadas na borda — dão o vizinho
 sem gastar tela.
+
+**Mapa só onde há território para mostrar.** Duas ou três unidades com dado num
+mapa de 27 é uma tabela mal desenhada. Houve um mapa do Brasil por estado no
+painel; saiu quando ficou claro que duas linhas diziam o mesmo em um sexto do
+espaço.
 
 ### Variação com sinal (divergente)
 

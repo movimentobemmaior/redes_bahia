@@ -32,14 +32,46 @@ def test_toda_malha_declarada_no_painel_existe_em_disco():
         assert caminho.exists(), f"nível '{nivel}' aponta para {arquivo}, que não existe"
 
 
-def test_nivel_do_contrato_tem_malha(contrato_real):
-    """Trocar `geografia.nivel` sem ter a malha esconderia o mapa sem avisar."""
-    if contrato_real.geografia is None:
+def test_malha_do_territorio_existe(contrato_real):
+    """Trocar `territorio.malha` sem ter o arquivo esconderia o mapa sem avisar."""
+    territorio = getattr(contrato_real.geografia, "territorio", None)
+    if territorio is None:
         return
     declaradas = _malhas_declaradas_no_painel()
-    assert contrato_real.geografia.nivel in declaradas, (
-        f"o contrato pede o nível '{contrato_real.geografia.nivel}', "
+    assert territorio.malha in declaradas, (
+        f"o contrato pede a malha '{territorio.malha}', "
         f"e o painel só sabe desenhar: {', '.join(sorted(declaradas))}"
+    )
+
+
+def test_malha_do_territorio_tem_populacao(contrato_real):
+    """O recorte é por população: malha sem o número não classifica nada.
+
+    Sem este teste, um município sem população cairia em "fora do território" —
+    dizendo o oposto do que se quer dizer, e sem erro nenhum na tela.
+    """
+    territorio = getattr(contrato_real.geografia, "territorio", None)
+    if territorio is None:
+        return
+    arquivo = _malhas_declaradas_no_painel()[territorio.malha]
+    malha = json.loads((PAINEL_JS.parent / arquivo).read_text(encoding="utf-8"))
+    assert malha.get("credito_populacao"), f"{arquivo} deve creditar a fonte da população"
+    sem = [f["properties"]["nome"] for f in malha["features"] if "populacao" not in f["properties"]]
+    assert not sem, f"{arquivo}: {len(sem)} município(s) sem população — {', '.join(sem[:5])}"
+
+
+def test_recorte_do_territorio_nao_e_vazio_nem_total(contrato_real):
+    """Um corte que não corta nada, ou que corta tudo, é corte errado."""
+    territorio = getattr(contrato_real.geografia, "territorio", None)
+    if territorio is None:
+        return
+    arquivo = _malhas_declaradas_no_painel()[territorio.malha]
+    malha = json.loads((PAINEL_JS.parent / arquivo).read_text(encoding="utf-8"))
+    populacoes = [f["properties"]["populacao"] for f in malha["features"]]
+    dentro = sum(1 for p in populacoes if p <= territorio.limite_populacao)
+    assert 0 < dentro < len(populacoes), (
+        f"limite de {territorio.limite_populacao} habitantes deixa "
+        f"{dentro} de {len(populacoes)} municípios no recorte"
     )
 
 
@@ -56,17 +88,7 @@ def test_malhas_tem_a_forma_que_o_painel_espera():
             assert f["geometry"]["type"] in {"Polygon", "MultiPolygon"}
 
 
-def test_destaque_do_contrato_existe_na_malha(contrato_real):
-    """Destaque que não casa com nenhuma feição não desenha contorno nenhum."""
-    geo = contrato_real.geografia
-    if geo is None or not geo.destaque:
-        return
-    arquivo = _malhas_declaradas_no_painel()[geo.nivel]
-    malha = json.loads((PAINEL_JS.parent / arquivo).read_text(encoding="utf-8"))
-    chaves = {f["properties"]["chave"].casefold() for f in malha["features"]}
-    assert geo.destaque.casefold() in chaves, (
-        f"geografia > destaque: '{geo.destaque}' não está em {arquivo}"
-    )
+
 
 
 # --- Simplificação da malha ----------------------------------------------------

@@ -63,6 +63,19 @@ class Edital:
 
 
 @dataclass(frozen=True)
+class Territorio:
+    """O recorte territorial em que o edital pode atuar.
+
+    Mesmo critério do `criterio_municipios_ate_200mil`, na forma que o mapa
+    consegue desenhar. O número fica no contrato porque é regra de edital.
+    """
+
+    malha: str
+    limite_populacao: int
+    rotulo: str
+
+
+@dataclass(frozen=True)
 class Geografia:
     """De onde o mapa tira o lugar de cada linha.
 
@@ -73,6 +86,7 @@ class Geografia:
     coluna: str
     nivel: str
     destaque: str
+    territorio: Territorio | None = None
 
 
 @dataclass(frozen=True)
@@ -340,7 +354,39 @@ def _ler_geografia(bruto: Any, datasets: dict[str, Dataset]) -> Geografia | None
             f"geografia > coluna: '{coluna}' não está declarada em nenhum dataset ({onde})."
         )
 
-    return Geografia(coluna=coluna, nivel=nivel, destaque=str(bruto.get("destaque", "")))
+    return Geografia(
+        coluna=coluna,
+        nivel=nivel,
+        destaque=str(bruto.get("destaque", "")),
+        territorio=_ler_territorio(bruto.get("territorio")),
+    )
+
+
+def _ler_territorio(bruto: Any) -> Territorio | None:
+    """Bloco opcional: sem ele o painel não desenha o mapa do território."""
+    if bruto is None:
+        return None
+    if not isinstance(bruto, dict):
+        raise ErroConfig("geografia > territorio: deve ser um bloco de configuração.")
+
+    malha = str(_exigir(bruto, "malha", "geografia > territorio"))
+    if malha not in NIVEIS_GEOGRAFICOS:
+        raise ErroConfig(
+            f"geografia > territorio > malha: '{malha}' desconhecida. "
+            f"Use uma de: {', '.join(sorted(NIVEIS_GEOGRAFICOS))}."
+        )
+
+    limite = _exigir(bruto, "limite_populacao", "geografia > territorio")
+    try:
+        limite = int(limite)
+    except (TypeError, ValueError) as erro:
+        raise ErroConfig(
+            f"geografia > territorio > limite_populacao: '{limite}' não é um número."
+        ) from erro
+    if limite <= 0:
+        raise ErroConfig("geografia > territorio > limite_populacao: deve ser maior que zero.")
+
+    return Territorio(malha=malha, limite_populacao=limite, rotulo=str(bruto.get("rotulo", "")))
 
 
 def _checar_referencias(datasets: dict[str, Dataset]) -> None:

@@ -453,7 +453,7 @@ select {
   gap: var(--e-6);
   align-items: start;
 }
-.mapa-lateral { display: flex; flex-direction: column; gap: var(--e-4); }
+.mapa-lateral { display: flex; flex-direction: column; gap: var(--e-6); }
 .mapa-lateral .meta { margin: 0; }
 .area-mapa-caixa { min-width: 0; }
 .mapa { display: block; width: 100%; height: auto; }
@@ -508,6 +508,40 @@ select {
 .legenda-mapa-passo i {
   width: 14px; height: 10px;
   border: 1px solid var(--borda); display: inline-block; flex: none;
+}
+/* A amostra do "fora" carrega a mesma trama do mapa: sem ela, a legenda
+   explicaria por cor uma distinção que no mapa é por cor e textura. */
+.legenda-mapa-passo i.legenda-fora {
+  background: var(--grade);
+  background-image: repeating-linear-gradient(
+    45deg, transparent 0 2px, var(--eixo) 2px 3px);
+}
+
+/* Mapa de território: duas classes, e a de fora ganha trama além da cor. */
+.mapa .area-no-territorio { stroke: var(--superficie); stroke-width: 0.5; }
+.mapa .area-fora-territorio { stroke: var(--superficie); stroke-width: 0.5; }
+.mapa .area-trama { pointer-events: none; }
+.mapa .trama-linha { stroke: var(--eixo); stroke-width: 1.6; }
+.mapa .area-no-territorio:hover { stroke: var(--tinta-1); stroke-width: 1.2; }
+.mapa .area-fora-territorio:hover { stroke: var(--tinta-1); stroke-width: 1.2; }
+
+/* Estatísticas ao lado do mapa: mesma gramática dos KPIs, em coluna. */
+.numeros-lado { margin: 0; display: grid; gap: var(--e-4); }
+.numeros-lado > div { border-top: 1px solid var(--eixo); padding-top: var(--e-2); }
+.numeros-lado dt {
+  font-size: var(--texto-2xl); font-weight: var(--peso-extra);
+  line-height: var(--altura-apertada); color: var(--tinta-1);
+  font-variant-numeric: tabular-nums;
+}
+.numeros-lado dd {
+  margin: var(--e-1) 0 0;
+  font-size: var(--texto-sm); color: var(--tinta-3);
+}
+.titulo-lateral {
+  margin: 0 0 var(--e-3);
+  font-size: var(--texto-xs); font-weight: var(--peso-forte);
+  text-transform: uppercase; letter-spacing: var(--entreletra-rotulo);
+  color: var(--tinta-3);
 }
 
 /* --- Prazo: estatística no pé do cabeçalho, sobre um fio ------------------- */

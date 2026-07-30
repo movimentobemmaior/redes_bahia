@@ -1,6 +1,6 @@
 {
   "painel": "Redes Bahia",
-  "gerado_em": "2026-07-30T16:02:46+00:00",
+  "gerado_em": "2026-07-30T16:56:56+00:00",
   "data_execucao": "2026-07-30",
   "versao_pipeline": "0.1.0",
   "versao_contrato": 3,
@@ -15,7 +15,12 @@
   "geografia": {
     "coluna": "estado",
     "nivel": "estado",
-    "destaque": "BA"
+    "destaque": "BA",
+    "territorio": {
+      "malha": "municipio",
+      "limite_populacao": 200000,
+      "rotulo": "municípios de até 200 mil habitantes"
+    }
   },
   "etapas": [
     {

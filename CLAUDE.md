@@ -28,8 +28,10 @@ se algo que não devia sair aparecer nele.
   do painel. Três critérios do edital têm sentido invertido: "Sim" exclui.
 - **Etapas do edital** → bloco `etapas:` do contrato. O painel monta o funil a
   partir dele.
-- **Nível do mapa** (estado ou município) → bloco `geografia:` do contrato. As
-  malhas estão em `dashboard/assets/geo/`, geradas por `make malhas`.
+- **Mapa: nível e recorte territorial** → bloco `geografia:` do contrato,
+  inclusive o corte de população do edital (`territorio.limite_populacao`). A
+  malha e a população ficam em `dashboard/assets/geo/`, geradas por
+  `make malhas`.
 - **Cor e tipografia** → `design/tokens/`, derivados de
   `docs/Edital-RedesBahia.pdf`.
 - **Decisão de rumo** → um ADR em `docs/adr/`.

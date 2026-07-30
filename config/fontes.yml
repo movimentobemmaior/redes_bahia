@@ -61,6 +61,18 @@ geografia:
   # onde não há resposta nenhuma.
   destaque: BA
 
+  # O mapa do território em que o edital pode atuar. É o mesmo critério do
+  # `criterio_municipios_ate_200mil`, aqui na forma que o mapa consegue
+  # desenhar: a malha municipal traz a população estimada pelo IBGE, e o painel
+  # separa quem está dentro do recorte.
+  #
+  # O número mora aqui, e não no JavaScript, porque é regra de edital: a
+  # próxima edição pode mudar o corte sem ninguém tocar na camada visual.
+  territorio:
+    malha: municipio
+    limite_populacao: 200000
+    rotulo: municípios de até 200 mil habitantes
+
 # =============================================================================
 # ETAPAS DO EDITAL
 # =============================================================================
