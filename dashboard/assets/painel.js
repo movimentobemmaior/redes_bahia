@@ -297,8 +297,18 @@ function montarIndicadores(linhas) {
       { rotulo: "Aprovadas automaticamente", valor: aprovadas, cor: "var(--serie-1)" },
       { rotulo: "Não aprovadas", valor: naoAprovadas, cor: "var(--serie-2)" },
     ],
-    { rotulo: "Resultado do credenciamento" }
+    // Mais alta que o padrão: ao lado de um gráfico de linha de 220px, uma
+    // barra de 40px lê como rodapé em vez de como a outra metade da linha.
+    { rotulo: "Resultado do credenciamento", altura: 56 }
   );
+
+  // A barra mostra a proporção; a nota diz o número. Sem ela, a taxa de
+  // aprovação — que é o que se leva para a reunião — teria de ser calculada de
+  // cabeça a partir de dois cartões.
+  $("#nota-resultado").textContent = total
+    ? `${Math.round((aprovadas / total) * 100)}% de aprovação automática ` +
+      `(${fmt.format(aprovadas)} de ${fmt.format(total)}).`
+    : "Nenhuma organização no recorte atual.";
 }
 
 /** O gráfico central: qual requisito está barrando quem.

@@ -110,38 +110,49 @@
         <article class="kpi" id="kpi-semmotivo"><p class="valor">—</p><p class="rotulo-kpi">—</p></article>
       </section>
 
-      <section class="bloco bloco-compacto" aria-labelledby="t-resultado">
-        <h2 id="t-resultado" class="titulo-compacto">Proporção do resultado</h2>
-        <div class="legenda">
-          <span class="chave"><i style="background: var(--serie-1)"></i>Aprovadas automaticamente</span>
-          <span class="chave"><i style="background: var(--serie-2)"></i>Não aprovadas</span>
-        </div>
-        <div id="grafico-resultado" class="area-grafico"></div>
-        <p class="bloco-descricao">
-          A checagem é automática, sobre o que a própria organização declarou.
-          Aprovado aqui não significa verificado: a comprovação vem em etapa
-          posterior.
-        </p>
-      </section>
+      <!-- Duas leituras de uma linha só: onde a etapa chegou (proporção) e para
+           onde ela está indo (ritmo). Lado a lado porque é assim que se lê —
+           "5 não aprovadas" e "faltam 18 dias" decidem juntas. -->
+      <div class="duas-colunas">
+        <section class="bloco painel-coluna" aria-labelledby="t-resultado">
+          <div class="coluna-cabecalho">
+            <p class="etiqueta">Resultado</p>
+            <h2 id="t-resultado">Proporção do credenciamento</h2>
+            <p class="bloco-descricao">
+              A checagem é automática, sobre o que a própria organização
+              declarou. Aprovado aqui não significa verificado: a comprovação
+              vem em etapa posterior.
+            </p>
+          </div>
+          <div class="coluna-figura">
+            <div class="legenda">
+              <span class="chave"><i style="background: var(--serie-1)"></i>Aprovadas automaticamente</span>
+              <span class="chave"><i style="background: var(--serie-2)"></i>Não aprovadas</span>
+            </div>
+            <div id="grafico-resultado" class="area-grafico"></div>
+            <p id="nota-resultado" class="meta"></p>
+          </div>
+        </section>
 
-      <section class="bloco" aria-labelledby="t-evolucao">
-        <header class="bloco-cabecalho">
-          <div>
+        <section class="bloco painel-coluna" aria-labelledby="t-evolucao">
+          <div class="coluna-cabecalho">
             <p class="etiqueta">Ritmo</p>
             <h2 id="t-evolucao">Respostas por dia</h2>
             <p class="bloco-descricao">
               Serve para decidir sobre comunicação: queda no ritmo com prazo
               longo pela frente é hora de reforçar a divulgação.
             </p>
+            <p id="prazo-inscricoes" class="cartao-prazo" hidden>
+              <span class="cartao-prazo-valor">—</span>
+              <span class="cartao-prazo-rotulo">—</span>
+            </p>
           </div>
-          <p id="prazo-inscricoes" class="cartao-prazo" hidden>
-            <span class="cartao-prazo-valor">—</span>
-            <span class="cartao-prazo-rotulo">—</span>
-          </p>
-        </header>
-        <div id="grafico-evolucao" class="area-grafico"></div>
-        <p id="nota-ritmo" class="meta"></p>
-      </section>
+          <div class="coluna-figura">
+            <div id="grafico-evolucao" class="area-grafico"></div>
+            <p id="nota-ritmo" class="meta"></p>
+          </div>
+        </section>
+      </div>
 
       <section class="bloco bloco-destaque" aria-labelledby="t-criterios">
         <header class="bloco-cabecalho">

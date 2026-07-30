@@ -83,41 +83,56 @@ code {
 .cabecalho {
   background: var(--gradiente-marca);
   color: var(--tinta-sobre-marca);
-  padding-block: var(--e-10) var(--e-12);
+  padding-block: var(--e-6) var(--e-8);
 }
 .cabecalho-interno {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-  gap: var(--e-6) var(--e-10);
+  gap: var(--e-4) var(--e-10);
   align-items: start;
 }
-.marca { height: 44px; width: auto; grid-column: 1; }
-.cabecalho-titulo { grid-column: 1; max-width: 46ch; }
+.marca { height: 34px; width: auto; grid-column: 1; align-self: center; }
+.cabecalho-titulo { grid-column: 1; max-width: 62ch; }
 
 /* Ficha do edital, como no bloco inferior da capa do regulamento: rótulo em
    caixa alta espaçada e o valor logo abaixo. Ocupa a metade direita com
    informação, no lugar de deixá-la vazia. */
+/* Rótulo e valor na MESMA linha, como ficha técnica: empilhados, os três itens
+   sozinhos comandavam a altura da faixa roxa e empurravam o painel para baixo
+   da dobra. Em linha, a mesma informação ocupa um terço da altura. */
 .ficha-edital {
   grid-column: 2; grid-row: 2 / 4;
-  align-self: end;
+  align-self: center;
   margin: 0;
-  display: grid; gap: var(--e-5);
+  display: grid; gap: var(--e-2);
   padding-left: var(--e-8);
   border-left: 1px solid rgba(255, 255, 255, 0.18);
 }
+.ficha-edital > div {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  justify-content: space-between; gap: var(--e-2) var(--e-4);
+  padding-bottom: var(--e-2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.ficha-edital > div:last-child { padding-bottom: 0; border-bottom: none; }
 .ficha-edital dt {
   font-size: var(--texto-xs); font-weight: var(--peso-forte);
   letter-spacing: var(--entreletra-rotulo); text-transform: uppercase;
   color: var(--tinta-sobre-marca-fraca);
 }
 .ficha-edital dd {
-  margin: var(--e-1) 0 0;
-  font-size: var(--texto-md); font-weight: var(--peso-forte);
+  margin: 0;
+  font-size: var(--texto-sm); font-weight: var(--peso-forte);
   color: var(--tinta-sobre-marca);
+  white-space: nowrap;
 }
-.cabecalho h1 { color: var(--tinta-sobre-marca); margin-bottom: var(--e-3); }
+.cabecalho h1 {
+  color: var(--tinta-sobre-marca);
+  font-size: var(--texto-2xl);
+  margin-bottom: var(--e-2);
+}
 .sobretitulo {
-  margin: 0 0 var(--e-2);
+  margin: 0 0 var(--e-1);
   font-size: var(--texto-sm);
   font-weight: var(--peso-medio);
   letter-spacing: var(--entreletra-rotulo);
@@ -127,8 +142,8 @@ code {
 .subtitulo {
   margin: 0;
   color: var(--tinta-sobre-marca-fraca);
-  font-size: var(--texto-md);
-  max-width: 58ch;
+  font-size: var(--texto-sm);
+  max-width: 62ch;
 }
 .botao-tema {
   grid-column: 2; grid-row: 1;
@@ -320,15 +335,40 @@ select {
    respiro, e dois fios seguidos viram grade. */
 .grade-kpi + .bloco { border-top: none; padding-top: 0; }
 
-/* Bloco que existe só para dar forma a um número já mostrado nos KPIs: título
-   miúdo e descrição depois do gráfico, para não competir com a seção. */
-.titulo-compacto {
-  margin: 0 0 var(--e-3);
-  font-size: var(--texto-sm); font-weight: var(--peso-forte);
-  text-transform: uppercase; letter-spacing: var(--entreletra-rotulo);
-  color: var(--tinta-3);
+/* --- Duas colunas ----------------------------------------------------------
+   Dois gráficos que se leem juntos, lado a lado. "Onde a etapa chegou" e
+   "para onde ela está indo" decidem em conjunto; empilhados, um sai da tela
+   quando o outro está sendo lido.
+
+   O subgrid alinha as duas figuras na mesma altura mesmo com cabeçalhos de
+   tamanhos diferentes. Sem ele (navegador antigo), cada coluna vira uma grade
+   normal e os gráficos apenas começam em alturas próprias — degrada sem
+   quebrar. */
+
+.duas-colunas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  gap: var(--e-6) var(--e-10);
+  margin-top: var(--e-8);
 }
-.bloco-compacto .bloco-descricao { margin: var(--e-4) 0 0; }
+.duas-colunas > .painel-coluna {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  gap: var(--e-5);
+  margin-top: 0;
+  min-width: 0;
+}
+.coluna-cabecalho > :last-child { margin-bottom: 0; }
+/* A figura curta (barra de proporção) fica no meio óptico da linha em vez de
+   colada no topo, ao lado de um gráfico três vezes mais alto. */
+.coluna-figura {
+  min-width: 0;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.coluna-figura .meta { margin-top: var(--e-3); }
+
 .bloco-cabecalho {
   display: flex; flex-wrap: wrap; gap: var(--e-4);
   align-items: flex-start; justify-content: space-between;
@@ -470,26 +510,25 @@ select {
   border: 1px solid var(--borda); display: inline-block; flex: none;
 }
 
-/* --- Prazo: estatística à direita do título, com um fio de apoio ----------- */
+/* --- Prazo: estatística no pé do cabeçalho, sobre um fio ------------------- */
 
 .cartao-prazo {
-  margin: 0; text-align: right; flex: none;
-  padding-left: var(--e-6);
-  border-left: 1px solid var(--borda);
+  display: flex; align-items: baseline; gap: var(--e-3);
+  margin: var(--e-4) 0 0;
+  padding-top: var(--e-3);
+  border-top: 1px solid var(--borda);
 }
 .cartao-prazo-valor {
-  display: block;
   font-size: var(--texto-2xl); font-weight: var(--peso-extra);
   line-height: var(--altura-apertada); color: var(--tinta-1);
   font-variant-numeric: tabular-nums;
 }
 .cartao-prazo-rotulo {
-  display: block; margin-top: var(--e-1);
-  font-size: var(--texto-xs); color: var(--tinta-3); max-width: 22ch;
+  font-size: var(--texto-xs); color: var(--tinta-3); max-width: 26ch;
 }
-.cartao-prazo[data-situacao="reta-final"] { border-left: 3px solid var(--status-atencao); }
+.cartao-prazo[data-situacao="reta-final"] { border-top-color: var(--status-atencao); }
 .cartao-prazo[data-situacao="reta-final"] .cartao-prazo-valor { color: var(--status-atencao); }
-.cartao-prazo[data-situacao="encerrado"] .cartao-prazo-valor { font-size: var(--texto-xl); }
+.cartao-prazo[data-situacao="encerrado"] .cartao-prazo-valor { font-size: var(--texto-lg); }
 
 .legenda {
   display: flex; flex-wrap: wrap; gap: var(--e-5);
@@ -631,16 +670,22 @@ td.motivo-ausente { color: var(--tinta-2); font-style: italic; }
     border-left: none; border-top: 1px solid rgba(255, 255, 255, 0.18);
   }
   /* Mapa em coluna estreita fica pequeno demais para o rótulo caber; largo e
-     com a tabela embaixo, continua legível. */
+     com a tabela embaixo, continua legível. Vale o mesmo para os dois
+     gráficos lado a lado. */
   .mapa-e-tabela { grid-template-columns: 1fr; }
-  .cartao-prazo { text-align: left; }
+  .duas-colunas { grid-template-columns: 1fr; gap: var(--e-8); }
+  .duas-colunas > .painel-coluna { grid-row: auto; grid-template-rows: none; }
   .cartao-prazo-rotulo { max-width: none; }
 }
 
 @media (max-width: 640px) {
   .faixa { padding-inline: var(--e-4); }
-  h1 { font-size: var(--texto-2xl); }
-  .cabecalho { padding-block: var(--e-8); }
+  /* No celular a faixa roxa competia com o painel pela primeira tela inteira.
+     Título menor, respiro menor e a ficha em uma coluna compacta. */
+  h1, .cabecalho h1 { font-size: var(--texto-xl); }
+  .cabecalho { padding-block: var(--e-5) var(--e-6); }
+  .ficha-edital { gap: var(--e-1); padding-top: var(--e-4); }
+  .ficha-edital > div { padding-bottom: var(--e-1); }
   .bloco { padding-top: var(--e-6); margin-top: var(--e-6); }
   .secao-etapa { margin-top: var(--e-12); }
   .grupo-principal { padding-right: 0; border-right: none; }
