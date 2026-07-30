@@ -6,11 +6,17 @@ página depende do CSS, de quatro módulos de JavaScript, da fonte Raleway, dos
 logos, da malha dos municípios e dos dados publicados. Mandar só o .html
 entrega uma tela em branco.
 
-O conteúdo é exatamente o de `_site/` — o mesmo pacote que vai ao ar, montado
-pela lista de permissão de `montar_site.py`, já conferido por
-`checar_publicacao.py`. Não há caminho separado para o zip, de propósito: um
-pacote montado por outras regras seria um segundo lugar de onde dado sigiloso
-poderia escapar.
+O conteúdo é o de `_site/` — o mesmo pacote que vai ao ar, montado pela lista de
+permissão de `montar_site.py`, já conferido por `checar_publicacao.py`. Não há
+caminho separado para o zip, de propósito: um pacote montado por outras regras
+seria um segundo lugar de onde dado sigiloso poderia escapar.
+
+Uma exceção: as páginas HTML entram na versão do REPOSITÓRIO, sem o `?v=` que a
+montagem acrescenta às referências de CSS e JS. O `?v=` é impressão do conteúdo
+contra cache do navegador, e serve ao site publicado, não a quem edita. Com ele
+no pacote, quem mexesse no HTML devolveria um arquivo que não casa com a fonte,
+e alguém teria de reaplicar a mudança à mão — exatamente o passo que faz uma
+edição se perder. Sem ele, o que ela edita é o que volta para o repositório.
 
 Vão junto um LEIA-ME e dois atalhos para abrir. Os atalhos existem porque a
 página **não abre com clique duplo**: o navegador recusa módulo de JavaScript e
@@ -80,12 +86,15 @@ conversar antes de escrever o número solto.
 O painel tem **um modo só, o claro**. Não há tema escuro para manter em
 sincronia.
 
-## Cuidado com os arquivos versionados
+## O HTML aqui é o mesmo do repositório
 
-Os nomes de CSS e JS dentro do HTML têm um `?v=` no fim (ex.:
-`painel.css?v=3365f73e`). É a impressão do conteúdo, que o site usa para o
-navegador não servir uma versão velha. Pode ignorar enquanto edita — quem gera
-o pacote refaz esses números.
+As páginas deste pacote são idênticas às do projeto — o que você editar pode
+voltar direto para lá, sem ninguém reaplicar nada à mão.
+
+(No site publicado, as referências de CSS e JS ganham um `?v=` no fim, com a
+impressão do conteúdo, para o navegador não servir versão velha. Isso é
+acrescentado na hora de publicar e não existe aqui, justamente para o arquivo
+que você mexe ser o arquivo que volta.)
 
 ## Os dados
 
@@ -148,7 +157,14 @@ def empacotar(saida: Path, site: Path) -> Path:
     arquivos = sorted(p for p in site.rglob("*") if p.is_file())
     with zipfile.ZipFile(saida, "w", zipfile.ZIP_DEFLATED) as zip_:
         for arquivo in arquivos:
-            zip_.write(arquivo, arquivo.relative_to(site))
+            interno = arquivo.relative_to(site)
+            fonte = RAIZ / interno
+            # HTML vai na versão do repositório (ver o cabeçalho deste arquivo).
+            # `index.html` da raiz não tem fonte: é gerado pela montagem.
+            if arquivo.suffix == ".html" and fonte.exists():
+                zip_.writestr(str(interno), fonte.read_text(encoding="utf-8"))
+            else:
+                zip_.write(arquivo, interno)
         zip_.writestr("LEIA-ME.md", LEIA_ME)
         # ZipInfo com permissão de execução: sem isso o .sh chega sem +x e o
         # atalho do macOS/Linux não roda com clique nem com ./abrir.sh.
