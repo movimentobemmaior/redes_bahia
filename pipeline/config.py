@@ -50,6 +50,16 @@ class Coluna:
 
 
 @dataclass(frozen=True)
+class Edital:
+    """Dados de capa do regulamento, exibidos no cabeçalho do painel."""
+
+    nome: str
+    periodo_inscricoes: str
+    duracao_parceria: str
+    territorio: str
+
+
+@dataclass(frozen=True)
 class Etapa:
     """Uma etapa do edital. O painel monta o funil a partir desta lista.
 
@@ -112,6 +122,7 @@ class Historico:
 @dataclass(frozen=True)
 class Config:
     versao: int
+    edital: Edital
     etapas: tuple[Etapa, ...]
     fonte: Fonte
     publicacao: Publicacao
@@ -347,8 +358,17 @@ def carregar(caminho: str | Path | None = None) -> Config:
     _checar_referencias(datasets)
     etapas = _ler_etapas(_exigir(bruto, "etapas", str(caminho.name)), datasets)
 
+    edital_bruto = bruto.get("edital") or {}
+    edital = Edital(
+        nome=str(edital_bruto.get("nome", "")),
+        periodo_inscricoes=str(edital_bruto.get("periodo_inscricoes", "")),
+        duracao_parceria=str(edital_bruto.get("duracao_parceria", "")),
+        territorio=str(edital_bruto.get("territorio", "")),
+    )
+
     return Config(
         versao=int(bruto.get("versao", 1)),
+        edital=edital,
         etapas=etapas,
         fonte=fonte,
         publicacao=publicacao,

@@ -25,6 +25,18 @@
 versao: 3
 
 # =============================================================================
+# O EDITAL
+# =============================================================================
+# Dados de capa do regulamento. Ficam aqui, e não escritos no HTML, porque são
+# informação do edital como qualquer outra — e porque a próxima edição muda
+# datas e território sem precisar de ninguém mexer na camada visual.
+edital:
+  nome: Redes Bahia
+  periodo_inscricoes: 27/07 a 17/08 de 2026
+  duracao_parceria: 2027 – 2028
+  territorio: Estado da Bahia
+
+# =============================================================================
 # ETAPAS DO EDITAL
 # =============================================================================
 # O painel monta o funil a partir desta lista, na ordem em que ela aparece.
