@@ -268,6 +268,16 @@ tbody tr:last-child td { border-bottom: none; }
   margin-top: var(--e-6);
 }
 
+.caixa-erro details {
+  margin-top: var(--e-4);
+  font-size: var(--texto-sm);
+  color: var(--tinta-3);
+}
+.caixa-erro summary {
+  cursor: pointer;
+  color: var(--tinta-2);
+}
+
 .rodape {
   margin-top: var(--e-12);
   padding-top: var(--e-4);

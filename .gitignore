@@ -26,6 +26,9 @@ htmlcov/
 reports/*
 !reports/.gitkeep
 
+# --- Pacote do site (sempre remontado por `make site`) ------------------------
+_site/
+
 # --- Sistema / editor ---------------------------------------------------------
 .DS_Store
 Thumbs.db

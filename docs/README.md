@@ -9,6 +9,7 @@
 | 05 | [Identidade visual](05-identidade-visual.md) | quem constrói telas e gráficos |
 | 06 | [Governança e LGPD](06-governanca-e-lgpd.md) | coordenação e jurídico |
 | 07 | [Roteiro](07-roteiro.md) | coordenação |
+| 08 | [Publicação do painel](08-publicacao-do-painel.md) | quem for hospedar o painel |
 | — | [Decisões de arquitetura (ADR)](adr/) | quem precisa entender "por que assim" |
 
 ## Convenções

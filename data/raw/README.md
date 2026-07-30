@@ -30,6 +30,9 @@ Esta é a **única pasta** em que se mexe na rotina diária.
 ## Atenção — LGPD
 
 Os arquivos desta pasta contêm dados de identificação (CNPJ, e-mail) e ficam
-versionados no repositório. Por isso o repositório **é privado**, e as colunas
-marcadas como `sensivel: true` no contrato nunca chegam a `data/published/`.
-Ver `docs/06-governanca-e-lgpd.md`.
+versionados no repositório. Por isso o repositório é **privado**, e precisa
+continuar sendo.
+
+As colunas marcadas como `sensivel: true` no contrato nunca chegam a
+`data/published/`, mas isso protege a camada publicada, **não** esta pasta:
+aqui o arquivo fica como veio. Ver `docs/06-governanca-e-lgpd.md`.

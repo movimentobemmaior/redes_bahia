@@ -3,6 +3,13 @@
 > Este documento descreve as decisões técnicas tomadas e o que ainda precisa de
 > validação jurídica. Não substitui parecer do jurídico.
 
+> ✅ **Resolvido em 2026-07-30: o repositório foi tornado privado.**
+>
+> Por um período o repositório esteve público, o que era incompatível com
+> `data/raw/` guardar as planilhas originais. Nada vazou — nenhuma planilha
+> chegou a ser subida nesse intervalo; `data/raw/` só tinha o README. A
+> condição que o projeto pressupõe está atendida.
+
 ## O que está em jogo
 
 A planilha do edital contém dados que identificam organizações e pessoas: CNPJ,
@@ -12,14 +19,25 @@ histórico e (dependendo da configuração) alcance.
 
 ## Decisões em vigor
 
-### 1. O repositório é privado
+### 0. O repositório é privado, e precisa continuar sendo
 
-`data/raw/` guarda as planilhas originais, com os dados de identificação. Isso
-é proposital — é o que permite refazer qualquer publicação passada — e é o que
-obriga o repositório a ser privado.
+`data/raw/` versiona as planilhas originais, com CNPJ e e-mail. Tornar o
+repositório público de novo exigiria, antes, tirar `data/raw/` e
+`data/processed/` do git — e do histórico, não só da última versão.
 
-**Se o repositório for tornado público, `data/raw/` e `data/processed/` precisam
-sair antes**, e sair do histórico do git, não só da última versão.
+**Repositório privado protege os arquivos, não o painel.** Site gerado a partir
+de repositório privado continua público se hospedado sem controle de acesso.
+Ver [publicação do painel](08-publicacao-do-painel.md).
+
+### 1. `data/raw/` guarda as planilhas originais
+
+Isso é proposital: é o que permite refazer qualquer publicação passada. E é
+justamente o que **exige repositório privado**, mesmo com o painel sendo
+público — são camadas diferentes.
+
+Se o repositório for tornado público mais tarde, `data/raw/` e
+`data/processed/` precisam sair antes — e sair do histórico do git, não só da
+última versão.
 
 ### 2. Coluna sigilosa não chega à camada publicada
 
@@ -40,29 +58,38 @@ seção "Colunas não publicadas".
 Existe um teste automatizado que falha se uma coluna sigilosa aparecer na
 camada publicada (`tests/test_publish.py`).
 
-### 3. Só `data/published/` alimenta o painel
+### 3. Só `data/published/` alimenta o painel — e ela agora é pública
 
-O painel não lê `data/raw/` nem `data/processed/`. Se um dia o painel for
-hospedado, é essa pasta — e só ela — que sai.
+O painel não lê `data/raw/` nem `data/processed/`. Com o painel publicado no
+GitHub Pages ([ADR 0005](adr/0005-painel-publico-no-github-pages.md)), tudo que
+está em `data/published/` é **acessível a qualquer pessoa na internet**.
 
-### 4. Nome de organização é publicado
+Consequência prática: acrescentar uma coluna ao contrato sem marcá-la como
+`sensivel` passou a ser uma decisão de publicação. A trava de `make site` barra
+o que está marcado; ela não adivinha o que deveria estar.
 
-`organizacao` não está marcada como sigilosa: identificar quem se inscreveu em
-edital de financiamento é, em geral, informação de interesse público, e sem ela
-o painel perde sentido.
+### 4. Nome de organização, status e notas são públicos
 
-**Ponto para validação jurídica**, especialmente se o painel for público.
+`organizacao`, `status`, `etapa`, `valor_solicitado`, `nota_final` e a tabela
+inteira de `avaliacoes` não estão marcadas como sigilosas, e portanto aparecem
+no painel público.
+
+**Ponto aberto para o jurídico**, e o mais relevante deste documento: uma
+organização aparece como "Inabilitada" para qualquer pessoa possivelmente antes
+de ser comunicada, e as notas por avaliador são avaliação identificável de
+terceiros. A decisão de publicar está registrada no
+[ADR 0005](adr/0005-painel-publico-no-github-pages.md), com as alternativas que
+foram descartadas caso ela precise ser revista.
 
 ## O que ainda precisa de decisão
 
 | Questão | Impacto |
 |---|---|
-| O painel será público, restrito à equipe, ou restrito ao comitê? | define o que pode ser publicado |
-| Nome de organização pode aparecer em painel público? | ver acima |
-| Notas por avaliador podem ser publicadas? | avaliação identificável de terceiros |
+| **O edital coletou consentimento para divulgação?** | base legal para o painel público — a pergunta mais urgente da lista |
+| Status de proposta em análise pode ser público antes da comunicação à organização? | hoje é |
+| Notas por avaliador podem ser públicas? | hoje são; avaliação identificável de terceiros |
 | Por quanto tempo guardar as planilhas em `data/raw/`? | hoje: indefinidamente |
 | Quem pode dar acesso ao repositório? | hoje: sem processo escrito |
-| O edital coletou consentimento para divulgação dos dados? | base legal do tratamento |
 
 ## Se um dado sigiloso vazar para a camada publicada
 

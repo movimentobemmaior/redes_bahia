@@ -1,0 +1,79 @@
+# Monta o pacote do painel, confere que nada sigiloso entrou, e publica no
+# GitHub Pages.
+#
+# O painel é PÚBLICO por decisão registrada em
+# docs/adr/0005-painel-publico-no-github-pages.md. Qualquer pessoa com o
+# endereço enxerga o conteúdo de data/published/.
+#
+# A trava continua sendo a peça crítica — e mais ainda agora. Ela é o que
+# garante que CNPJ, e-mail e a base interna nunca saiam, mesmo com o site
+# aberto. Se ela falhar, nada é publicado.
+#
+# Antes do primeiro uso, alguém precisa fazer uma vez, na mão:
+#   Settings → Pages → Build and deployment → Source: GitHub Actions
+#
+# Repositório privado + Pages exige plano pago do GitHub. Se este fluxo falhar
+# por isso, NÃO resolva tornando o repositório público: data/raw/ guarda as
+# planilhas originais, com CNPJ e e-mail. Ver docs/06-governanca-e-lgpd.md.
+name: Publicar painel
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/published/**"
+      - "dashboard/**"
+      - "design/tokens/**"
+      - "config/fontes.yml"
+      - "scripts/montar_site.py"
+      - "scripts/checar_publicacao.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install PyYAML
+
+      - name: Montar o pacote do painel
+        run: python scripts/montar_site.py
+
+      # Última barreira antes de o conteúdo ir para a web aberta.
+      # Falhou aqui, nada é publicado.
+      - name: Conferir que nada sigiloso entrou
+        run: python scripts/checar_publicacao.py
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Enviar pacote
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site/
+
+      - name: Publicar
+        id: deploy
+        uses: actions/deploy-pages@v4
+
+      - name: Endereço publicado
+        run: echo "Painel no ar em ${{ steps.deploy.outputs.page_url }}"

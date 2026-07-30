@@ -33,6 +33,13 @@ jobs:
           python scripts/gerar_exemplo.py
           python -m pipeline dados
 
+      # Prova que a trava de sigilo funciona sobre um pacote real, e não só
+      # sobre os casos sintéticos dos testes.
+      - name: Montar o pacote do painel e conferir sigilo
+        run: |
+          python scripts/montar_site.py
+          python scripts/checar_publicacao.py
+
       - name: Guardar relatórios
         if: always()
         uses: actions/upload-artifact@v4
