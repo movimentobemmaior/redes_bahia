@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := ajuda
 PY ?= python3
 
-.PHONY: ajuda instalar exemplo perfil validar dados dicionario teste lint formatar painel limpar tudo
+.PHONY: ajuda instalar exemplo perfil validar dados dicionario teste lint formatar painel site limpar tudo
 
 ajuda:  ## mostra esta ajuda
 	@echo "Painel Redes Bahia — comandos disponíveis:"
@@ -42,8 +42,12 @@ painel:  ## abre o painel local em http://localhost:8000
 	@echo "Painel em http://localhost:8000/dashboard/  (Ctrl+C para parar)"
 	@$(PY) -m http.server 8000
 
+site:  ## monta o pacote do painel em _site/ e roda a trava de sigilo
+	$(PY) scripts/montar_site.py
+	$(PY) scripts/checar_publicacao.py
+
 limpar:  ## apaga saídas intermediárias e relatórios locais
-	rm -rf data/interim/* reports/* .pytest_cache .ruff_cache
+	rm -rf data/interim/* reports/* _site .pytest_cache .ruff_cache
 	find . -name __pycache__ -type d -prune -exec rm -rf {} +
 
 tudo: lint teste dados  ## checagem completa: estilo, testes e pipeline

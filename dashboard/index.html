@@ -75,14 +75,22 @@
     </div>
 
     <div id="erro" class="caixa-erro" hidden>
-      <h2>Não foi possível ler a base</h2>
-      <p id="erro-detalhe" class="meta"></p>
-      <p>Prováveis causas:</p>
-      <ul>
-        <li>a base ainda não foi gerada — rode <code>make dados</code>;</li>
-        <li>a página foi aberta direto do arquivo — use <code>make painel</code>
-          e acesse <code>http://localhost:8000/dashboard/</code>.</li>
-      </ul>
+      <h2>A base ainda não foi publicada</h2>
+      <p>
+        Nenhuma planilha foi processada até agora, então não há dados para
+        mostrar. Assim que a primeira atualização rodar, esta página passa a
+        exibir o estado da base.
+      </p>
+      <details>
+        <summary>Detalhes técnicos</summary>
+        <p id="erro-detalhe" class="meta"></p>
+        <ul>
+          <li>a base ainda não foi gerada — rode <code>make dados</code>;</li>
+          <li>a página foi aberta direto do arquivo, sem servidor — use
+            <code>make painel</code> e acesse
+            <code>http://localhost:8000/dashboard/</code>.</li>
+        </ul>
+      </details>
     </div>
   </main>
 

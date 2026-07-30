@@ -1,0 +1,78 @@
+# Monta o pacote do painel e confere que nada sigiloso entrou nele.
+#
+# O pacote fica disponível como artefato do fluxo (`painel`), pronto para ser
+# hospedado. O passo de hospedagem em si está comentado no fim, porque o
+# painel é restrito ao comitê e hospedagem com controle de acesso depende de
+# uma escolha que ainda não foi feita — ver docs/08-publicacao-do-painel.md.
+#
+# A montagem é por lista de permissão (scripts/montar_site.py) e a conferência
+# é contra o contrato de dados (scripts/checar_publicacao.py). Se a trava
+# acusar qualquer coisa, o fluxo falha e nenhum artefato é gerado.
+name: Publicar painel
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/published/**"
+      - "dashboard/**"
+      - "design/tokens/**"
+      - "config/fontes.yml"
+      - "scripts/montar_site.py"
+      - "scripts/checar_publicacao.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publicar-painel
+  cancel-in-progress: true
+
+jobs:
+  empacotar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install PyYAML
+
+      - name: Montar o pacote do painel
+        run: python scripts/montar_site.py
+
+      # Se este passo falhar, nada é publicado. É a última barreira antes de
+      # o conteúdo sair do controle de acesso do repositório.
+      - name: Conferir que nada sigiloso entrou
+        run: python scripts/checar_publicacao.py
+
+      - name: Guardar o pacote
+        uses: actions/upload-artifact@v4
+        with:
+          name: painel
+          path: _site/
+          retention-days: 30
+
+      # --- Hospedagem -------------------------------------------------------
+      # Descomente APENAS depois de escolher onde hospedar, e leia antes
+      # docs/08-publicacao-do-painel.md.
+      #
+      # ATENÇÃO: GitHub Pages serve o site publicamente mesmo quando o
+      # repositório é privado (a exceção é o Enterprise Cloud, que tem
+      # controle de acesso). Como este painel é restrito ao comitê, os passos
+      # abaixo só valem se essa condição estiver atendida.
+      #
+      # - name: Configurar Pages
+      #   uses: actions/configure-pages@v5
+      # - name: Enviar pacote para o Pages
+      #   uses: actions/upload-pages-artifact@v3
+      #   with:
+      #     path: _site/
+      # - name: Publicar
+      #   id: deploy
+      #   uses: actions/deploy-pages@v4

@@ -38,6 +38,28 @@ e em `data/published/historico.csv`. Este arquivo registra mudanças de
 - Documentação: arquitetura, rotina de atualização, indicadores, identidade
   visual, governança/LGPD, roteiro e três ADRs.
 
+### Publicação do painel
+
+- Decidido: o painel é **restrito ao comitê**
+  ([ADR 0004](docs/adr/0004-painel-restrito-ao-comite.md)).
+- `make site` monta o pacote para hospedagem por **lista de permissão** — só
+  entram a página, os tokens de design e `data/published/`.
+- Trava de sigilo (`scripts/checar_publicacao.py`) confere o pacote contra o
+  contrato antes de qualquer hospedagem: barra planilhas, arquivos da base
+  interna, colunas sigilosas e arquivos inesperados na camada publicada.
+  Roda no CI e no fluxo **Publicar painel**.
+- Documentado por que repositório privado **não** torna um site privado, e as
+  opções de hospedagem com controle de acesso
+  ([08](docs/08-publicacao-do-painel.md)).
+
+### Corrigido
+
+- Fluxo **Atualizar base** não falha mais quando o contrato muda antes de
+  existir qualquer planilha.
+- Documentação afirmava que o repositório era privado quando ainda não era.
+  Repositório tornado privado em 2026-07-30, sem nenhuma planilha exposta no
+  intervalo.
+
 ### Pendente
 
 - Substituir o contrato provisório pelo contrato do `.xlsm` real (fase 2).

@@ -24,9 +24,6 @@ Entregue:
 
 Assunto para o dia em que o `.xlsm` de verdade chegar.
 
-0. **Resolver a visibilidade do repositório** ([governança](06-governanca-e-lgpd.md),
-   "Como destravar"). Enquanto isso não sair, nenhuma planilha pode subir — o
-   que trava toda a fase 2.
 1. `make perfil` na planilha real.
 2. Reescrever `config/fontes.yml` a partir do que existe de fato (o contrato
    atual é uma suposição).
@@ -69,6 +66,7 @@ a valer a pena:
 | Grafia inconsistente (município, status) | contagem errada, buraco no mapa | vira aviso na validação, com os valores listados |
 | Ninguém sobe a planilha por vários dias | painel desatualizado sem parecer | data da última atualização em destaque na tela |
 | Dado sigiloso vazar para a camada publicada | incidente de LGPD | remoção automática + teste que falha se acontecer |
-| **Repositório público com planilha em `data/raw/`** | **publicação de dado pessoal, irreversível pelo histórico do git** | **pendência aberta e bloqueante — ver [governança](06-governanca-e-lgpd.md)** |
+| Repositório voltar a ser público com planilha em `data/raw/` | publicação de dado pessoal, irreversível pelo histórico do git | repositório privado desde 2026-07-30; a condição está registrada em [governança](06-governanca-e-lgpd.md) |
+| Painel hospedado sem controle de acesso | comitê vira público sem ninguém perceber | montagem por lista de permissão + trava conferida em CI; hospedagem documentada em [publicação](08-publicacao-do-painel.md) |
 | Chave duplicada | todo total do painel fica errado | erro que bloqueia a publicação |
 | O contrato atual é uma suposição | retrabalho na fase 2 | aviso explícito no topo de `config/fontes.yml` |
