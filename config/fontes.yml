@@ -2,39 +2,41 @@
 # CONTRATO DE DADOS — Painel Redes Bahia
 # =============================================================================
 # Este arquivo é a ÚNICA fonte de verdade sobre a estrutura da planilha.
-# Dele saem: a leitura do xlsm, as validações, o dicionário de dados
+# Dele saem: a leitura do arquivo, as validações, o dicionário de dados
 # (docs/03-dicionario-de-dados.md) e os metadados publicados para o painel.
 #
-# >>> ATENÇÃO: o schema abaixo é PROVISÓRIO. <<<
-# Foi escrito antes do primeiro xlsm real chegar, apenas para o pipeline rodar
-# de ponta a ponta. Quando o arquivo real entrar em data/raw/, rode:
+# Escrito a partir da planilha real de 30/07/2026 11:22
+# (Credenciamento_Redes_Bahia_30072026_105430.xlsx, 13 respostas).
 #
-#     make perfil
+# Se a estrutura mudar, rode `make perfil`: ele lê a planilha e gera um
+# rascunho deste arquivo em reports/rascunho_fontes.yml, além de um relatório
+# em reports/perfil_*.md. Compare, ajuste aqui e só então rode `make dados`.
 #
-# ...que lê a planilha e gera um rascunho deste arquivo em
-# reports/rascunho_fontes.yml + um relatório em reports/perfil_*.md.
-# Compare, ajuste este arquivo e só então rode `make dados`.
+# `exclui_quando` marca o valor que torna a organização INELEGÍVEL. Parte dos
+# critérios do edital tem sentido invertido — "Sim" exclui —, e essa informação
+# precisa estar em um lugar só, revisável, e não espalhada pelo código do
+# painel. O painel lê isso do manifesto.
 #
 # Tipos aceitos: texto | inteiro | decimal | data | booleano | categoria
 # Regras aceitas: unico | valores_permitidos | intervalo | nao_nulo | minimo_linhas |
 #                 referencia (chave estrangeira entre datasets)
 # =============================================================================
 
-versao: 1
+versao: 2
 
 fonte:
   diretorio: data/raw
-  padrao_arquivo: "*.xlsm"
-  # mais_recente = usa só o arquivo mais novo (por nome). É o modo do piloto:
-  # a planilha do dia representa a foto completa da base naquele dia.
+  # A exportação do formulário sai em .xlsx (não .xlsm).
+  padrao_arquivo: "*.xlsx"
+  # mais_recente = usa só o arquivo mais novo (por nome). A planilha do dia
+  # representa a foto completa da base naquele dia.
   selecao: mais_recente
 
 publicacao:
   formatos: [csv, parquet, json]
-  # Colunas marcadas como sensiveis nunca saem em data/published/ (ver LGPD em
-  # docs/06-governanca-e-lgpd.md). Ficam apenas em data/processed/.
+  # Colunas marcadas como sensíveis nunca saem em data/published/, que é o que
+  # alimenta o painel público. Ver docs/06-governanca-e-lgpd.md.
   remover_sensiveis: true
-  # Limite de linhas por dataset no JSON do painel (0 = sem limite).
   limite_linhas_json: 0
 
 # Histórico: a cada execução, grava contagens agregadas em
@@ -42,166 +44,164 @@ publicacao:
 # mesmo com a planilha sendo sempre uma foto do momento.
 historico:
   arquivo: data/published/historico.csv
-  agrupar_por: [status, territorio_identidade, eixo]
+  agrupar_por: [status_credenciamento, estado, representa]
 
 datasets:
 
-  inscricoes:
-    aba: Inscricoes
+  credenciamento:
+    aba: Credenciamento Redes Bahia
     descricao: >-
-      Uma linha por proposta inscrita no edital. Grão: inscrição.
-      Base para todos os indicadores de funil, território e valores.
+      Uma linha por organização que respondeu o formulário de credenciamento.
+      Grão: resposta ao formulário. É o funil de elegibilidade do edital —
+      cada coluna `criterio_*` é um requisito respondido pela própria
+      organização, e o `status_credenciamento` é o resultado da checagem
+      automática desses requisitos.
     linha_cabecalho: 1
-    chave: [id_inscricao]
+    chave: [id]
     colunas:
-      id_inscricao:
-        origem: "ID Inscrição"
+
+      # --- Identificação da resposta -------------------------------------
+      id:
+        origem: "ID"
         tipo: texto
         obrigatorio: true
-        descricao: Identificador único da proposta no sistema de inscrição.
-      organizacao:
-        origem: "Organização"
+        descricao: Identificador da resposta no sistema de formulários.
+      edital:
+        origem: "Edital"
         tipo: texto
-        obrigatorio: true
-        descricao: Nome da organização proponente.
-      cnpj:
-        origem: "CNPJ"
-        tipo: texto
-        sensivel: true
-        descricao: CNPJ da proponente. Dado de identificação — não publicado.
-      email_contato:
-        origem: "E-mail de Contato"
-        tipo: texto
-        sensivel: true
-        descricao: Contato da proponente. Dado pessoal — não publicado.
-      municipio:
-        origem: "Município"
+        descricao: >-
+          Edital ao qual a resposta se refere. Veio inteiramente vazia na
+          remessa de 30/07/2026 — declarada aqui para não sumir do painel
+          quando começar a ser preenchida.
+      formulario:
+        origem: "Formulário"
         tipo: categoria
-        obrigatorio: true
-        descricao: Município-sede da organização.
-      territorio_identidade:
-        origem: "Território de Identidade"
-        tipo: categoria
-        obrigatorio: true
-        descricao: Um dos 27 Territórios de Identidade da Bahia.
-      eixo:
-        origem: "Eixo"
-        tipo: categoria
-        descricao: Eixo temático da proposta.
-      etapa:
-        origem: "Etapa"
-        tipo: categoria
-        descricao: Etapa do processo em que a proposta se encontra.
-      status:
-        origem: "Status"
-        tipo: categoria
-        obrigatorio: true
-        descricao: Situação atual da proposta.
-      data_inscricao:
-        origem: "Data de Inscrição"
+        descricao: Nome do formulário de origem. Hoje há só um.
+      data_resposta:
+        origem: "Data da Resposta"
         tipo: data
         obrigatorio: true
-        descricao: Data de envio da proposta.
-      valor_solicitado:
-        origem: "Valor Solicitado"
-        tipo: decimal
-        descricao: Valor pleiteado em reais.
-      nota_final:
-        origem: "Nota Final"
-        tipo: decimal
-        descricao: Nota consolidada da avaliação (0 a 10). Vazia até ser avaliada.
+        descricao: >-
+          Data de envio da resposta. Vem como texto no formato
+          "29/07/2026 às 12:16"; o pipeline converte para data.
+
+      # --- Quem respondeu -------------------------------------------------
+      organizacao:
+        origem: "Respondente"
+        tipo: texto
+        obrigatorio: true
+        descricao: Nome da organização ou coletivo respondente.
+      estado:
+        origem: "Estado do respondente"
+        tipo: categoria
+        obrigatorio: true
+        descricao: Estado declarado pela organização.
+      respondente_nome:
+        origem: "Usuário que respondeu"
+        tipo: texto
+        sensivel: true
+        descricao: >-
+          Nome da pessoa física que preencheu o formulário. Dado pessoal —
+          não publicado.
+      respondente_email:
+        origem: "E-mail do usuário"
+        tipo: texto
+        sensivel: true
+        descricao: E-mail da pessoa que preencheu. Dado pessoal — não publicado.
+
+      # --- Resultado ------------------------------------------------------
+      status_credenciamento:
+        origem: "Status do credenciamento"
+        tipo: categoria
+        obrigatorio: true
+        descricao: Resultado da checagem automática dos critérios.
+      representa:
+        origem: "Eu represento:"
+        tipo: categoria
+        obrigatorio: true
+        descricao: Natureza jurídica declarada pela respondente.
+
+      # --- Critérios de elegibilidade -------------------------------------
+      # Nomes curtos aqui, pergunta completa em `origem`: o cabeçalho original
+      # tem até 150 caracteres e não serve como nome de coluna no painel.
+      criterio_estatuto_registrado:
+        origem: "Sua organização social possui a ata de Constituição e Estatuto Social registrada em cartório?"
+        tipo: booleano
+        exclui_quando: "Não"
+        descricao: Ata de constituição e estatuto registrados em cartório.
+      criterio_regularidade_credito:
+        origem: "Sua organização social está regularizada nos órgãos fiscalizadores de crédito, tais como: Serasa, SPC, Receita Federal, etc?"
+        tipo: booleano
+        exclui_quando: "Não"
+        descricao: Regularidade em Serasa, SPC, Receita Federal e afins.
+      criterio_dois_representantes:
+        origem: "Seu coletivo tem, no mínimo, dois representantes?"
+        tipo: categoria
+        descricao: >-
+          Coletivo com ao menos dois representantes. Não é Sim/Não: organizações
+          formais respondem "Não se aplica".
+      criterio_sede_bahia:
+        origem: "Sua organização tem sede no estado da Bahia?"
+        tipo: booleano
+        exclui_quando: "Não"
+        descricao: Sede no estado da Bahia.
+      criterio_atuacao_apenas_bahia:
+        origem: "Sua organização ou coletivo atua somente no mesmo estado onde está sediada (Bahia)?"
+        tipo: booleano
+        exclui_quando: "Não"
+        descricao: Atuação restrita ao estado da sede.
+      criterio_municipios_ate_200mil:
+        origem: "A sua organização ou coletivo atua em municípios baianos de, no máximo, 200 mil habitantes?"
+        tipo: booleano
+        exclui_quando: "Não"
+        descricao: Atuação em municípios de até 200 mil habitantes.
+      criterio_em_atividade:
+        origem: "Sua organização ou coletivo está em atividade e beneficia diretamente pessoas?"
+        tipo: booleano
+        exclui_quando: "Não"
+        descricao: Em atividade, com beneficiários diretos.
+      criterio_receita_acima_500mil:
+        origem: "Sua organização ou coletivo teve uma receita anual de mais de 500 mil reais no ano de 2025?"
+        tipo: booleano
+        exclui_quando: "Sim"
+        descricao: >-
+          Receita anual acima de R$ 500 mil em 2025. Atenção ao sentido:
+          "Sim" aqui é critério de EXCLUSÃO, não de aprovação.
+      criterio_atuacao_minima_3_anos:
+        origem: "A sua organização ou coletivo, desenvolve comprovadamente atividades no território há, no mínimo, 3 anos?"
+        tipo: booleano
+        exclui_quando: "Não"
+        descricao: Pelo menos três anos de atuação comprovada no território.
+      criterio_vinculo_partidario:
+        origem: "Sua organização ou coletivo possui algum vínculo com partidos políticos em todo o território nacional ou seus responsáveis exercem cargos políticos?"
+        tipo: booleano
+        exclui_quando: "Sim"
+        descricao: >-
+          Vínculo partidário ou cargo político. "Sim" é critério de EXCLUSÃO.
+      criterio_fins_religiosos:
+        origem: "Sua organização social ou coletivo tem fins religiosos?"
+        tipo: booleano
+        exclui_quando: "Sim"
+        descricao: Fins religiosos. "Sim" é critério de EXCLUSÃO.
+      ciencia_comprovacao_receita:
+        origem: "Declaro que estou ciente de que serão pedidas comprovações da receita anual."
+        tipo: categoria
+        descricao: Ciência de que a receita declarada será comprovada.
+
     regras:
       - tipo: minimo_linhas
         valor: 1
       - tipo: unico
-        colunas: [id_inscricao]
+        colunas: [id]
       - tipo: valores_permitidos
-        coluna: status
-        valores: [Inscrita, Em análise, Habilitada, Inabilitada, Selecionada, Não selecionada, Desistente]
-      - tipo: intervalo
-        coluna: nota_final
-        min: 0
-        max: 10
-      - tipo: intervalo
-        coluna: valor_solicitado
-        min: 0
-      # Município escrito de forma diferente da tabela de apoio é a causa nº 1
-      # de mapa com buraco. Vira aviso, não erro.
-      - tipo: referencia
-        coluna: municipio
-        dataset: municipios
-        coluna_alvo: municipio
-
-  avaliacoes:
-    aba: Avaliacoes
-    descricao: >-
-      Uma linha por nota atribuída. Grão: inscrição × avaliador × critério.
-      Permite ver dispersão entre avaliadores e desempenho por critério.
-    linha_cabecalho: 1
-    chave: [id_inscricao, avaliador, criterio]
-    colunas:
-      id_inscricao:
-        origem: "ID Inscrição"
-        tipo: texto
-        obrigatorio: true
-        descricao: Chave estrangeira para inscricoes.id_inscricao.
-      avaliador:
-        origem: "Avaliador"
-        tipo: categoria
-        obrigatorio: true
-        descricao: Identificação do avaliador (código ou nome).
-      criterio:
-        origem: "Critério"
-        tipo: categoria
-        obrigatorio: true
-        descricao: Critério avaliado, conforme edital.
-      nota:
-        origem: "Nota"
-        tipo: decimal
-        obrigatorio: true
-        descricao: Nota do critério (0 a 10).
-      data_avaliacao:
-        origem: "Data da Avaliação"
-        tipo: data
-        descricao: Data em que a nota foi registrada.
-    regras:
-      - tipo: unico
-        colunas: [id_inscricao, avaliador, criterio]
-      - tipo: intervalo
-        coluna: nota
-        min: 0
-        max: 10
-      - tipo: referencia
-        coluna: id_inscricao
-        dataset: inscricoes
-        coluna_alvo: id_inscricao
-
-  municipios:
-    aba: Municipios
-    descricao: >-
-      Tabela de apoio (dimensão). Grão: município. Usada para mapas,
-      cobertura territorial e cálculos por habitante.
-    linha_cabecalho: 1
-    chave: [municipio]
-    colunas:
-      municipio:
-        origem: "Município"
-        tipo: texto
-        obrigatorio: true
-        descricao: Nome do município.
-      codigo_ibge:
-        origem: "Código IBGE"
-        tipo: texto
-        descricao: Código IBGE de 7 dígitos — chave para bases externas e mapas.
-      territorio_identidade:
-        origem: "Território de Identidade"
-        tipo: categoria
-        obrigatorio: true
-        descricao: Território de Identidade ao qual o município pertence.
-      populacao:
-        origem: "População"
-        tipo: inteiro
-        descricao: População estimada (fonte IBGE).
-    regras:
-      - tipo: unico
-        colunas: [municipio]
+        coluna: status_credenciamento
+        valores: [Aprovado automaticamente, Não aprovado]
+      - tipo: valores_permitidos
+        coluna: representa
+        valores: [Associação sem fins lucrativos, Coletivo, Nenhuma das opções]
+      - tipo: valores_permitidos
+        coluna: criterio_dois_representantes
+        valores:
+          - Sim
+          - Não
+          - "Não se aplica, pois somos uma organização social (ONG, OSC)"

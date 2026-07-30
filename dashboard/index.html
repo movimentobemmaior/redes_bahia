@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Estado da base · Painel Redes Bahia</title>
+  <title>Painel Redes Bahia · Credenciamento</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%232a78d6'/%3E%3Crect x='3.5' y='8' width='2.5' height='5' fill='white'/%3E%3Crect x='7' y='5' width='2.5' height='8' fill='white'/%3E%3Crect x='10.5' y='3' width='2.5' height='10' fill='white'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="../design/tokens/tokens.css">
   <link rel="stylesheet" href="assets/painel.css">
@@ -14,8 +14,8 @@
   <header class="topo">
     <div class="faixa">
       <div>
-        <p class="sobretitulo">Painel Redes Bahia</p>
-        <h1>Estado da base de dados</h1>
+        <p class="sobretitulo">Edital Redes Bahia</p>
+        <h1>Credenciamento</h1>
       </div>
       <button id="alternar-tema" class="botao-tema" type="button" aria-pressed="false">
         Modo escuro
@@ -24,30 +24,164 @@
   </header>
 
   <main id="conteudo" class="faixa">
-    <p id="carregando" class="aviso-carregando">Carregando o manifesto da base…</p>
+    <p id="carregando" class="aviso-carregando">Carregando a base…</p>
 
     <div id="painel" hidden>
+
+      <!-- Estado da base: primeiro, porque decide se o resto pode ser lido -->
       <section class="destaque" aria-labelledby="t-atualizacao">
-        <h2 id="t-atualizacao" class="rotulo">Última atualização</h2>
-        <p id="data-atualizacao" class="numero-destaque">—</p>
-        <p id="origem" class="meta">—</p>
-        <p id="selo-validacao" class="selo"><span class="selo-icone" aria-hidden="true"></span><span class="selo-texto">—</span></p>
+        <div>
+          <h2 id="t-atualizacao" class="rotulo">Última atualização</h2>
+          <p id="data-atualizacao" class="numero-destaque">—</p>
+          <p id="origem" class="meta">—</p>
+        </div>
+        <p id="selo-validacao" class="selo">
+          <span class="selo-icone" aria-hidden="true"></span><span class="selo-texto">—</span>
+        </p>
       </section>
 
-      <section aria-labelledby="t-tabelas">
-        <h2 id="t-tabelas">Tabelas publicadas</h2>
-        <div id="cartoes" class="grade-cartoes"></div>
+      <!-- Filtros: uma faixa só, acima de tudo -->
+      <section class="filtros" aria-label="Filtros">
+        <label>
+          <span>Estado</span>
+          <select id="filtro-estado"></select>
+        </label>
+        <label>
+          <span>Resultado</span>
+          <select id="filtro-resultado"></select>
+        </label>
+        <label>
+          <span>Natureza jurídica</span>
+          <select id="filtro-representa"></select>
+        </label>
+        <button id="limpar-filtros" type="button" class="botao-secundario">Limpar</button>
+        <p id="aviso-filtro" class="aviso-filtro" hidden>
+          Os números abaixo refletem o filtro aplicado.
+        </p>
       </section>
 
-      <section aria-labelledby="t-problemas">
-        <h2 id="t-problemas">Problemas encontrados na última execução</h2>
+      <section class="grade-kpi" aria-label="Números gerais">
+        <article class="cartao kpi" id="kpi-total">
+          <p class="valor">—</p><p class="rotulo-kpi">—</p>
+        </article>
+        <article class="cartao kpi" id="kpi-aprovadas">
+          <p class="valor">—</p><p class="rotulo-kpi">—</p>
+        </article>
+        <article class="cartao kpi" id="kpi-reprovadas">
+          <p class="valor">—</p><p class="rotulo-kpi">—</p>
+        </article>
+        <article class="cartao kpi" id="kpi-semmotivo">
+          <p class="valor">—</p><p class="rotulo-kpi">—</p>
+        </article>
+      </section>
+
+      <section class="cartao" aria-labelledby="t-resultado">
+        <h2 id="t-resultado">Resultado do credenciamento</h2>
+        <p class="descricao-bloco">
+          A checagem é automática, sobre o que a própria organização declarou.
+          Aprovado aqui não significa verificado — a comprovação vem depois.
+        </p>
+        <div class="legenda">
+          <span class="chave"><i style="background: var(--serie-1)"></i>Aprovadas automaticamente</span>
+          <span class="chave"><i style="background: var(--serie-2)"></i>Não aprovadas</span>
+        </div>
+        <div id="grafico-resultado" class="area-grafico"></div>
+      </section>
+
+      <!-- O bloco central: o que está barrando quem -->
+      <section class="cartao" aria-labelledby="t-criterios">
+        <div class="cabecalho-bloco">
+          <div>
+            <h2 id="t-criterios">Requisitos não atendidos</h2>
+            <p class="descricao-bloco">
+              Quantas organizações responderam o valor que torna a proposta
+              inelegível em cada requisito do edital.
+            </p>
+          </div>
+          <label class="seletor-escopo">
+            <span>Considerar</span>
+            <select id="escopo-criterios">
+              <option value="reprovadas">só as não aprovadas</option>
+              <option value="todas">todas as respostas</option>
+            </select>
+          </label>
+        </div>
+        <div id="grafico-criterios" class="area-grafico"></div>
+        <p id="nota-criterios" class="meta"></p>
+        <details class="tabela-alternativa">
+          <summary>Ver como tabela</summary>
+          <div id="tabela-criterios" class="rolagem"></div>
+        </details>
+      </section>
+
+      <div class="duas-colunas">
+        <section class="cartao" aria-labelledby="t-estado">
+          <h2 id="t-estado">Origem por estado</h2>
+          <p class="descricao-bloco">
+            O edital é para organizações com sede na Bahia, mas o formulário
+            aceita respostas de fora. Quem está fora aparece aqui.
+          </p>
+          <div id="grafico-estado" class="area-grafico"></div>
+        </section>
+
+        <section class="cartao" aria-labelledby="t-natureza">
+          <h2 id="t-natureza">Natureza jurídica</h2>
+          <p class="descricao-bloco">
+            "Nenhuma das opções" é o valor mais informativo: é quem não se
+            encaixa no desenho do edital.
+          </p>
+          <div id="grafico-natureza" class="area-grafico"></div>
+        </section>
+      </div>
+
+      <section class="cartao" aria-labelledby="t-evolucao">
+        <h2 id="t-evolucao">Respostas por dia</h2>
+        <p class="descricao-bloco">
+          Cobre apenas o período em que o formulário esteve aberto.
+        </p>
+        <div id="grafico-evolucao" class="area-grafico"></div>
+      </section>
+
+      <section class="cartao" aria-labelledby="t-organizacoes">
+        <div class="cabecalho-bloco">
+          <h2 id="t-organizacoes">Organizações</h2>
+          <p id="contagem-tabela" class="meta"></p>
+        </div>
+        <div class="rolagem">
+          <table id="tabela-organizacoes">
+            <caption class="oculto">Organizações que responderam o credenciamento</caption>
+            <thead>
+              <tr>
+                <th scope="col">Organização</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Natureza jurídica</th>
+                <th scope="col">Resposta</th>
+                <th scope="col">Resultado</th>
+                <th scope="col">Requisitos não atendidos</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="cartao" aria-labelledby="t-qualidade">
+        <h2 id="t-qualidade">Qualidade da base</h2>
+        <p class="descricao-bloco">
+          Um painel que não mostra a saúde do próprio dado convida à decisão
+          errada.
+        </p>
+        <h3>Preenchimento</h3>
+        <ul id="qualidade" class="lista-simples"></ul>
+        <p id="sigilo" class="meta"></p>
+
+        <h3>Problemas na última execução</h3>
         <div class="rolagem">
           <table id="tabela-problemas">
-            <caption class="oculto">Problemas de dados detectados pela validação</caption>
+            <caption class="oculto">Problemas detectados pela validação</caption>
             <thead>
               <tr>
                 <th scope="col">Gravidade</th>
-                <th scope="col">Tabela</th>
                 <th scope="col">Coluna</th>
                 <th scope="col">Problema</th>
                 <th scope="col" class="num">Linhas</th>
@@ -60,16 +194,14 @@
         <p id="sem-problemas" class="meta" hidden>Nenhum problema encontrado nesta execução.</p>
       </section>
 
-      <section aria-labelledby="t-arquivos">
-        <h2 id="t-arquivos">Arquivos da base</h2>
-        <ul id="arquivos" class="lista-arquivos"></ul>
-      </section>
-
       <footer class="rodape">
         <p id="procedencia" class="meta"></p>
         <p class="meta">
-          Esta página lê apenas <code>data/published/</code>. Documentação em
-          <a href="../docs/README.md"><code>docs/</code></a>.
+          Dados abertos:
+          <a href="../data/published/credenciamento.csv">CSV</a> ·
+          <a href="../data/published/credenciamento.json">JSON</a> ·
+          <a href="../data/published/manifest.json">manifesto</a>.
+          Esta página lê apenas <code>data/published/</code>.
         </p>
       </footer>
     </div>
@@ -79,7 +211,7 @@
       <p>
         Nenhuma planilha foi processada até agora, então não há dados para
         mostrar. Assim que a primeira atualização rodar, esta página passa a
-        exibir o estado da base.
+        exibir o painel.
       </p>
       <details>
         <summary>Detalhes técnicos</summary>
@@ -94,6 +226,6 @@
     </div>
   </main>
 
-  <script src="assets/painel.js"></script>
+  <script type="module" src="assets/painel.js"></script>
 </body>
 </html>

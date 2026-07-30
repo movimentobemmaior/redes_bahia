@@ -1,20 +1,41 @@
 # Indicadores do painel
 
-> **Estado: proposta.** Este catálogo foi escrito a partir da estrutura provável
-> da planilha, antes da validação com a coordenação do edital. Serve para abrir
-> a conversa: o que confirmar, o que cortar, o que falta.
+> Reescrito em 30/07/2026, a partir da planilha real de credenciamento
+> (13 respostas). O catálogo anterior tinha sido escrito antes do dado existir
+> e supunha uma base de inscrições com avaliações, valores e territórios — que
+> não é o que existe nesta etapa.
 >
-> Cada indicador só entra no painel depois de ter: definição escrita, fonte no
-> dicionário de dados, e uma pessoa responsável por respondê-lo.
+> **Estado: proposta.** Cada indicador só entra no painel depois de ter
+> definição escrita, fonte no dicionário de dados e uma pessoa responsável.
 
-## Por que catalogar antes de desenhar
+## O que a base é hoje
 
-Um indicador sem definição escrita vira três números diferentes em três telas.
-"Taxa de habilitação" pode ser sobre o total inscrito, sobre o total analisado
-ou sobre o total que chegou ao comitê. As três leituras são defensáveis; o que
-não é defensável é o painel não dizer qual delas está mostrando.
+Uma linha por organização que respondeu o **formulário de credenciamento**.
+Não é ainda a base de propostas: é a etapa anterior, em que a organização
+declara se atende aos requisitos e o sistema aprova ou não automaticamente.
 
-Por isso todo indicador aqui declara **numerador, denominador e recorte**.
+Isso define o que dá e o que não dá para medir:
+
+| Dá para medir | Não dá (ainda não existe na base) |
+|---|---|
+| quantas organizações se credenciaram | propostas, projetos, valores |
+| quantas foram aprovadas e quantas não | notas, avaliadores, critérios de mérito |
+| **qual requisito está barrando quem** | município, território de identidade |
+| natureza jurídica das respondentes | etapas de análise, prazos |
+| estado de origem | |
+| evolução diária de tudo isso | |
+
+Quando a etapa de inscrição começar, entra uma segunda aba/planilha e o
+catálogo cresce. Mapas por território dependem de uma coluna de município, que
+o formulário de credenciamento não coleta.
+
+## Cuidado que vale para o painel inteiro
+
+São **13 respostas**. Qualquer percentual se move mais de 7 pontos com uma
+resposta a mais. Enquanto a base for desse tamanho, o painel deve mostrar
+**números absolutos**, com o percentual em segundo plano — ou não mostrar
+percentual nenhum. Gráfico de pizza com 13 casos comunica uma precisão que o
+dado não tem.
 
 ## Formato de cada ficha
 
@@ -23,160 +44,141 @@ ID · Nome
 Pergunta que responde
 Cálculo:      numerador / denominador
 Fonte:        dataset.coluna
-Recorte:      dimensões em que pode ser fatiado
 Forma:        como se lê melhor visualmente
 Cuidado:      o que faz esse número mentir
 ```
 
 ---
 
-## Bloco 1 — Alcance do edital
+## Bloco 1 — Alcance
 
-### A1 · Inscrições recebidas
-- **Pergunta:** quantas propostas o edital atraiu?
-- **Cálculo:** contagem de linhas em `inscricoes`
-- **Fonte:** `inscricoes.id_inscricao`
-- **Recorte:** território, eixo, município, semana
+### A1 · Organizações credenciadas
+- **Pergunta:** quantas organizações passaram pelo formulário?
+- **Cálculo:** contagem de linhas em `credenciamento`
+- **Fonte:** `credenciamento.id`
 - **Forma:** número de destaque, com a variação desde a última atualização
-- **Cuidado:** conta propostas, não organizações. Uma organização pode inscrever
-  mais de uma proposta — se isso for comum, separar A1 de A2.
+- **Cuidado:** conta respostas, não organizações distintas. Se a mesma
+  organização puder responder duas vezes, A1 e A2 divergem — hoje
+  `organizacao` é única nas 13 respostas, mas isso não está garantido por
+  regra no contrato.
 
-### A2 · Organizações proponentes
-- **Pergunta:** quantas organizações diferentes o edital alcançou?
-- **Cálculo:** contagem de `organizacao` distintos
-- **Fonte:** `inscricoes.organizacao`
-- **Cuidado:** depende da grafia estar padronizada. "Assoc. Rede" e "Associação
-  Rede" contam como duas. Vale conferir com o CNPJ (base interna) e padronizar
-  a grafia na planilha.
+### A2 · Origem geográfica
+- **Pergunta:** de onde vêm as respostas?
+- **Cálculo:** contagem por `estado`
+- **Fonte:** `credenciamento.estado`
+- **Forma:** barras horizontais; a Bahia domina, então o valor informativo
+  está nas outras
+- **Cuidado:** o edital é para organizações com sede na Bahia, mas o
+  formulário aceita respostas de outros estados. Resposta de fora não é erro
+  de dado — é organização inelegível que respondeu mesmo assim, e ela precisa
+  aparecer, não ser filtrada em silêncio.
 
-### A3 · Cobertura territorial
-- **Pergunta:** quantos dos 27 Territórios de Identidade têm ao menos uma
-  proposta?
-- **Cálculo:** territórios com inscrição / 27
-- **Fonte:** `inscricoes.territorio_identidade`
-- **Forma:** mapa da Bahia com rampa sequencial de uma cor só; ao lado, a lista
-  dos territórios sem nenhuma inscrição
-- **Cuidado:** o vazio no mapa é o dado mais importante, e é o que a maioria dos
-  mapas esconde. Território sem inscrição precisa ficar visualmente distinto de
-  território com poucas inscrições.
-
-### A4 · Concentração territorial
-- **Pergunta:** o edital está concentrado em poucos territórios?
-- **Cálculo:** % das inscrições nos 3 territórios com mais propostas
-- **Cuidado:** número alto pode significar tanto desigualdade de acesso quanto
-  concentração populacional. Ler junto com A5.
-
-### A5 · Inscrições por 100 mil habitantes
-- **Pergunta:** onde a mobilização foi proporcionalmente maior?
-- **Cálculo:** inscrições do município / população × 100.000
-- **Fonte:** `inscricoes` + `municipios.populacao`
-- **Cuidado:** em município pequeno, uma inscrição a mais desloca muito a taxa.
-  Suprimir municípios abaixo de um limite de população, ou mostrar o valor
-  absoluto junto.
+### A3 · Natureza jurídica
+- **Cálculo:** contagem por `representa`
+- **Fonte:** `credenciamento.representa`
+- **Cuidado:** "Nenhuma das opções" é o valor mais informativo da lista — é
+  quem não se encaixa no desenho do edital. Não agrupar em "Outros".
 
 ---
 
-## Bloco 2 — Andamento da análise
+## Bloco 2 — Funil de elegibilidade (o bloco central)
 
-### B1 · Funil do edital
-- **Pergunta:** onde estão as propostas agora?
-- **Cálculo:** contagem por `status`, na ordem do processo
-- **Fonte:** `inscricoes.status`
-- **Forma:** funil ou barras horizontais ordenadas pela etapa, com o percentual
-  em relação ao total inscrito
-- **Cuidado:** `status` e `etapa` são coisas diferentes (situação × ponto do
-  fluxo). Misturar as duas é o erro mais provável deste painel.
+### B1 · Resultado do credenciamento
+- **Pergunta:** quantas passaram?
+- **Cálculo:** contagem por `status_credenciamento`
+- **Fonte:** `credenciamento.status_credenciamento`
+- **Forma:** duas barras ou dois números lado a lado, absolutos
+- **Cuidado:** "Aprovado automaticamente" significa que o sistema conferiu as
+  respostas declaradas — não que a organização foi verificada. A comprovação
+  vem depois (ver `ciencia_comprovacao_receita`). O painel não pode dar a
+  entender que é decisão final.
 
-### B2 · Propostas sem análise há mais de N dias
-- **Pergunta:** o que está parado?
-- **Cálculo:** inscrições em `Em análise` com `data_inscricao` anterior a N dias
-- **Forma:** número de destaque com cor de status, mais a lista
-- **Cuidado:** é o indicador que gera ação. Vale definir N com a coordenação
-  antes de publicar.
+### B2 · Qual requisito está barrando — o indicador que gera ação
+- **Pergunta:** entre as não aprovadas, qual critério cada uma deixou de
+  atender?
+- **Cálculo:** entre linhas com `status_credenciamento = "Não aprovado"`,
+  contagem de cada critério na condição de exclusão:
 
-### B3 · Tempo médio até a decisão
-- **Pergunta:** quanto tempo leva para uma proposta ser decidida?
-- **Cálculo:** média de (`data_avaliacao` mais recente − `data_inscricao`)
-- **Cuidado:** média esconde a cauda. Mostrar também a mediana e o percentil 90,
-  ou preferir a distribuição à média.
+  | Critério | Exclui quando |
+  |---|---|
+  | `criterio_sede_bahia` | `Não` |
+  | `criterio_atuacao_apenas_bahia` | `Não` |
+  | `criterio_municipios_ate_200mil` | `Não` |
+  | `criterio_em_atividade` | `Não` |
+  | `criterio_estatuto_registrado` | `Não` |
+  | `criterio_regularidade_credito` | `Não` |
+  | `criterio_atuacao_minima_3_anos` | `Não` |
+  | `criterio_receita_acima_500mil` | **`Sim`** |
+  | `criterio_vinculo_partidario` | **`Sim`** |
+  | `criterio_fins_religiosos` | **`Sim`** |
 
-### B4 · Evolução do funil
-- **Pergunta:** o processo está andando?
-- **Cálculo:** série de `historico.csv`, agrupamento `status`
-- **Forma:** linhas no tempo, uma por status, com rótulo direto nas séries
-- **Cuidado:** a série só existe a partir do primeiro dia em que o pipeline
-  rodou. Deixar isso explícito no eixo.
+- **Forma:** barras horizontais ordenadas pela frequência
+- **Cuidado:** **três critérios têm o sentido invertido** — neles, "Sim"
+  exclui. Ler todos como "Sim = bom" é o erro mais provável deste painel, e
+  produziria um gráfico exatamente ao contrário da realidade. O sentido está
+  registrado na descrição de cada coluna no
+  [dicionário](03-dicionario-de-dados.md).
+- **Cuidado 2:** uma organização pode falhar em mais de um critério, então a
+  soma das barras é maior que o número de não aprovadas. O eixo precisa dizer
+  isso, ou o leitor soma e não bate.
 
----
+### B3 · Requisito mais restritivo
+- **Pergunta:** qual exigência do edital exclui mais gente?
+- **Cálculo:** entre **todas** as respostas (não só as reprovadas), proporção
+  que não atende cada critério
+- **Cuidado:** diferente de B2. B2 explica quem já foi barrado; B3 informa o
+  desenho do próximo edital. Vale separar as duas telas.
 
-## Bloco 3 — Avaliação
-
-### C1 · Distribuição das notas finais
-- **Forma:** histograma
-- **Cuidado:** média de notas de propostas em etapas diferentes compara coisas
-  diferentes. Filtrar por etapa antes.
-
-### C2 · Dispersão entre avaliadores
-- **Pergunta:** avaliadores diferentes dão notas parecidas para a mesma
-  proposta?
-- **Cálculo:** desvio-padrão das notas por `id_inscricao`
-- **Fonte:** `avaliacoes`
-- **Cuidado:** indicador sensível — mede o processo, e pode ser lido como
-  avaliação de pessoas. Definir com a coordenação se entra no painel público.
-
-### C3 · Desempenho por critério
-- **Forma:** barras horizontais, um critério por barra, ordenadas pela média
-- **Cuidado:** critérios com pesos diferentes não são comparáveis na mesma
-  escala sem normalizar.
-
----
-
-## Bloco 4 — Recursos
-
-### D1 · Valor total solicitado
-- **Cálculo:** soma de `valor_solicitado`
-- **Cuidado:** só faz sentido junto com o valor disponível no edital. Sozinho,
-  não informa nada.
-
-### D2 · Valor solicitado por proposta
-- **Forma:** distribuição (boxplot ou histograma), não média
-- **Cuidado:** poucas propostas grandes deslocam a média. A distribuição é a
-  leitura honesta.
-
-### D3 · Razão demanda/oferta
-- **Cálculo:** valor total solicitado / valor disponível no edital
-- **Pendência:** o valor disponível não está na planilha. Precisa entrar como
-  parâmetro de configuração.
+### B4 · Coletivos sem dois representantes
+- **Fonte:** `credenciamento.criterio_dois_representantes`
+- **Cuidado:** não é Sim/Não. Organizações formais respondem "Não se aplica",
+  e tratá-lo como booleano descarta ou distorce metade das respostas.
 
 ---
 
-## Bloco 5 — Qualidade da base (sempre visível)
+## Bloco 3 — Evolução
 
-Um painel que não mostra a saúde do próprio dado convida a decisão errada.
+### C1 · Credenciamentos por dia
+- **Cálculo:** contagem por `data_resposta`
+- **Forma:** linha no tempo
+- **Cuidado:** só cobre o período em que o formulário esteve aberto. Com dez
+  dias de dados, é cedo para falar em tendência.
 
-### E1 · Última atualização
+### C2 · Evolução do funil
+- **Cálculo:** série de `historico.csv`, agrupamento `status_credenciamento`
+- **Cuidado:** a série começa no primeiro dia em que o pipeline rodou
+  (30/07/2026), não no início do edital. Deixar isso explícito no eixo.
+
+---
+
+## Bloco 4 — Qualidade da base (sempre visível)
+
+Um painel que não mostra a saúde do próprio dado convida à decisão errada.
+
+### D1 · Última atualização
 - **Fonte:** `manifest.json → data_execucao`
-- **Cuidado:** se a base tem mais de 24h, precisa ficar evidente na tela.
+- **Cuidado:** base com mais de 24h precisa ficar evidente na tela.
 
-### E2 · Status da validação
+### D2 · Status da validação
 - **Fonte:** `manifest.json → validacao.status`
 - **Forma:** selo com cor de status **e** rótulo em texto (nunca cor sozinha)
 
-### E3 · Preenchimento por coluna
+### D3 · Preenchimento por coluna
 - **Fonte:** `manifest.json → datasets[].colunas[].preenchimento`
-- **Cuidado:** coluna abaixo de 100% em indicador de contagem significa que o
-  total do painel não bate com o total da planilha.
+- **Cuidado:** `edital` está hoje em 0%. Coluna vazia no painel é diferente de
+  coluna ausente — a primeira é normal, a segunda bloqueia a publicação.
 
 ---
 
 ## Pendências para a coordenação
 
-1. Qual a lista oficial e a ordem dos `status`? (hoje o contrato tem uma
-   suposição)
-2. `status` e `etapa` são dimensões independentes?
-3. Qual o valor total disponível no edital? (D3)
-4. Qual o prazo aceitável de análise? (B2)
-5. C2 (dispersão entre avaliadores) entra no painel ou fica em relatório
-   interno?
-6. O painel será público ou restrito? A resposta muda o que pode ser publicado
-   (ver [governança](06-governanca-e-lgpd.md)).
+1. `status_credenciamento` pode ter outros valores além de "Aprovado
+   automaticamente" e "Não aprovado"? (há aprovação manual em algum caso?)
+2. A coluna `Edital` vai passar a ser preenchida? Ela permitiria separar
+   edições e comparar entre elas.
+3. Organizações de fora da Bahia devem aparecer no painel ou ser filtradas?
+   A recomendação aqui é aparecer — some do painel, some da análise.
+4. A base de **inscrições** (propostas) virá em outra planilha? Se sim, o
+   painel de funil de mérito é uma segunda etapa, com contrato próprio.
+5. Confirmar o sentido de exclusão dos três critérios invertidos (B2) antes de
+   qualquer gráfico ir ao ar.

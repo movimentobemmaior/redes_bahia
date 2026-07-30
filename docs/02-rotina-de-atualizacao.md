@@ -5,8 +5,8 @@ Como subir a planilha do dia e o que fazer quando algo dá errado.
 ## O caminho curto (sem instalar nada)
 
 1. Abra o repositório no GitHub, entre em `data/raw/`.
-2. **Add file → Upload files**, arraste o `.xlsm`.
-3. Nomeie no formato `AAAA-MM-DD_redes_bahia.xlsm`.
+2. **Add file → Upload files**, arraste o `.xlsx`.
+3. Nomeie no formato `AAAA-MM-DD_redes_bahia.xlsx`.
 4. Commit.
 5. Na aba **Actions**, acompanhe o fluxo **Atualizar base**.
    - ✅ verde: base publicada e commitada de volta. Fim.
@@ -17,7 +17,7 @@ Como subir a planilha do dia e o que fazer quando algo dá errado.
 
 ```bash
 make instalar          # só na primeira vez
-cp ~/planilhas/edital.xlsm data/raw/2026-08-01_redes_bahia.xlsm
+cp ~/planilhas/edital.xlsx data/raw/2026-08-01_redes_bahia.xlsx
 make validar           # confere sem publicar
 make dados             # valida e publica
 git add data/ docs/03-dicionario-de-dados.md
@@ -32,8 +32,8 @@ caminho todo.
 
 - Um arquivo por dia. **Nunca sobrescrever** o de ontem.
 - A data no nome define qual é o mais recente. Data errada, base errada.
-- Extensão `.xlsm` (é o que `fonte.padrao_arquivo` procura). Para `.xlsx`,
-  ajustar o contrato.
+- Extensão `.xlsx` (é o que `fonte.padrao_arquivo` procura). Para outro
+  formato, ajustar o contrato.
 - A planilha não pode estar protegida por senha.
 
 ## Quando dá errado
@@ -52,22 +52,25 @@ Alguém renomeou, moveu ou apagou uma coluna na planilha.
 ### `chave_duplicada` — "linhas repetidas"
 
 Duas linhas com o mesmo identificador. O relatório mostra quais. Normalmente é
-linha colada duas vezes ou inscrição registrada em duplicidade. Corrigir na
+linha colada duas vezes ou resposta registrada em duplicidade. Corrigir na
 planilha: com chave duplicada, qualquer contagem do painel fica errada.
 
 ### `obrigatorio_vazio` — "coluna obrigatória com valor vazio"
 
 Célula em branco em coluna que o painel precisa. O relatório identifica as
-linhas pelo `id_inscricao`.
+linhas pela chave do dataset (hoje, o `id` da resposta) — muito mais útil que
+"linha 47" para achar o registro na planilha.
 
-Se a coluna legitimamente pode ficar vazia (por exemplo, nota antes da
-avaliação), o certo é tirar `obrigatorio: true` dela no contrato, não preencher
-com valor inventado.
+Se a coluna legitimamente pode ficar vazia, o certo é tirar `obrigatorio: true`
+dela no contrato, não preencher com valor inventado. **Coluna inteira vazia não
+é este caso**: coluna com nome e sem nenhum dado é aceita normalmente e aparece
+com 0% de preenchimento.
 
 ### `valor_nao_previsto` — aviso, não bloqueia
 
-Apareceu uma categoria que não está na lista do contrato (status novo, eixo
-novo, ou só uma diferença de grafia: "Em Análise" vs "Em análise").
+Apareceu uma categoria que não está na lista do contrato (um resultado de
+credenciamento novo, uma natureza jurídica nova, ou só uma diferença de
+grafia: "Aprovado" vs "Aprovado automaticamente").
 
 - Grafia diferente → padronizar na planilha.
 - Categoria nova de verdade → acrescentar em `valores` no contrato.
@@ -77,8 +80,9 @@ diferentes.
 
 ### `referencia_orfa` — aviso, não bloqueia
 
-Valor que não existe na tabela de apoio. Um município escrito diferente do que
-está na aba `Municipios` some do mapa. Padronizar a grafia.
+Valor que não existe na tabela de apoio referenciada pelo contrato. O contrato
+atual não usa essa regra — ela volta a valer quando houver mais de um dataset
+(por exemplo, inscrições apontando para credenciamento).
 
 ### `conversao_invalida` — aviso, não bloqueia
 

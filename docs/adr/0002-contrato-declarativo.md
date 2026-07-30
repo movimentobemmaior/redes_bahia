@@ -9,7 +9,7 @@ A planilha muda: coluna renomeada, aba nova, categoria nova. Se a estrutura
 esperada estiver espalhada pelo código Python, cada mudança dessas vira tarefa
 de programação, e a documentação desatualiza em silêncio.
 
-Além disso, o contrato foi escrito **antes** de o `.xlsm` real existir. Ele
+Além disso, o contrato foi escrito **antes** de o `.xlsx` real existir. Ele
 precisa ser fácil de reescrever inteiro.
 
 ## Decisão

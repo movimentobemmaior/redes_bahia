@@ -41,6 +41,12 @@ class Coluna:
     obrigatorio: bool = False
     sensivel: bool = False
     descricao: str = ""
+    # Valor que torna a linha INELEGÍVEL. Existe porque parte dos critérios do
+    # edital tem sentido invertido ("Sim" exclui), e ler todos como "Sim = bom"
+    # produziria um painel exatamente ao contrário da realidade. Fica no
+    # contrato, e não no código do painel, para haver um lugar só onde essa
+    # regra é revisada.
+    exclui_quando: str | None = None
 
 
 @dataclass(frozen=True)
@@ -131,6 +137,9 @@ def _ler_coluna(nome: str, bruto: Any, onde: str) -> Coluna:
         obrigatorio=bool(bruto.get("obrigatorio", False)),
         sensivel=bool(bruto.get("sensivel", False)),
         descricao=str(bruto.get("descricao", "")).strip(),
+        exclui_quando=(
+            str(bruto["exclui_quando"]) if bruto.get("exclui_quando") is not None else None
+        ),
     )
 
 

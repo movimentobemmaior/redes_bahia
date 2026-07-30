@@ -42,11 +42,14 @@ def repo(tmp_path):
 
     publicados = tmp_path / "data" / "published"
     publicados.mkdir(parents=True)
-    (publicados / "inscricoes.csv").write_text(
-        "id_inscricao,organizacao,status\nRB-1,Org,Inscrita\n", encoding="utf-8"
+    (publicados / "credenciamento.csv").write_text(
+        "id,organizacao,status_credenciamento\n110167,Org,Aprovado automaticamente\n",
+        encoding="utf-8",
     )
-    (publicados / "inscricoes.json").write_text(
-        json.dumps([{"id_inscricao": "RB-1", "organizacao": "Org", "status": "Inscrita"}]),
+    (publicados / "credenciamento.json").write_text(
+        json.dumps(
+            [{"id": "110167", "organizacao": "Org", "status_credenciamento": "Aprovado"}]
+        ),
         encoding="utf-8",
     )
     (publicados / "manifest.json").write_text(
@@ -54,12 +57,15 @@ def repo(tmp_path):
             {
                 "datasets": [
                     {
-                        "nome": "inscricoes",
-                        "colunas_omitidas_por_sigilo": ["cnpj", "email_contato"],
+                        "nome": "credenciamento",
+                        "colunas_omitidas_por_sigilo": [
+                            "respondente_nome",
+                            "respondente_email",
+                        ],
                         "colunas": [
-                            {"nome": "id_inscricao", "publicada": True},
-                            {"nome": "cnpj", "publicada": False},
-                            {"nome": "email_contato", "publicada": False},
+                            {"nome": "id", "publicada": True},
+                            {"nome": "respondente_nome", "publicada": False},
+                            {"nome": "respondente_email", "publicada": False},
                         ],
                     }
                 ]
@@ -70,10 +76,10 @@ def repo(tmp_path):
 
     # O que NÃO pode sair daqui de jeito nenhum.
     (tmp_path / "data" / "raw").mkdir(parents=True)
-    (tmp_path / "data" / "raw" / "2026-08-01_redes_bahia.xlsm").write_bytes(b"planilha")
+    (tmp_path / "data" / "raw" / "2026-08-01_redes_bahia.xlsx").write_bytes(b"planilha")
     (tmp_path / "data" / "processed").mkdir(parents=True)
-    (tmp_path / "data" / "processed" / "inscricoes.csv").write_text(
-        "id_inscricao,cnpj,email_contato\nRB-1,11.111.111/0001-11,a@b.org\n", encoding="utf-8"
+    (tmp_path / "data" / "processed" / "credenciamento.csv").write_text(
+        "id,respondente_nome,respondente_email\n110167,Fulana,a@b.org\n", encoding="utf-8"
     )
     return tmp_path
 
@@ -92,7 +98,7 @@ def test_monta_apenas_o_que_esta_na_lista(site):
     assert (site / "dashboard" / "index.html").exists()
     assert (site / "dashboard" / "assets" / "painel.css").exists()
     assert (site / "design" / "tokens" / "tokens.css").exists()
-    assert (site / "data" / "published" / "inscricoes.csv").exists()
+    assert (site / "data" / "published" / "credenciamento.csv").exists()
     assert (site / "index.html").exists(), "falta o redirecionador na raiz"
 
 
@@ -100,7 +106,7 @@ def test_planilha_e_base_interna_ficam_de_fora(site):
     caminhos = {p.relative_to(site).as_posix() for p in site.rglob("*") if p.is_file()}
     assert not any("raw" in c for c in caminhos)
     assert not any("processed" in c for c in caminhos)
-    assert not any(c.endswith(".xlsm") for c in caminhos)
+    assert not any(c.endswith((".xlsm", ".xlsx")) for c in caminhos)
 
 
 def test_documentacao_interna_nao_vai_para_o_site(site):
@@ -124,18 +130,18 @@ def test_pacote_limpo_e_aprovado(site):
 
 
 def test_csv_com_coluna_sigilosa_bloqueia(site):
-    (site / "data" / "published" / "inscricoes.csv").write_text(
-        "id_inscricao,cnpj\nRB-1,11.111.111/0001-11\n", encoding="utf-8"
+    (site / "data" / "published" / "credenciamento.csv").write_text(
+        "id,respondente_email\n110167,a@b.org\n", encoding="utf-8"
     )
-    with pytest.raises(Vazamento, match="cnpj"):
+    with pytest.raises(Vazamento, match="respondente_email"):
         checar_publicacao.checar(site, CONTRATO)
 
 
 def test_json_com_coluna_sigilosa_bloqueia(site):
-    (site / "data" / "published" / "inscricoes.json").write_text(
-        json.dumps([{"id_inscricao": "RB-1", "email_contato": "a@b.org"}]), encoding="utf-8"
+    (site / "data" / "published" / "credenciamento.json").write_text(
+        json.dumps([{"id": "110167", "respondente_nome": "Fulana"}]), encoding="utf-8"
     )
-    with pytest.raises(Vazamento, match="email_contato"):
+    with pytest.raises(Vazamento, match="respondente_nome"):
         checar_publicacao.checar(site, CONTRATO)
 
 
@@ -144,7 +150,7 @@ def test_arquivo_com_nome_desconhecido_bloqueia(site):
     batia com um dataset do contrato. Uma cópia manual com outro nome — que é
     o vazamento mais provável na prática — passava sem nenhuma conferência."""
     (site / "data" / "published" / "backup_planilha.csv").write_text(
-        "id_inscricao,cnpj,email_contato\nRB-1,11.111.111/0001-11,a@b.org\n", encoding="utf-8"
+        "id,respondente_nome,respondente_email\n110167,Fulana,a@b.org\n", encoding="utf-8"
     )
     with pytest.raises(Vazamento, match="inesperado"):
         checar_publicacao.checar(site, CONTRATO)
@@ -152,10 +158,10 @@ def test_arquivo_com_nome_desconhecido_bloqueia(site):
 
 def test_coluna_sigilosa_de_outro_dataset_tambem_bloqueia(site):
     """A conferência é contra a união das colunas sigilosas, não as do dataset."""
-    (site / "data" / "published" / "municipios.csv").write_text(
-        "municipio,email_contato\nSalvador,a@b.org\n", encoding="utf-8"
+    (site / "data" / "published" / "historico.csv").write_text(
+        "data_execucao,respondente_email\n2026-08-01,a@b.org\n", encoding="utf-8"
     )
-    with pytest.raises(Vazamento, match="email_contato"):
+    with pytest.raises(Vazamento, match="respondente_email"):
         checar_publicacao.checar(site, CONTRATO)
 
 
@@ -185,7 +191,7 @@ def test_manifesto_que_declara_sigiloso_como_publicado_bloqueia(site):
     dados = json.loads(caminho.read_text(encoding="utf-8"))
     dados["datasets"][0]["colunas"][1]["publicada"] = True
     caminho.write_text(json.dumps(dados), encoding="utf-8")
-    with pytest.raises(Vazamento, match="cnpj"):
+    with pytest.raises(Vazamento, match="respondente_nome"):
         checar_publicacao.checar(site, CONTRATO)
 
 
@@ -197,7 +203,7 @@ def test_site_inexistente_bloqueia(tmp_path):
 def test_trava_le_o_contrato_de_verdade():
     """Se alguém tirar a marcação `sensivel` do contrato, a trava perde o alvo."""
     sensiveis = checar_publicacao.sensiveis_por_dataset(CONTRATO)
-    assert sensiveis["inscricoes"] == {"cnpj", "email_contato"}
+    assert sensiveis["credenciamento"] == {"respondente_nome", "respondente_email"}
 
 
 def test_contrato_e_montagem_concordam_sobre_o_que_e_publicado():

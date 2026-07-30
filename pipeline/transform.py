@@ -20,6 +20,7 @@ from .problemas import AVISO, ERRO, Problema
 
 _ESPACOS = re.compile(r"\s+")
 _MILHAR_BR = re.compile(r"^\d{1,3}(\.\d{3})+$")
+_AS_HORAS = re.compile(r"\s+[àa]s\s+", re.IGNORECASE)
 _VERDADEIROS = {"sim", "s", "true", "verdadeiro", "1", "x"}
 _FALSOS = {"nao", "não", "n", "false", "falso", "0"}
 # Faixa de números de série do Excel que corresponde a 1954-2079: o suficiente
@@ -79,7 +80,14 @@ def _para_numero(valor: object) -> object:
 
 
 def _para_data(serie: pd.Series) -> pd.Series:
-    """Converte para data aceitando texto dd/mm/aaaa, ISO e série do Excel."""
+    """Converte para data aceitando texto dd/mm/aaaa, ISO e série do Excel.
+
+    Trata também o formato que os formulários brasileiros exportam,
+    "29/07/2026 às 12:16": o "às" vira espaço e o resto parseia normalmente.
+    """
+    serie = serie.astype("object").map(
+        lambda v: _AS_HORAS.sub(" ", v) if isinstance(v, str) else v
+    )
     numerico = pd.to_numeric(serie, errors="coerce")
     e_serie = numerico.between(_SERIE_MIN, _SERIE_MAX)
 

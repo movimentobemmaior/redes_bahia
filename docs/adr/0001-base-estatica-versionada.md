@@ -1,11 +1,11 @@
-# ADR 0001 — Base estática versionada em git, a partir do `.xlsm`
+# ADR 0001 — Base estática versionada em git, a partir do `.xlsx`
 
 - **Data:** 2026-07-30
 - **Situação:** vigente
 
 ## Contexto
 
-O dado do edital vive em uma planilha `.xlsm` mantida à mão. Não há API. A
+O dado do edital vive em uma planilha `.xlsx` mantida à mão. Não há API. A
 atualização é diária e feita por uma pessoa da equipe, não por um sistema. O
 objetivo imediato é um piloto que funcione, não uma plataforma.
 

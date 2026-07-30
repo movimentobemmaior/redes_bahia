@@ -32,7 +32,7 @@ e em `data/published/historico.csv`. Este arquivo registra mudanças de
 - Design tokens (`design/tokens/`) com paleta verificada para daltonismo e
   contraste nos modos claro e escuro.
 - Página de estado da base em `dashboard/`.
-- Automação: subir um `.xlsm` em `data/raw/` dispara validação e publicação.
+- Automação: subir um `.xlsx` em `data/raw/` dispara validação e publicação.
 - Testes cobrindo contrato, padronização, validação, publicação e o caminho
   completo de ponta a ponta.
 - Documentação: arquitetura, rotina de atualização, indicadores, identidade
@@ -62,8 +62,59 @@ e em `data/published/historico.csv`. Este arquivo registra mudanças de
   Repositório tornado privado em 2026-07-30, sem nenhuma planilha exposta no
   intervalo.
 
+### Ajuste ao dado real (30/07/2026)
+
+Primeira planilha de produção: formulário de credenciamento, 13 respostas.
+
+- `config/fontes.yml` reescrito do zero (**versão 2**). O contrato provisório
+  supunha inscrições, avaliações e municípios; a base real é o credenciamento,
+  uma aba só com 22 colunas de perguntas do formulário.
+- Fonte passa a ser `.xlsx` (era `.xlsm`).
+- Colunas sigilosas agora são `respondente_nome` e `respondente_email` — nome
+  de pessoa física e e-mail. O nome não foi apontado pelo perfilador
+  automático, o que confirma por que o rascunho é revisado por gente.
+- Catálogo de indicadores ([04](docs/04-indicadores.md)) reescrito para o que a
+  base permite medir, com destaque para os três critérios de sentido invertido,
+  em que "Sim" exclui.
+- Gerador de exemplo passa a ler os cabeçalhos do próprio contrato, em vez de
+  manter uma cópia que diverge.
+
+### Corrigido no pipeline, a partir do dado real
+
+- **Coluna com nome e sem dado era tratada como ausente.** A coluna `Edital`
+  veio vazia; no perfil ela sumia em silêncio, e na leitura viraria
+  `coluna_ausente` — erro que bloquearia a publicação todos os dias. Agora só
+  colunas-fantasma do Excel (sem nome e sem conteúdo) são descartadas.
+- **Data no formato "29/07/2026 às 12:16" não era reconhecida** e virava vazio,
+  o que apagaria a data de toda a base.
+
+### Painel (30/07/2026)
+
+Primeira versão do painel propriamente dito, no lugar da página de estado da
+base.
+
+- Funil de elegibilidade como bloco central: **qual requisito está barrando
+  quem**, alternando entre "só as não aprovadas" e "todas as respostas".
+- Números gerais, resultado do credenciamento, origem por estado, natureza
+  jurídica, respostas por dia e a tabela completa com o motivo linha a linha.
+- Filtros de estado, resultado e natureza jurídica recalculam tudo.
+- Gráficos em SVG escrito à mão (`dashboard/assets/graficos.js`), sem
+  dependência externa nem build: barras horizontais, barra segmentada e linha
+  no tempo.
+- `exclui_quando` passa a ser declarado no contrato e publicado no manifesto.
+  O painel lê de lá qual resposta torna a organização inelegível, em vez de
+  carregar a regra no JavaScript — três critérios do edital têm sentido
+  invertido, e errar isso publicaria um gráfico ao contrário.
+- Painel destaca **não aprovadas sem requisito não atendido**: nos dados reais
+  há um caso assim, em que o motivo está fora das colunas do formulário.
+
 ### Pendente
 
-- Substituir o contrato provisório pelo contrato do `.xlsm` real (fase 2).
-- Fechar o catálogo de indicadores com a coordenação.
-- Decidir se o painel será público ou restrito.
+- Confirmar com a coordenação o sentido de exclusão dos critérios invertidos.
+- Definir se a etapa de inscrição virá em outra planilha (seria um segundo
+  dataset, com contrato próprio).
+- Repositório está público por decisão consciente durante o piloto. `data/raw/`
+  e `data/processed/` não são versionados enquanto isso; só `data/published/`,
+  que não tem dado de identificação. Ver
+  [governança](docs/06-governanca-e-lgpd.md).
+- Investigar a não aprovada cujo motivo não está nas colunas do formulário.

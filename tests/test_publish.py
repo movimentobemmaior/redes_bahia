@@ -79,6 +79,28 @@ def test_manifesto_registra_status_e_origem(saidas, cfg_temp, tabelas):
     assert gravado == manifesto
 
 
+def test_manifesto_carrega_a_semantica_de_exclusao(saidas, cfg_temp, tabelas, contrato_real):
+    """O painel decide o que é "requisito não atendido" lendo `exclui_quando`
+    do manifesto. Se a informação parar de ser publicada, o gráfico central
+    esvazia em silêncio — e três critérios do edital têm sentido invertido,
+    então o erro apareceria como "ninguém foi barrado", não como tela quebrada."""
+    invertidos = [c for c in contrato_real.datasets["credenciamento"].colunas if c.exclui_quando]
+    assert len(invertidos) >= 10, "todos os critérios precisam declarar exclui_quando"
+    assert {c.nome for c in invertidos if c.exclui_quando == "Sim"} == {
+        "criterio_receita_acima_500mil",
+        "criterio_vinculo_partidario",
+        "criterio_fins_religiosos",
+    }, "os três critérios de sentido invertido mudaram — confirme com a coordenação"
+
+
+def test_manifesto_publica_exclui_quando(saidas, cfg_temp, tabelas):
+    manifesto = _publicar(cfg_temp, tabelas)
+    colunas = manifesto["datasets"][0]["colunas"]
+    assert all("exclui_quando" in c for c in colunas), (
+        "o painel lê essa chave de toda coluna; sem ela, quebra"
+    )
+
+
 def test_historico_acumula_dias_diferentes(saidas, cfg_temp, tabelas):
     _publicar(cfg_temp, tabelas, dia="2026-05-01")
     _publicar(cfg_temp, tabelas, dia="2026-05-02")

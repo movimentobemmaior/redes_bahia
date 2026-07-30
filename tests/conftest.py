@@ -47,7 +47,9 @@ CONTRATO_MINIMO = {
 
 def escrever_contrato(tmp_path: Path, contrato: dict) -> Path:
     caminho = tmp_path / "fontes.yml"
-    caminho.write_text(yaml.safe_dump(contrato, allow_unicode=True), encoding="utf-8")
+    caminho.write_text(
+        yaml.safe_dump(contrato, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    )
     return caminho
 
 
@@ -67,6 +69,34 @@ def cfg(tmp_path: Path, contrato: dict):
 @pytest.fixture
 def ds(cfg) -> Dataset:
     return cfg.datasets["inscricoes"]
+
+
+@pytest.fixture
+def contrato_com_referencia(tmp_path, contrato):
+    """Contrato sintético com dois datasets e uma regra `referencia`.
+
+    A regra é testada aqui, e não contra config/fontes.yml, para que o teste
+    da funcionalidade não quebre toda vez que o contrato do projeto mudar.
+    """
+    contrato["datasets"]["avaliacoes"] = {
+        "aba": "Avaliacoes",
+        "descricao": "teste",
+        "linha_cabecalho": 1,
+        "chave": ["id_inscricao"],
+        "colunas": {
+            "id_inscricao": {"origem": "ID", "tipo": "texto", "obrigatorio": True},
+            "nota": {"origem": "Nota", "tipo": "decimal"},
+        },
+        "regras": [
+            {
+                "tipo": "referencia",
+                "coluna": "id_inscricao",
+                "dataset": "inscricoes",
+                "coluna_alvo": "id_inscricao",
+            }
+        ],
+    }
+    return carregar(escrever_contrato(tmp_path, contrato))
 
 
 @pytest.fixture

@@ -2,7 +2,7 @@
 
 ## O problema
 
-A planilha `.xlsm` do edital é preenchida por pessoas, muda de formato sem
+A planilha `.xlsx` do edital é preenchida por pessoas, muda de formato sem
 aviso e é a foto de um momento. Um painel construído direto em cima dela quebra
 na primeira coluna renomeada e não consegue mostrar evolução no tempo.
 
@@ -11,7 +11,7 @@ A solução aqui é colocar **uma camada de contrato** entre a planilha e o pain
 ## O caminho do dado
 
 ```
-  data/raw/2026-08-01_redes_bahia.xlsm        planilha do dia, como veio
+  data/raw/2026-07-30_redes_bahia.xlsx        planilha do dia, como veio
             │
             │  1. leitura         pipeline/ingest.py
             ▼
@@ -71,7 +71,7 @@ A distinção mais importante do projeto:
 | | O que é | O que acontece |
 |---|---|---|
 | **erro** | quebra de estrutura: coluna sumiu, chave duplicada, aba vazia | **bloqueia** a publicação; o painel continua com a base anterior |
-| **aviso** | quebra de conteúdo: categoria nova, valor fora da faixa, município órfão | publica, registra no manifesto e fica visível no painel |
+| **aviso** | quebra de conteúdo: categoria nova, valor fora da faixa, referência órfã | publica, registra no manifesto e fica visível no painel |
 
 O raciocínio: dado estranho em uma linha não pode derrubar o painel inteiro,
 mas dado com a estrutura quebrada não pode entrar calado. Para revisão de
@@ -85,8 +85,8 @@ pipeline grava a cada execução um resumo em `data/published/historico.csv`
 
 Reexecutar no mesmo dia substitui as linhas daquele dia, não duplica.
 
-Os agrupamentos ficam em `historico.agrupar_por`, no contrato. Hoje: `status`,
-`territorio_identidade`, `eixo`.
+Os agrupamentos ficam em `historico.agrupar_por`, no contrato. Hoje:
+`status_credenciamento`, `estado`, `representa`.
 
 ## O manifesto
 

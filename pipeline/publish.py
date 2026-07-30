@@ -76,6 +76,7 @@ def _resumo_colunas(cfg: Config, nome: str, df: pd.DataFrame, publicaveis: list[
                 "descricao": col.descricao,
                 "obrigatorio": col.obrigatorio,
                 "sensivel": col.sensivel,
+                "exclui_quando": col.exclui_quando,
                 "publicada": col.nome in publicaveis,
                 "preenchimento": round(preenchidas / len(df), 4) if len(df) else 0.0,
                 "valores_distintos": int(serie.nunique(dropna=True)),

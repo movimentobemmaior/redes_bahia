@@ -72,29 +72,24 @@ def test_modo_estrito_promove_avisos_a_erros(cfg):
     assert all(p.bloqueia for p in validar(tabelas, cfg, estrito=True))
 
 
-def test_referencia_orfa_avisa(contrato_real):
+def test_referencia_orfa_avisa(contrato_com_referencia):
     inscricoes = pd.DataFrame(
         {
-            "id_inscricao": ["RB-1"],
-            "municipio": ["Salvador"],
-            "organizacao": ["Org"],
-            "territorio_identidade": ["T"],
-            "status": ["Inscrita"],
-            "data_inscricao": [pd.Timestamp("2026-01-01")],
+            "id_inscricao": pd.Series(["RB-1"], dtype="string"),
+            "cnpj": pd.Series([None], dtype="string"),
+            "status": pd.Series(["Inscrita"], dtype="string"),
+            "data_inscricao": pd.to_datetime(["2026-01-01"]),
+            "valor_solicitado": pd.Series([10.0], dtype="Float64"),
         }
     )
     avaliacoes = pd.DataFrame(
         {
-            "id_inscricao": ["RB-1", "RB-999"],
-            "avaliador": ["AV-1", "AV-1"],
-            "criterio": ["C1", "C1"],
-            "nota": [8.0, 9.0],
+            "id_inscricao": pd.Series(["RB-1", "RB-999"], dtype="string"),
+            "nota": pd.Series([8.0, 9.0], dtype="Float64"),
         }
     )
-    municipios = pd.DataFrame({"municipio": ["Salvador"], "territorio_identidade": ["T"]})
     problemas = validar(
-        {"inscricoes": inscricoes, "avaliacoes": avaliacoes, "municipios": municipios},
-        contrato_real,
+        {"inscricoes": inscricoes, "avaliacoes": avaliacoes}, contrato_com_referencia
     )
     orfa = next(p for p in problemas if p.codigo == "referencia_orfa")
     assert not orfa.bloqueia

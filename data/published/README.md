@@ -24,11 +24,11 @@ confiada sem carregar uma linha.
 ```jsonc
 {
   "data_execucao": "2026-08-01",
-  "fonte": { "arquivo": "...xlsm", "hash_sha256": "...", "bytes": 32057 },
+  "fonte": { "arquivo": "...xlsx", "hash_sha256": "...", "bytes": 11512 },
   "validacao": { "status": "com_avisos", "erros": 0, "avisos": 3, "problemas": [...] },
   "datasets": [
-    { "nome": "inscricoes", "n_linhas": 120,
-      "colunas_omitidas_por_sigilo": ["cnpj", "email_contato"],
+    { "nome": "credenciamento", "n_linhas": 13,
+      "colunas_omitidas_por_sigilo": ["respondente_nome", "respondente_email"],
       "colunas": [ { "nome": "...", "tipo": "...", "preenchimento": 1.0 } ] }
   ]
 }
@@ -42,8 +42,8 @@ Formato longo, uma linha por dia × tabela × agrupamento × categoria:
 
 ```csv
 data_execucao,arquivo_fonte,dataset,agrupamento,categoria,metrica,valor
-2026-08-01,2026-08-01_redes_bahia.xlsm,inscricoes,total,todos,n_linhas,120
-2026-08-01,2026-08-01_redes_bahia.xlsm,inscricoes,status,Em análise,n_linhas,29
+2026-07-30,2026-07-30_redes_bahia.xlsx,credenciamento,total,todos,n_linhas,13
+2026-07-30,2026-07-30_redes_bahia.xlsx,credenciamento,status_credenciamento,Aprovado automaticamente,n_linhas,8
 ```
 
 É o que permite gráfico de evolução, já que a planilha é sempre a foto de hoje.

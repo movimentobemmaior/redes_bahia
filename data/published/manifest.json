@@ -1,0 +1,311 @@
+{
+  "painel": "Redes Bahia",
+  "gerado_em": "2026-07-30T14:43:17+00:00",
+  "data_execucao": "2026-07-30",
+  "versao_pipeline": "0.1.0",
+  "versao_contrato": 2,
+  "fonte": {
+    "arquivo": "2026-07-30_redes_bahia.xlsx",
+    "hash_sha256": "eee5e5c8d44a1f0b2dc84480087f9a326293285aa20e96707045014d9d3005d5",
+    "bytes": 11512
+  },
+  "validacao": {
+    "status": "aprovado",
+    "erros": 0,
+    "avisos": 0,
+    "problemas": []
+  },
+  "datasets": [
+    {
+      "nome": "credenciamento",
+      "aba": "Credenciamento Redes Bahia",
+      "descricao": "Uma linha por organização que respondeu o formulário de credenciamento. Grão: resposta ao formulário. É o funil de elegibilidade do edital — cada coluna `criterio_*` é um requisito respondido pela própria organização, e o `status_credenciamento` é o resultado da checagem automática desses requisitos.",
+      "grao": [
+        "id"
+      ],
+      "n_linhas": 13,
+      "n_colunas_publicadas": 20,
+      "colunas_omitidas_por_sigilo": [
+        "respondente_nome",
+        "respondente_email"
+      ],
+      "colunas": [
+        {
+          "nome": "id",
+          "origem": "ID",
+          "tipo": "texto",
+          "descricao": "Identificador da resposta no sistema de formulários.",
+          "obrigatorio": true,
+          "sensivel": false,
+          "exclui_quando": null,
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 13
+        },
+        {
+          "nome": "edital",
+          "origem": "Edital",
+          "tipo": "texto",
+          "descricao": "Edital ao qual a resposta se refere. Veio inteiramente vazia na remessa de 30/07/2026 — declarada aqui para não sumir do painel quando começar a ser preenchida.",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": null,
+          "publicada": true,
+          "preenchimento": 0.0,
+          "valores_distintos": 0
+        },
+        {
+          "nome": "formulario",
+          "origem": "Formulário",
+          "tipo": "categoria",
+          "descricao": "Nome do formulário de origem. Hoje há só um.",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": null,
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 1
+        },
+        {
+          "nome": "data_resposta",
+          "origem": "Data da Resposta",
+          "tipo": "data",
+          "descricao": "Data de envio da resposta. Vem como texto no formato \"29/07/2026 às 12:16\"; o pipeline converte para data.",
+          "obrigatorio": true,
+          "sensivel": false,
+          "exclui_quando": null,
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 4
+        },
+        {
+          "nome": "organizacao",
+          "origem": "Respondente",
+          "tipo": "texto",
+          "descricao": "Nome da organização ou coletivo respondente.",
+          "obrigatorio": true,
+          "sensivel": false,
+          "exclui_quando": null,
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 13
+        },
+        {
+          "nome": "estado",
+          "origem": "Estado do respondente",
+          "tipo": "categoria",
+          "descricao": "Estado declarado pela organização.",
+          "obrigatorio": true,
+          "sensivel": false,
+          "exclui_quando": null,
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 2
+        },
+        {
+          "nome": "respondente_nome",
+          "origem": "Usuário que respondeu",
+          "tipo": "texto",
+          "descricao": "Nome da pessoa física que preencheu o formulário. Dado pessoal — não publicado.",
+          "obrigatorio": false,
+          "sensivel": true,
+          "exclui_quando": null,
+          "publicada": false,
+          "preenchimento": 1.0,
+          "valores_distintos": 13
+        },
+        {
+          "nome": "respondente_email",
+          "origem": "E-mail do usuário",
+          "tipo": "texto",
+          "descricao": "E-mail da pessoa que preencheu. Dado pessoal — não publicado.",
+          "obrigatorio": false,
+          "sensivel": true,
+          "exclui_quando": null,
+          "publicada": false,
+          "preenchimento": 1.0,
+          "valores_distintos": 13
+        },
+        {
+          "nome": "status_credenciamento",
+          "origem": "Status do credenciamento",
+          "tipo": "categoria",
+          "descricao": "Resultado da checagem automática dos critérios.",
+          "obrigatorio": true,
+          "sensivel": false,
+          "exclui_quando": null,
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 2
+        },
+        {
+          "nome": "representa",
+          "origem": "Eu represento:",
+          "tipo": "categoria",
+          "descricao": "Natureza jurídica declarada pela respondente.",
+          "obrigatorio": true,
+          "sensivel": false,
+          "exclui_quando": null,
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 2
+        },
+        {
+          "nome": "criterio_estatuto_registrado",
+          "origem": "Sua organização social possui a ata de Constituição e Estatuto Social registrada em cartório?",
+          "tipo": "booleano",
+          "descricao": "Ata de constituição e estatuto registrados em cartório.",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": "Não",
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 2
+        },
+        {
+          "nome": "criterio_regularidade_credito",
+          "origem": "Sua organização social está regularizada nos órgãos fiscalizadores de crédito, tais como: Serasa, SPC, Receita Federal, etc?",
+          "tipo": "booleano",
+          "descricao": "Regularidade em Serasa, SPC, Receita Federal e afins.",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": "Não",
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 1
+        },
+        {
+          "nome": "criterio_dois_representantes",
+          "origem": "Seu coletivo tem, no mínimo, dois representantes?",
+          "tipo": "categoria",
+          "descricao": "Coletivo com ao menos dois representantes. Não é Sim/Não: organizações formais respondem \"Não se aplica\".",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": null,
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 3
+        },
+        {
+          "nome": "criterio_sede_bahia",
+          "origem": "Sua organização tem sede no estado da Bahia?",
+          "tipo": "booleano",
+          "descricao": "Sede no estado da Bahia.",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": "Não",
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 2
+        },
+        {
+          "nome": "criterio_atuacao_apenas_bahia",
+          "origem": "Sua organização ou coletivo atua somente no mesmo estado onde está sediada (Bahia)?",
+          "tipo": "booleano",
+          "descricao": "Atuação restrita ao estado da sede.",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": "Não",
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 2
+        },
+        {
+          "nome": "criterio_municipios_ate_200mil",
+          "origem": "A sua organização ou coletivo atua em municípios baianos de, no máximo, 200 mil habitantes?",
+          "tipo": "booleano",
+          "descricao": "Atuação em municípios de até 200 mil habitantes.",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": "Não",
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 2
+        },
+        {
+          "nome": "criterio_em_atividade",
+          "origem": "Sua organização ou coletivo está em atividade e beneficia diretamente pessoas?",
+          "tipo": "booleano",
+          "descricao": "Em atividade, com beneficiários diretos.",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": "Não",
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 1
+        },
+        {
+          "nome": "criterio_receita_acima_500mil",
+          "origem": "Sua organização ou coletivo teve uma receita anual de mais de 500 mil reais no ano de 2025?",
+          "tipo": "booleano",
+          "descricao": "Receita anual acima de R$ 500 mil em 2025. Atenção ao sentido: \"Sim\" aqui é critério de EXCLUSÃO, não de aprovação.",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": "Sim",
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 2
+        },
+        {
+          "nome": "criterio_atuacao_minima_3_anos",
+          "origem": "A sua organização ou coletivo, desenvolve comprovadamente atividades no território há, no mínimo, 3 anos?",
+          "tipo": "booleano",
+          "descricao": "Pelo menos três anos de atuação comprovada no território.",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": "Não",
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 1
+        },
+        {
+          "nome": "criterio_vinculo_partidario",
+          "origem": "Sua organização ou coletivo possui algum vínculo com partidos políticos em todo o território nacional ou seus responsáveis exercem cargos políticos?",
+          "tipo": "booleano",
+          "descricao": "Vínculo partidário ou cargo político. \"Sim\" é critério de EXCLUSÃO.",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": "Sim",
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 1
+        },
+        {
+          "nome": "criterio_fins_religiosos",
+          "origem": "Sua organização social ou coletivo tem fins religiosos?",
+          "tipo": "booleano",
+          "descricao": "Fins religiosos. \"Sim\" é critério de EXCLUSÃO.",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": "Sim",
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 1
+        },
+        {
+          "nome": "ciencia_comprovacao_receita",
+          "origem": "Declaro que estou ciente de que serão pedidas comprovações da receita anual.",
+          "tipo": "categoria",
+          "descricao": "Ciência de que a receita declarada será comprovada.",
+          "obrigatorio": false,
+          "sensivel": false,
+          "exclui_quando": null,
+          "publicada": true,
+          "preenchimento": 1.0,
+          "valores_distintos": 1
+        }
+      ]
+    }
+  ],
+  "arquivos": {
+    "historico": "data/published/historico.csv",
+    "publicados": [
+      "data/published/README.md",
+      "data/published/credenciamento.csv",
+      "data/published/credenciamento.json",
+      "data/published/credenciamento.parquet",
+      "data/published/historico.csv",
+      "data/published/manifest.json"
+    ]
+  }
+}
