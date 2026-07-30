@@ -1,6 +1,13 @@
 /* Painel Redes Bahia.
    Cor, tipografia e espaçamento vêm de design/tokens/tokens.css, derivados do
    regulamento do edital. Nenhum valor escrito na mão aqui.
+
+   O layout é PLANO, no estilo de relatório de dados (Banco Mundial, Our World
+   in Data): fundo branco, sem cartões, sem sombra, quase sem raio. A estrutura
+   vem de três coisas só — fio fino (--borda) separa blocos, fio grosso roxo
+   abre etapa, e espaço em branco faz o resto. Caixa com fundo é exceção
+   reservada a aviso e erro. Regras: docs/05-identidade-visual.md.
+
    Regras de gráfico: docs/05-identidade-visual.md */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -128,28 +135,26 @@ code {
   justify-self: end;
   font: inherit; font-size: var(--texto-sm); font-weight: var(--peso-medio);
   color: var(--tinta-sobre-marca);
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: var(--raio-pilula);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--raio-sm);
   padding: var(--e-2) var(--e-4);
   cursor: pointer;
 }
-.botao-tema:hover { background: rgba(255, 255, 255, 0.2); }
+.botao-tema:hover { background: rgba(255, 255, 255, 0.14); }
 
 main { padding-block: 0 var(--e-16); }
 
-/* --- Barra de estado, encaixada sobre o cabeçalho -------------------------- */
+/* --- Barra de estado: uma linha de rosto de jornal, não um cartão ---------- */
 
 .barra-estado {
-  position: relative;
-  margin-top: calc(var(--e-8) * -1);
-  background: var(--superficie);
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-lg);
-  padding: var(--e-5) var(--e-6);
-  box-shadow: 0 2px 12px rgba(62, 33, 102, 0.06);
-  display: flex; flex-wrap: wrap; gap: var(--e-4);
-  align-items: center; justify-content: space-between;
+  padding-block: var(--e-4);
+  border-bottom: 1px solid var(--borda);
+  display: flex; flex-wrap: wrap; gap: var(--e-2) var(--e-6);
+  align-items: baseline; justify-content: space-between;
+}
+.barra-estado > div {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--e-2) var(--e-3);
 }
 .rotulo {
   margin: 0;
@@ -158,10 +163,12 @@ main { padding-block: 0 var(--e-16); }
   color: var(--tinta-3);
 }
 .numero-estado {
-  margin: var(--e-1) 0 0;
-  font-size: var(--texto-xl); font-weight: var(--peso-extra);
+  margin: 0;
+  font-size: var(--texto-lg); font-weight: var(--peso-extra);
   color: var(--tinta-1); line-height: var(--altura-apertada);
+  font-variant-numeric: tabular-nums;
 }
+.barra-estado .meta { margin: 0; }
 .meta {
   margin: var(--e-2) 0 0;
   font-size: var(--texto-sm); color: var(--tinta-3);
@@ -186,28 +193,22 @@ main { padding-block: 0 var(--e-16); }
 .selo[data-status="com_avisos"] .selo-icone { background: var(--status-atencao); }
 .selo[data-status="reprovado"] .selo-icone  { background: var(--status-critico); }
 
-/* --- Funil das etapas ------------------------------------------------------ */
+/* --- Funil das etapas: colunas com fio de acento, sem caixa ---------------- */
 
 .funil { margin-top: var(--e-8); }
 .funil-etapas {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--e-3);
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: var(--e-5) var(--e-6);
   list-style: none; margin: 0; padding: 0;
 }
 .etapa {
-  position: relative;
-  background: var(--superficie);
-  border: 1px solid var(--borda);
-  border-top: 3px solid var(--eixo);
-  border-radius: var(--raio-md);
-  padding: var(--e-4);
+  border-top: 3px solid var(--grade);
+  padding-top: var(--e-3);
   min-width: 0;
 }
-.etapa[data-estado="com_dados"] { border-top-color: var(--serie-1); }
-.etapa[data-estado="atual"]     { border-top-color: var(--serie-1); }
-.etapa[data-estado="aguardando"],
-.etapa[data-estado="sem_contrato"] { background: var(--superficie-alt); }
+.etapa[data-estado="com_dados"],
+.etapa[data-estado="atual"] { border-top-color: var(--serie-1); }
 
 .etapa-ordem {
   margin: 0;
@@ -231,23 +232,20 @@ main { padding-block: 0 var(--e-16); }
   font-style: italic;
 }
 .etapa-taxa {
-  margin: var(--e-3) 0 0; padding-top: var(--e-2);
-  border-top: 1px solid var(--borda);
+  margin: var(--e-2) 0 0;
   font-size: var(--texto-sm); color: var(--tinta-2);
   font-variant-numeric: tabular-nums;
 }
 
-/* --- Filtros ---------------------------------------------------------------
-   Vivem dentro da seção da etapa, e a caixa é o que diz isso: solto no topo da
-   página, o mesmo controle parecia comandar o painel inteiro — inclusive o
-   funil das cinco etapas, sobre o qual ele não tem efeito nenhum. */
+/* --- Filtros: uma régua entre dois fios, dentro da etapa -------------------
+   Vivem dentro da seção da etapa porque é só sobre ela que agem. A faixa
+   delimitada por fios diz "isto recorta o que vem abaixo" sem precisar de
+   caixa colorida. */
 
 .filtros {
-  margin-top: var(--e-5);
-  padding: var(--e-4) var(--e-5);
-  background: var(--superficie-alt);
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-md);
+  margin-top: var(--e-6);
+  padding-block: var(--e-4);
+  border-block: 1px solid var(--borda);
 }
 .filtros-titulo {
   margin: 0 0 var(--e-3);
@@ -268,13 +266,13 @@ select {
   font: inherit; font-size: var(--texto-sm); font-weight: var(--peso-normal);
   text-transform: none; letter-spacing: normal;
   color: var(--tinta-1); background: var(--superficie);
-  border: 1px solid var(--borda); border-radius: var(--raio-sm);
+  border: 1px solid var(--eixo); border-radius: var(--raio-sm);
   padding: var(--e-2) var(--e-3); min-width: 12rem; max-width: 100%;
 }
 .botao-secundario {
   font: inherit; font-size: var(--texto-sm);
   color: var(--tinta-2); background: transparent;
-  border: 1px solid var(--borda); border-radius: var(--raio-sm);
+  border: 1px solid var(--eixo); border-radius: var(--raio-sm);
   padding: var(--e-2) var(--e-4); cursor: pointer;
 }
 .botao-secundario:hover { color: var(--tinta-1); background: var(--superficie-alt); }
@@ -284,19 +282,19 @@ select {
 }
 :root[data-tema="escuro"] .aviso-filtro { color: var(--serie-1); }
 
-/* --- Indicadores ----------------------------------------------------------- */
+/* --- Indicadores: números com fio em cima, como tabela de estatística ------ */
 
 .grade-kpi {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: var(--e-4);
-  margin-top: var(--e-6);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--e-5) var(--e-6);
+  margin-top: var(--e-8);
 }
 .kpi {
-  background: var(--superficie);
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-md);
-  padding: var(--e-5);
+  /* 3px como o funil e o alerta: com espessuras diferentes na mesma fileira,
+     os números desalinhavam pela diferença de fio. */
+  border-top: 3px solid var(--grade);
+  padding-top: var(--e-3);
 }
 .kpi .valor {
   margin: 0;
@@ -307,26 +305,28 @@ select {
 .kpi .rotulo-kpi {
   margin: var(--e-2) 0 0; font-size: var(--texto-sm); color: var(--tinta-3);
 }
-/* Só destaca quando há o que destacar; cartão sempre colorido vira ruído. */
-.kpi-alerta { border-color: var(--status-atencao); background: var(--roxo-050); }
+/* Só destaca quando há o que destacar; número sempre colorido vira ruído. */
+.kpi-alerta { border-top-color: var(--status-atencao); }
 .kpi-alerta .valor { color: var(--status-atencao); }
 
-/* --- Blocos ---------------------------------------------------------------- */
+/* --- Blocos: seções separadas por fio, sem caixa --------------------------- */
 
 .bloco {
-  background: var(--superficie);
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-lg);
-  padding: var(--e-6);
-  margin-top: var(--e-4);
+  border-top: 1px solid var(--borda);
+  padding-top: var(--e-8);
+  margin-top: var(--e-8);
 }
-.bloco-destaque { border-left: 3px solid var(--serie-1); }
+/* O primeiro bloco depois dos KPIs dispensa o fio: os KPIs já terminam num
+   respiro, e dois fios seguidos viram grade. */
+.grade-kpi + .bloco { border-top: none; padding-top: 0; }
+
 /* Bloco que existe só para dar forma a um número já mostrado nos KPIs: título
    miúdo e descrição depois do gráfico, para não competir com a seção. */
-.bloco-compacto { padding-block: var(--e-5); }
 .titulo-compacto {
   margin: 0 0 var(--e-3);
-  font-size: var(--texto-md); font-weight: var(--peso-forte); color: var(--tinta-2);
+  font-size: var(--texto-sm); font-weight: var(--peso-forte);
+  text-transform: uppercase; letter-spacing: var(--entreletra-rotulo);
+  color: var(--tinta-3);
 }
 .bloco-compacto .bloco-descricao { margin: var(--e-4) 0 0; }
 .bloco-cabecalho {
@@ -345,16 +345,29 @@ select {
 }
 :root[data-tema="escuro"] .etiqueta { color: var(--serie-1); }
 
-.secao-etapa { margin-top: var(--e-12); }
+/* --- Abertura de etapa: o fio grosso roxo é a quebra de capítulo -----------
+   É o único traço pesado da página — tudo o mais é fio fino. Assim a etapa
+   se distingue de bloco à primeira rolagem, sem caixa nem fundo. */
+
+.secao-etapa { margin-top: var(--e-16); }
 .secao-etapa-cabecalho {
-  display: flex; align-items: baseline; gap: var(--e-3);
-  padding-bottom: var(--e-3);
-  border-bottom: 2px solid var(--borda);
+  border-top: 3px solid var(--roxo-800);
+  padding-top: var(--e-4);
 }
-.secao-etapa-cabecalho h2 { margin: 0; font-size: var(--texto-2xl); }
+:root[data-tema="escuro"] .secao-etapa-cabecalho { border-top-color: var(--serie-1); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .secao-etapa-cabecalho { border-top-color: var(--serie-1); }
+}
+.secao-etapa-cabecalho h2 { margin: var(--e-1) 0 0; font-size: var(--texto-2xl); }
 .secao-etapa-numero {
-  font-size: var(--texto-sm); font-weight: var(--peso-extra);
-  color: var(--roxo-600); font-variant-numeric: tabular-nums;
+  display: block;
+  font-size: var(--texto-xs); font-weight: var(--peso-forte);
+  letter-spacing: var(--entreletra-rotulo); text-transform: uppercase;
+  color: var(--roxo-700); font-variant-numeric: tabular-nums;
+}
+:root[data-tema="escuro"] .secao-etapa-numero { color: var(--serie-1); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .secao-etapa-numero { color: var(--serie-1); }
 }
 .secao-etapa-resumo {
   margin: var(--e-3) 0 0; font-size: var(--texto-sm);
@@ -362,11 +375,9 @@ select {
 }
 
 .aguardando {
-  margin-top: var(--e-4);
-  background: var(--superficie-alt);
-  border: 1px dashed var(--borda);
-  border-radius: var(--raio-lg);
-  padding: var(--e-6);
+  margin-top: var(--e-6);
+  border-left: 3px solid var(--eixo);
+  padding: var(--e-1) 0 var(--e-1) var(--e-5);
 }
 .aguardando p { margin: 0 0 var(--e-2); font-size: var(--texto-sm); color: var(--tinta-2); }
 .aguardando p:last-child { margin-bottom: 0; }
@@ -455,17 +466,16 @@ select {
 .legenda-mapa-passos { display: flex; align-items: center; gap: var(--e-3); }
 .legenda-mapa-passo { display: inline-flex; align-items: center; gap: var(--e-1); }
 .legenda-mapa-passo i {
-  width: 14px; height: 10px; border-radius: 2px;
+  width: 14px; height: 10px;
   border: 1px solid var(--borda); display: inline-block; flex: none;
 }
 
-/* --- Prazo ------------------------------------------------------------------ */
+/* --- Prazo: estatística à direita do título, com um fio de apoio ----------- */
 
 .cartao-prazo {
   margin: 0; text-align: right; flex: none;
-  padding: var(--e-3) var(--e-4);
-  border: 1px solid var(--borda); border-radius: var(--raio-md);
-  background: var(--superficie-alt);
+  padding-left: var(--e-6);
+  border-left: 1px solid var(--borda);
 }
 .cartao-prazo-valor {
   display: block;
@@ -477,7 +487,7 @@ select {
   display: block; margin-top: var(--e-1);
   font-size: var(--texto-xs); color: var(--tinta-3); max-width: 22ch;
 }
-.cartao-prazo[data-situacao="reta-final"] { border-color: var(--status-atencao); }
+.cartao-prazo[data-situacao="reta-final"] { border-left: 3px solid var(--status-atencao); }
 .cartao-prazo[data-situacao="reta-final"] .cartao-prazo-valor { color: var(--status-atencao); }
 .cartao-prazo[data-situacao="encerrado"] .cartao-prazo-valor { font-size: var(--texto-xl); }
 
@@ -487,7 +497,7 @@ select {
   font-size: var(--texto-sm); color: var(--tinta-2);
 }
 .chave { display: inline-flex; align-items: center; gap: var(--e-2); }
-.chave i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; flex: none; }
+.chave i { width: 10px; height: 10px; display: inline-block; flex: none; }
 
 .sem-dado {
   margin: 0; padding: var(--e-8) 0;
@@ -498,16 +508,14 @@ select {
 .tabela-alternativa summary { cursor: pointer; color: var(--tinta-2); }
 .tabela-alternativa table { margin-top: var(--e-3); }
 
-/* --- Tabelas --------------------------------------------------------------- */
+/* --- Tabelas: fio grosso no topo, fios finos entre linhas ------------------ */
 
 .rolagem { overflow-x: auto; }
 
 table {
   width: 100%; border-collapse: collapse;
   font-size: var(--texto-sm);
-  background: var(--superficie);
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-md);
+  border-top: 2px solid var(--eixo);
 }
 th, td {
   text-align: left; padding: var(--e-3);
@@ -518,7 +526,6 @@ th {
   font-size: var(--texto-xs); text-transform: uppercase;
   letter-spacing: var(--entreletra-rotulo); white-space: nowrap;
 }
-tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background: var(--superficie-alt); }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 td.motivo { color: var(--tinta-3); min-width: 18rem; }
@@ -546,17 +553,16 @@ td.motivo-ausente { color: var(--tinta-2); font-style: italic; }
 .aviso-carregando { color: var(--tinta-3); padding-block: var(--e-12); }
 
 .caixa-erro {
-  background: var(--superficie);
-  border: 1px solid var(--borda);
   border-left: 3px solid var(--status-critico);
-  border-radius: var(--raio-lg);
-  padding: var(--e-6); margin-top: var(--e-8);
+  padding: var(--e-2) 0 var(--e-2) var(--e-6);
+  margin-top: var(--e-10);
 }
 .caixa-erro details { margin-top: var(--e-4); font-size: var(--texto-sm); color: var(--tinta-3); }
 .caixa-erro summary { cursor: pointer; color: var(--tinta-2); }
 
 .procedencia {
-  margin-top: var(--e-8);
+  margin-top: var(--e-10); padding-top: var(--e-4);
+  border-top: 1px solid var(--borda);
   font-size: var(--texto-xs); color: var(--tinta-3);
   overflow-wrap: anywhere;
 }
@@ -564,7 +570,6 @@ td.motivo-ausente { color: var(--tinta-2); font-style: italic; }
 /* --- Rodapé da coalizão ---------------------------------------------------- */
 
 .rodape {
-  background: var(--superficie);
   border-top: 1px solid var(--borda);
   padding-block: var(--e-10);
 }
@@ -588,24 +593,17 @@ td.motivo-ausente { color: var(--tinta-2); font-style: italic; }
    placa branca — é o que as marcas dos parceiros pedem, e inverter ou
    dessaturar logo de terceiro não é opção. Dentro da placa, a tinta volta a
    ser a do modo claro: rótulo claro sobre branco não se lê. */
-:root[data-tema="escuro"] .coalizao,
-:root:not([data-tema="claro"]) .coalizao:where(.placa-escura) {
+:root[data-tema="escuro"] .coalizao {
   background: #ffffff;
-  border-radius: var(--raio-lg);
   padding: var(--e-6);
 }
-:root[data-tema="escuro"] .coalizao .etiqueta-grupo,
-:root:not([data-tema="claro"]) .coalizao:where(.placa-escura) .etiqueta-grupo {
-  color: #746a85;
-}
-:root[data-tema="escuro"] .coalizao .grupo-principal,
-:root:not([data-tema="claro"]) .coalizao:where(.placa-escura) .grupo-principal {
+:root[data-tema="escuro"] .coalizao .etiqueta-grupo { color: #746a85; }
+:root[data-tema="escuro"] .coalizao .grupo-principal {
   border-right-color: rgba(62, 33, 102, 0.12);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="claro"]) .coalizao {
     background: #ffffff;
-    border-radius: var(--raio-lg);
     padding: var(--e-6);
   }
   :root:not([data-tema="claro"]) .coalizao .etiqueta-grupo { color: #746a85; }
@@ -643,7 +641,8 @@ td.motivo-ausente { color: var(--tinta-2); font-style: italic; }
   .faixa { padding-inline: var(--e-4); }
   h1 { font-size: var(--texto-2xl); }
   .cabecalho { padding-block: var(--e-8); }
-  .bloco, .barra-estado { padding: var(--e-4); }
+  .bloco { padding-top: var(--e-6); margin-top: var(--e-6); }
+  .secao-etapa { margin-top: var(--e-12); }
   .grupo-principal { padding-right: 0; border-right: none; }
 }
 
