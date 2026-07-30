@@ -33,8 +33,33 @@ versao: 3
 edital:
   nome: Redes Bahia
   periodo_inscricoes: 27/07 a 17/08 de 2026
+  # As mesmas datas em formato de data, para o painel calcular quanto falta.
+  # Duplicadas de propósito: a linha de cima é como se lê no regulamento, estas
+  # são o que a máquina consegue subtrair.
+  inicio_inscricoes: 2026-07-27
+  fim_inscricoes: 2026-08-17
   duracao_parceria: 2027 – 2028
   territorio: Estado da Bahia
+
+# =============================================================================
+# GEOGRAFIA
+# =============================================================================
+# De onde o mapa tira o lugar de cada organização.
+#
+# Hoje o formulário só pergunta o ESTADO, então o mapa é do Brasil e a leitura
+# possível é "quantas vêm de fora do território do edital". Quando a coluna de
+# município chegar (etapa de triagem), troque `coluna` e `nivel` — a malha dos
+# 417 municípios baianos já está no repositório e o painel passa a desenhá-la
+# sem nenhuma mudança de código.
+#
+# nivel: estado    -> dashboard/assets/geo/brasil-estados.json (casa por UF ou nome)
+# nivel: municipio -> dashboard/assets/geo/bahia-municipios.json (casa por código IBGE ou nome)
+geografia:
+  coluna: estado
+  nivel: estado
+  # Unidade contornada como território do edital. Serve de referência mesmo
+  # onde não há resposta nenhuma.
+  destaque: BA
 
 # =============================================================================
 # ETAPAS DO EDITAL

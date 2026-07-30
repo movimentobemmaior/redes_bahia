@@ -1,14 +1,21 @@
 {
   "painel": "Redes Bahia",
-  "gerado_em": "2026-07-30T15:41:07+00:00",
+  "gerado_em": "2026-07-30T16:02:46+00:00",
   "data_execucao": "2026-07-30",
   "versao_pipeline": "0.1.0",
   "versao_contrato": 3,
   "edital": {
     "nome": "Redes Bahia",
     "periodo_inscricoes": "27/07 a 17/08 de 2026",
+    "inicio_inscricoes": "2026-07-27",
+    "fim_inscricoes": "2026-08-17",
     "duracao_parceria": "2027 – 2028",
     "territorio": "Estado da Bahia"
+  },
+  "geografia": {
+    "coluna": "estado",
+    "nivel": "estado",
+    "destaque": "BA"
   },
   "etapas": [
     {

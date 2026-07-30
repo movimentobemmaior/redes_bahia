@@ -230,9 +230,20 @@ def publicar(
         "edital": {
             "nome": cfg.edital.nome,
             "periodo_inscricoes": cfg.edital.periodo_inscricoes,
+            "inicio_inscricoes": cfg.edital.inicio_inscricoes,
+            "fim_inscricoes": cfg.edital.fim_inscricoes,
             "duracao_parceria": cfg.edital.duracao_parceria,
             "territorio": cfg.edital.territorio,
         },
+        "geografia": (
+            {
+                "coluna": cfg.geografia.coluna,
+                "nivel": cfg.geografia.nivel,
+                "destaque": cfg.geografia.destaque,
+            }
+            if cfg.geografia
+            else None
+        ),
         "etapas": _resumo_etapas(cfg, tabelas),
         "fontes": {
             nome: {

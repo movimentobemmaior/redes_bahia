@@ -11,8 +11,16 @@
  */
 
 import { barrasHorizontais, barraSegmentada, fmt, linhaTempo, tabelaEquivalente } from "./graficos.js";
+import { mapaCoropletico, normalizar } from "./mapa.js";
 
 const BASE = "../data/published";
+
+// Qual malha desenhar em cada nível declarado no contrato (`geografia.nivel`).
+// Trocar o nível no contrato troca o mapa; nada aqui precisa mudar.
+const MALHAS = {
+  estado: { arquivo: "geo/brasil-estados.json", unidade: "organizações", maxRotulos: 8 },
+  municipio: { arquivo: "geo/bahia-municipios.json", unidade: "organizações", maxRotulos: 12 },
+};
 
 /** Plural sem o "(s)" entre parênteses, que é gíria de formulário. */
 function plural(n, singular, plural_) {
@@ -23,6 +31,7 @@ const estado = {
   manifesto: null,
   linhas: [],
   criterios: [],
+  malha: null,
   filtros: { estado: "", resultado: "", representa: "" },
 };
 
@@ -313,6 +322,9 @@ function montarCriterios(linhas) {
   barrasHorizontais($("#grafico-criterios"), dados, {
     rotulo: "Critérios não atendidos",
     cor: "var(--serie-2)",
+    // Requisito de edital é frase, não palavra: com a calha estreita, todos
+    // terminavam em reticências e o gráfico deixava de dizer qual é qual.
+    larguraRotulo: 380,
     total: base.length,
   });
 
@@ -327,20 +339,115 @@ function montarCriterios(linhas) {
   );
 }
 
-function montarDistribuicoes(linhas) {
-  const porEstado = contar(linhas, "estado");
-  barrasHorizontais($("#grafico-estado"), porEstado, {
-    rotulo: "Origem por estado",
-    larguraRotulo: 160,
-    total: linhas.length,
-  });
-
+function montarNatureza(linhas) {
   const porNatureza = contar(linhas, "representa");
   barrasHorizontais($("#grafico-natureza"), porNatureza, {
     rotulo: "Natureza jurídica",
     larguraRotulo: 280,
     total: linhas.length,
   });
+}
+
+/** O mapa: de onde vêm as organizações, sobre a malha declarada no contrato.
+ *
+ *  Enquanto o formulário só perguntar o estado, a leitura possível é "quantas
+ *  vêm de fora do território do edital" — que já é decisão, porque sede fora da
+ *  Bahia é critério de exclusão. Quando a coluna de município chegar, muda o
+ *  `geografia.nivel` do contrato e o mesmo bloco passa a desenhar municípios. */
+function montarTerritorio(linhas) {
+  const geo = estado.manifesto.geografia;
+  const bloco = $("#mapa-territorio").closest(".bloco");
+  if (!geo || !estado.malha) {
+    bloco.hidden = true;
+    return;
+  }
+  bloco.hidden = false;
+
+  const contagem = contar(linhas, geo.coluna).filter((d) => d.rotulo !== "(não informado)");
+  const valores = new Map(contagem.map((d) => [normalizar(d.rotulo), d.valor]));
+
+  mapaCoropletico($("#mapa-territorio"), estado.malha, valores, {
+    rotulo: "Organizações por unidade territorial",
+    destaque: geo.destaque,
+    unidade: MALHAS[geo.nivel]?.unidade ?? "organizações",
+    maxRotulos: MALHAS[geo.nivel]?.maxRotulos ?? 8,
+  });
+
+  $("#tabela-territorio").replaceChildren(
+    tabelaEquivalente(contagem, [geo.nivel === "municipio" ? "Município" : "Estado", "Organizações"])
+  );
+
+  // Quem está fora do território do edital. O nome da unidade destacada sai da
+  // própria malha, para a frase não depender de uma sigla escrita à mão aqui.
+  // A frase diz "território do edital" e põe o nome entre parênteses de
+  // propósito: "fora de Bahia" e "fora do Ceará" pedem artigos diferentes, e
+  // não há como acertar a crase de um nome que vem de um arquivo.
+  const alvo = (estado.malha.features ?? []).find(
+    (f) => normalizar(f.properties.chave) === normalizar(geo.destaque)
+  );
+  const dentro = new Set([normalizar(geo.destaque), normalizar(alvo?.properties.nome)]);
+  const fora = contagem.filter((d) => !dentro.has(normalizar(d.rotulo)));
+  const nFora = fora.reduce((s, d) => s + d.valor, 0);
+  const territorio =
+    estado.manifesto.edital?.territorio || alvo?.properties.nome || geo.destaque;
+
+  // Recorte vazio precisa dizer que está vazio: "todas declararam sede no
+  // território" com zero respostas é verdadeiro por vacuidade e lido como
+  // afirmação sobre a base.
+  const total = contagem.reduce((s, d) => s + d.valor, 0);
+  $("#nota-territorio").textContent = !total
+    ? "Nenhuma organização no recorte atual."
+    : nFora
+      ? `${plural(nFora, "organização declarou sede fora", "organizações declararam sede fora")} ` +
+        `do território do edital — ${fora.map((d) => d.rotulo).join(", ")}. ` +
+        "Sede fora do território é critério de exclusão."
+      : `Todas as ${plural(total, "resposta", "respostas")} do recorte ` +
+        `declararam sede no território do edital (${territorio}).`;
+}
+
+function comoData(iso) {
+  return new Date(`${String(iso).slice(0, 10)}T00:00:00`);
+}
+
+function diasEntre(de, ate) {
+  return Math.round((comoData(ate) - comoData(de)) / 86400000);
+}
+
+/** Dias corridos até uma data ISO. Negativo quando ela já passou. */
+function diasAte(iso) {
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  return Math.round((comoData(iso) - hoje) / 86400000);
+}
+
+/** Quanto falta para fechar as inscrições. Não depende de filtro: é do edital.
+ *
+ *  Fica ao lado do gráfico de ritmo porque é lá que a informação decide algo —
+ *  ritmo caindo com muito prazo pela frente pede divulgação; ritmo caindo na
+ *  véspera é só o fim natural da janela. */
+function montarPrazo() {
+  const fim = estado.manifesto.edital?.fim_inscricoes;
+  const cartao = $("#prazo-inscricoes");
+  if (!fim) {
+    cartao.hidden = true;
+    return;
+  }
+  const dias = diasAte(fim);
+  const valor = cartao.querySelector(".cartao-prazo-valor");
+  const rotulo = cartao.querySelector(".cartao-prazo-rotulo");
+
+  if (dias > 0) {
+    valor.textContent = fmt.format(dias);
+    rotulo.textContent = `${dias === 1 ? "dia" : "dias"} até ${formatarData(fim)}, fim das inscrições`;
+  } else if (dias === 0) {
+    valor.textContent = "Hoje";
+    rotulo.textContent = "último dia de inscrições";
+  } else {
+    valor.textContent = "Encerrado";
+    rotulo.textContent = `inscrições fechadas em ${formatarData(fim)}`;
+  }
+  cartao.dataset.situacao = dias < 0 ? "encerrado" : dias <= 3 ? "reta-final" : "aberto";
+  cartao.hidden = false;
 }
 
 function montarEvolucao(linhas) {
@@ -350,11 +457,26 @@ function montarEvolucao(linhas) {
     const dia = String(l.data_resposta).slice(0, 10);
     porDia.set(dia, (porDia.get(dia) || 0) + 1);
   }
-  const pontos = [...porDia.entries()]
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([dia, valor]) => ({ rotulo: formatarData(dia), valor }));
+  const dias = [...porDia.entries()].sort(([a], [b]) => a.localeCompare(b));
+  const pontos = dias.map(([dia, valor]) => ({ rotulo: formatarData(dia), valor }));
 
   linhaTempo($("#grafico-evolucao"), pontos, { rotulo: "Respostas por dia" });
+
+  const total = dias.reduce((s, [, v]) => s + v, 0);
+  if (!dias.length) {
+    $("#nota-ritmo").textContent = "Nenhuma resposta no recorte atual.";
+    return;
+  }
+  // Média sobre o intervalo corrido entre a primeira e a última resposta, e não
+  // sobre o número de dias com movimento: dia sem resposta é informação sobre o
+  // ritmo, e descartá-lo infla a média justamente quando o fluxo está secando.
+  const primeiro = dias[0][0];
+  const ultimo = dias[dias.length - 1][0];
+  const media = total / Math.max(1, diasEntre(primeiro, ultimo) + 1);
+  $("#nota-ritmo").textContent =
+    `${plural(total, "resposta", "respostas")} entre ${formatarData(primeiro)} e ` +
+    `${formatarData(ultimo)} — média de ` +
+    `${media.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} por dia.`;
 }
 
 function montarTabela(linhas) {
@@ -473,10 +595,30 @@ function desenhar() {
   $("#aviso-filtro").hidden = !filtrando;
 
   montarIndicadores(linhas);
-  montarCriterios(linhas);
-  montarDistribuicoes(linhas);
   montarEvolucao(linhas);
+  montarCriterios(linhas);
+  montarTerritorio(linhas);
+  montarNatureza(linhas);
   montarTabela(linhas);
+}
+
+/** Busca a malha do nível declarado no contrato.
+ *
+ *  Falha aqui não derruba o painel: o mapa é um bloco entre outros, e uma
+ *  malha ausente não pode apagar os números. O bloco simplesmente não aparece.
+ */
+async function carregarMalha(geografia) {
+  const escolha = MALHAS[geografia?.nivel];
+  if (!escolha) return null;
+  try {
+    // Resolvido contra o módulo, não contra a página: a malha mora ao lado
+    // deste arquivo, e um caminho relativo à página quebraria se o painel
+    // passasse a ser servido de outra pasta.
+    const resposta = await fetch(new URL(escolha.arquivo, import.meta.url));
+    return resposta.ok ? await resposta.json() : null;
+  } catch {
+    return null;
+  }
 }
 
 function configurarTema() {
@@ -526,10 +668,13 @@ async function iniciar() {
         rotulo: c.descricao ? c.descricao.split(".")[0] : c.nome,
       }));
 
+    estado.malha = await carregarMalha(manifesto.geografia);
+
     montarCabecalho();
     montarFunil();
     montarSecoesEtapas();
     montarFiltros();
+    montarPrazo();
     montarQualidade();
     $("#escopo-criterios").addEventListener("change", () => montarCriterios(aplicarFiltros(estado.linhas)));
 

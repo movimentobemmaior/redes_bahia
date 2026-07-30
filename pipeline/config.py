@@ -57,6 +57,22 @@ class Edital:
     periodo_inscricoes: str
     duracao_parceria: str
     territorio: str
+    # As mesmas datas do período, em ISO, para o painel contar quanto falta.
+    inicio_inscricoes: str = ""
+    fim_inscricoes: str = ""
+
+
+@dataclass(frozen=True)
+class Geografia:
+    """De onde o mapa tira o lugar de cada linha.
+
+    Existe para que a troca de estado → município seja uma edição do contrato,
+    e não do JavaScript: muda `coluna` e `nivel`, e o painel troca a malha.
+    """
+
+    coluna: str
+    nivel: str
+    destaque: str
 
 
 @dataclass(frozen=True)
@@ -123,6 +139,7 @@ class Historico:
 class Config:
     versao: int
     edital: Edital
+    geografia: Geografia | None
     etapas: tuple[Etapa, ...]
     fonte: Fonte
     publicacao: Publicacao
@@ -290,6 +307,42 @@ def _ler_etapas(bruto: Any, datasets: dict[str, Dataset]) -> tuple[Etapa, ...]:
     return tuple(etapas)
 
 
+def _como_iso(valor: Any) -> str:
+    """AAAA-MM-DD, venha o valor como date do YAML ou como texto."""
+    if valor is None:
+        return ""
+    return str(valor)[:10]
+
+
+NIVEIS_GEOGRAFICOS = {"estado", "municipio"}
+
+
+def _ler_geografia(bruto: Any, datasets: dict[str, Dataset]) -> Geografia | None:
+    """Bloco opcional: sem ele o painel simplesmente não desenha o mapa."""
+    if bruto is None:
+        return None
+    if not isinstance(bruto, dict):
+        raise ErroConfig("geografia: deve ser um bloco com 'coluna' e 'nivel'.")
+
+    nivel = str(_exigir(bruto, "nivel", "geografia"))
+    if nivel not in NIVEIS_GEOGRAFICOS:
+        raise ErroConfig(
+            f"geografia > nivel: '{nivel}' desconhecido. "
+            f"Use um de: {', '.join(sorted(NIVEIS_GEOGRAFICOS))}."
+        )
+
+    coluna = str(_exigir(bruto, "coluna", "geografia"))
+    # Apontar para uma coluna que não existe deixaria o mapa mudo sem nenhum
+    # aviso — o painel não tem como distinguir "coluna errada" de "sem dado".
+    if not any(ds.coluna(coluna) for ds in datasets.values()):
+        onde = ", ".join(sorted(datasets)) or "(nenhum)"
+        raise ErroConfig(
+            f"geografia > coluna: '{coluna}' não está declarada em nenhum dataset ({onde})."
+        )
+
+    return Geografia(coluna=coluna, nivel=nivel, destaque=str(bruto.get("destaque", "")))
+
+
 def _checar_referencias(datasets: dict[str, Dataset]) -> None:
     """Só é possível checar regras 'referencia' depois de ler todos os datasets."""
     for nome, ds in datasets.items():
@@ -364,11 +417,16 @@ def carregar(caminho: str | Path | None = None) -> Config:
         periodo_inscricoes=str(edital_bruto.get("periodo_inscricoes", "")),
         duracao_parceria=str(edital_bruto.get("duracao_parceria", "")),
         territorio=str(edital_bruto.get("territorio", "")),
+        inicio_inscricoes=_como_iso(edital_bruto.get("inicio_inscricoes")),
+        fim_inscricoes=_como_iso(edital_bruto.get("fim_inscricoes")),
     )
+
+    geografia = _ler_geografia(bruto.get("geografia"), datasets)
 
     return Config(
         versao=int(bruto.get("versao", 1)),
         edital=edital,
+        geografia=geografia,
         etapas=etapas,
         fonte=fonte,
         publicacao=publicacao,

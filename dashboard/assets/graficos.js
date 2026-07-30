@@ -219,7 +219,13 @@ export function linhaTempo(destino, pontos, opcoes = {}) {
   const largura = larguraDe(destino);
   const altura = 220;
   const margem = { topo: 20, direita: 24, baixo: 40, esquerda: 44 };
-  const maximo = Math.max(...pontos.map((p) => p.valor), 1);
+  // O eixo conta coisas inteiras (respostas por dia). Dividir o máximo em
+  // quatro partes iguais produzia ticks como 1,5 e 4,5, arredondados na hora de
+  // escrever — e a grade acabava rotulada 0, 2, 3, 5, 6, com dois intervalos
+  // aparentemente diferentes do mesmo tamanho. Subir o topo até o próximo
+  // múltiplo do passo custa um pouco de espaço e devolve uma escala legível.
+  const passo = Math.max(1, Math.ceil(Math.max(...pontos.map((p) => p.valor), 1) / 4));
+  const maximo = passo * 4;
   const larguraUtil = largura - margem.esquerda - margem.direita;
   const alturaUtil = altura - margem.topo - margem.baixo;
 
