@@ -62,6 +62,7 @@ def test_coluna_vazia_declarada_nao_bloqueia_a_publicacao(planilha, contrato, cf
 
     ds = Dataset(
         nome="credenciamento",
+        etapa="cadastro",
         aba="Dados",
         descricao="",
         linha_cabecalho=1,

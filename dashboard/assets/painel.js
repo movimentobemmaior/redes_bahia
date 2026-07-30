@@ -89,8 +89,11 @@ function aplicarFiltros(linhas) {
 
 function montarCabecalho() {
   const m = estado.manifesto;
+  const fontes = Object.values(m.fontes ?? {}).map((f) => f.arquivo);
   $("#data-atualizacao").textContent = formatarData(m.data_execucao);
-  $("#origem").textContent = `${idadeEmTexto(m.data_execucao)} · origem: ${m.fonte.arquivo}`;
+  $("#origem").textContent =
+    `${idadeEmTexto(m.data_execucao)} · ${fontes.length === 1 ? "origem" : "origens"}: ` +
+    (fontes.join(", ") || "—");
 
   const selo = $("#selo-validacao");
   selo.dataset.status = m.validacao.status;
@@ -98,9 +101,114 @@ function montarCabecalho() {
   selo.querySelector(".selo-texto").textContent =
     `${TEXTO_STATUS[m.validacao.status] ?? m.validacao.status} · ${detalhe}`;
 
+  const hashes = Object.entries(m.fontes ?? {})
+    .map(([nome, f]) => `${nome}: ${f.hash_sha256.slice(0, 12)}…`)
+    .join(" · ");
   $("#procedencia").textContent =
     `Gerada em ${m.gerado_em} pelo pipeline ${m.versao_pipeline}, contrato versão ` +
-    `${m.versao_contrato}. SHA-256 da planilha: ${m.fonte.hash_sha256}.`;
+    `${m.versao_contrato}. SHA-256 das planilhas — ${hashes || "nenhuma"}.`;
+}
+
+/** O funil do edital: a leitura de visão geral, antes de qualquer detalhe.
+ *
+ *  Mostra as cinco etapas sempre, inclusive as que ainda não receberam
+ *  planilha. Uma etapa escondida enquanto não tem dado dá a impressão de que o
+ *  edital termina onde os dados terminam, que é o contrário do que um painel
+ *  de acompanhamento precisa comunicar. */
+function montarFunil() {
+  const lista = $("#funil-etapas");
+  lista.replaceChildren();
+
+  const etapas = estado.manifesto.etapas ?? [];
+  let anterior = null;
+
+  for (const etapa of etapas) {
+    const item = document.createElement("li");
+    item.className = "etapa";
+    item.dataset.estado = etapa.estado;
+
+    const ordem = document.createElement("p");
+    ordem.className = "etapa-ordem";
+    ordem.textContent = `Etapa ${etapa.ordem}`;
+
+    const nome = document.createElement("p");
+    nome.className = "etapa-nome";
+    nome.textContent = etapa.nome;
+
+    item.append(ordem, nome);
+
+    if (etapa.estado === "com_dados") {
+      const valor = document.createElement("p");
+      valor.className = "etapa-valor";
+      valor.textContent = fmt.format(etapa.n_linhas);
+      const unidade = document.createElement("p");
+      unidade.className = "etapa-unidade";
+      unidade.textContent = etapa.n_linhas === 1 ? "organização" : "organizações";
+      item.append(valor, unidade);
+
+      // Taxa de passagem em relação à etapa anterior com dados: é o número que
+      // orienta decisão, mais que o total isolado de cada etapa.
+      if (anterior && anterior.n_linhas > 0) {
+        const taxa = document.createElement("p");
+        taxa.className = "etapa-taxa";
+        const pct = Math.round((etapa.n_linhas / anterior.n_linhas) * 100);
+        taxa.textContent = `${pct}% de ${anterior.nome}`;
+        item.append(taxa);
+      }
+      anterior = etapa;
+    } else {
+      const espera = document.createElement("p");
+      espera.className = "etapa-espera";
+      espera.textContent =
+        etapa.estado === "aguardando"
+          ? "aguardando a planilha da etapa"
+          : "ainda sem dados";
+      item.append(espera);
+    }
+
+    item.title = etapa.resumo || etapa.nome;
+    lista.append(item);
+  }
+}
+
+/** Ordena as seções por etapa e cria as que ainda não têm tela própria. */
+function montarSecoesEtapas() {
+  const container = $("#etapas");
+  const existentes = new Map(
+    [...container.querySelectorAll("[data-etapa]")].map((el) => [el.dataset.etapa, el])
+  );
+
+  for (const etapa of estado.manifesto.etapas ?? []) {
+    let secao = existentes.get(etapa.chave);
+    if (!secao) {
+      secao = document.createElement("section");
+      secao.className = "secao-etapa";
+      secao.dataset.etapa = etapa.chave;
+      secao.innerHTML = `
+        <header class="secao-etapa-cabecalho">
+          <span class="secao-etapa-numero"></span>
+          <h2></h2>
+        </header>
+        <p class="secao-etapa-resumo"></p>
+        <div class="aguardando"></div>`;
+      const espera = secao.querySelector(".aguardando");
+      const linha1 = document.createElement("p");
+      linha1.textContent =
+        etapa.estado === "aguardando"
+          ? "O contrato desta etapa já está definido; falta a planilha do dia."
+          : "Esta etapa ainda não tem planilha nem contrato de dados.";
+      const linha2 = document.createElement("p");
+      linha2.append(document.createTextNode("Solte o arquivo .xlsx em "));
+      const codigo = document.createElement("code");
+      codigo.textContent = `${etapa.pasta}/`;
+      linha2.append(codigo, document.createTextNode(" para que os números apareçam aqui."));
+      espera.append(linha1, linha2);
+    }
+    secao.querySelector(".secao-etapa-numero").textContent = `Etapa ${etapa.ordem}`;
+    secao.querySelector(".secao-etapa-cabecalho h2").textContent = etapa.nome;
+    secao.querySelector(".secao-etapa-resumo").textContent = etapa.resumo || "";
+    container.append(secao); // append reordena o que já existe
+  }
 }
 
 function montarFiltros() {
@@ -397,6 +505,8 @@ async function iniciar() {
       }));
 
     montarCabecalho();
+    montarFunil();
+    montarSecoesEtapas();
     montarFiltros();
     montarQualidade();
     $("#escopo-criterios").addEventListener("change", () => montarCriterios(aplicarFiltros(estado.linhas)));

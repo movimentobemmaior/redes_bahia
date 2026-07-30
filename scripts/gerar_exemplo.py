@@ -121,17 +121,24 @@ def gerar(linhas: int, saida: Path, semente: int = 7, contrato: Path | None = No
     return saida
 
 
+def destino_padrao(contrato: Path | None = None) -> Path:
+    """Pasta da etapa dona do dataset, tirada do contrato.
+
+    Fixar `data/raw/` aqui já quebrou o CI uma vez: a fonte passou a vir da
+    etapa e o exemplo continuou caindo na raiz, onde o pipeline não olha mais.
+    """
+    cfg = carregar(contrato)
+    ds = next(iter(cfg.datasets.values()))
+    etapa = next(e for e in cfg.etapas if e.dataset == ds.nome)
+    return etapa.pasta / f"exemplo_{date.today().isoformat()}_{etapa.chave}.xlsx"
+
+
 def main() -> int:
-    hoje = date.today().isoformat()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--linhas", type=int, default=40, help="número de respostas")
-    parser.add_argument(
-        "--saida",
-        default=RAIZ / "data" / "raw" / f"exemplo_{hoje}_redes_bahia.xlsx",
-        type=Path,
-    )
+    parser.add_argument("--saida", type=Path, default=None)
     args = parser.parse_args()
-    destino = gerar(args.linhas, args.saida)
+    destino = gerar(args.linhas, args.saida or destino_padrao())
     print(f"Planilha de exemplo criada em {destino}")
     print("Rode agora: make dados")
     return 0

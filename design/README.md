@@ -5,6 +5,13 @@
 | `tokens/tokens.css` | variáveis CSS usadas pelo painel no navegador |
 | `tokens/tokens.json` | os mesmos valores, para código que gera gráfico (Python, JS) |
 
+Os ativos de marca ficam junto do painel, porque é ele quem os serve:
+
+| Pasta | Conteúdo |
+|---|---|
+| `dashboard/assets/marca/` | logos da coalizão, extraídos do regulamento |
+| `dashboard/assets/fontes/` | Raleway (woff2) e a licença SIL OFL |
+
 **O CSS é a referência.** Mudou um, muda o outro — os dois fora de sincronia
 deixam a tela e os gráficos com cores diferentes.
 
@@ -20,4 +27,6 @@ parte dessa verificação**: ela é o que garante que cores vizinhas continuem
 distinguíveis. Reordenar por gosto quebra a acessibilidade sem quebrar nenhum
 teste.
 
-Trocar qualquer hex exige revalidar a paleta inteira nos dois modos.
+Trocar qualquer hex exige revalidar a paleta inteira nos dois modos. A paleta
+atual vem do regulamento do edital; os números da verificação estão em
+`docs/05-identidade-visual.md`.

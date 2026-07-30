@@ -46,7 +46,11 @@ def _publicar(cfg_temp, tabelas, problemas=None, dia="2026-05-01"):
     return publish.publicar(
         tabelas=tabelas,
         cfg=cfg_temp,
-        arquivo=Arquivo(caminho=pd.io.common.Path("planilha.xlsm"), hash_sha256="abc", bytes=1),
+        fontes={
+            "inscricoes": Arquivo(
+                caminho=pd.io.common.Path("planilha.xlsx"), hash_sha256="abc", bytes=1
+            )
+        },
         problemas=problemas or [],
         data_execucao=date.fromisoformat(dia),
         versao_pipeline="teste",
@@ -73,7 +77,7 @@ def test_manifesto_registra_status_e_origem(saidas, cfg_temp, tabelas):
     problema = Problema(dataset="inscricoes", codigo="x", gravidade=AVISO, mensagem="teste")
     manifesto = _publicar(cfg_temp, tabelas, [problema])
     assert manifesto["validacao"]["status"] == "com_avisos"
-    assert manifesto["fonte"]["hash_sha256"] == "abc"
+    assert manifesto["fontes"]["inscricoes"]["hash_sha256"] == "abc"
     assert manifesto["datasets"][0]["colunas_omitidas_por_sigilo"] == ["cnpj"]
     gravado = json.loads((saidas / "published" / "manifest.json").read_text(encoding="utf-8"))
     assert gravado == manifesto

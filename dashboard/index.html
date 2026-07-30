@@ -3,19 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Painel Redes Bahia · Credenciamento</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%232a78d6'/%3E%3Crect x='3.5' y='8' width='2.5' height='5' fill='white'/%3E%3Crect x='7' y='5' width='2.5' height='8' fill='white'/%3E%3Crect x='10.5' y='3' width='2.5' height='10' fill='white'/%3E%3C/svg%3E">
+  <title>Redes Bahia · Painel do edital</title>
+  <meta name="description" content="Acompanhamento do Edital Redes Bahia, da divulgação ao resultado — Movimento Bem Maior.">
+  <meta name="theme-color" content="#4f2d71">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%234f2d71'/%3E%3Ccircle cx='8' cy='8' r='4.2' fill='none' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
+  <link rel="preload" href="assets/fontes/raleway-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../design/tokens/tokens.css">
   <link rel="stylesheet" href="assets/painel.css">
 </head>
 <body>
   <a class="pular" href="#conteudo">Pular para o conteúdo</a>
 
-  <header class="topo">
-    <div class="faixa">
-      <div>
+  <header class="cabecalho">
+    <div class="faixa cabecalho-interno">
+      <img class="marca" src="assets/marca/logo-movimento-bem-maior-branco.png"
+           alt="Movimento Bem Maior" width="431" height="120">
+      <div class="cabecalho-titulo">
         <p class="sobretitulo">Edital Redes Bahia</p>
-        <h1>Credenciamento</h1>
+        <h1>Painel do edital</h1>
+        <p class="subtitulo">
+          Acompanhamento das cinco etapas do edital, da divulgação ao resultado.
+          Apoio a organizações da sociedade civil e coletivos de pequeno porte
+          no estado da Bahia, com investimento financeiro e desenvolvimento
+          institucional ao longo de dois anos.
+        </p>
       </div>
       <button id="alternar-tema" class="botao-tema" type="button" aria-pressed="false">
         Modo escuro
@@ -28,11 +39,10 @@
 
     <div id="painel" hidden>
 
-      <!-- Estado da base: primeiro, porque decide se o resto pode ser lido -->
-      <section class="destaque" aria-labelledby="t-atualizacao">
+      <section class="barra-estado" aria-labelledby="t-atualizacao">
         <div>
           <h2 id="t-atualizacao" class="rotulo">Última atualização</h2>
-          <p id="data-atualizacao" class="numero-destaque">—</p>
+          <p id="data-atualizacao" class="numero-estado">—</p>
           <p id="origem" class="meta">—</p>
         </div>
         <p id="selo-validacao" class="selo">
@@ -40,47 +50,58 @@
         </p>
       </section>
 
-      <!-- Filtros: uma faixa só, acima de tudo -->
+      <section class="funil" aria-labelledby="t-funil">
+        <h2 id="t-funil" class="oculto">Funil do edital</h2>
+        <ol id="funil-etapas" class="funil-etapas"></ol>
+      </section>
+
       <section class="filtros" aria-label="Filtros">
-        <label>
-          <span>Estado</span>
-          <select id="filtro-estado"></select>
-        </label>
-        <label>
-          <span>Resultado</span>
-          <select id="filtro-resultado"></select>
-        </label>
-        <label>
-          <span>Natureza jurídica</span>
-          <select id="filtro-representa"></select>
-        </label>
-        <button id="limpar-filtros" type="button" class="botao-secundario">Limpar</button>
+        <div class="filtros-campos">
+          <label>
+            <span>Estado</span>
+            <select id="filtro-estado"></select>
+          </label>
+          <label>
+            <span>Resultado</span>
+            <select id="filtro-resultado"></select>
+          </label>
+          <label>
+            <span>Natureza jurídica</span>
+            <select id="filtro-representa"></select>
+          </label>
+          <button id="limpar-filtros" type="button" class="botao-secundario">Limpar filtros</button>
+        </div>
         <p id="aviso-filtro" class="aviso-filtro" hidden>
-          Os números abaixo refletem o filtro aplicado.
+          Os números abaixo consideram apenas o recorte selecionado.
         </p>
       </section>
+
+      <div id="etapas">
+      <section class="secao-etapa" data-etapa="cadastramento">
+        <header class="secao-etapa-cabecalho">
+          <span class="secao-etapa-numero"></span>
+          <h2></h2>
+        </header>
+        <p class="secao-etapa-resumo"></p>
 
       <section class="grade-kpi" aria-label="Números gerais">
-        <article class="cartao kpi" id="kpi-total">
-          <p class="valor">—</p><p class="rotulo-kpi">—</p>
-        </article>
-        <article class="cartao kpi" id="kpi-aprovadas">
-          <p class="valor">—</p><p class="rotulo-kpi">—</p>
-        </article>
-        <article class="cartao kpi" id="kpi-reprovadas">
-          <p class="valor">—</p><p class="rotulo-kpi">—</p>
-        </article>
-        <article class="cartao kpi" id="kpi-semmotivo">
-          <p class="valor">—</p><p class="rotulo-kpi">—</p>
-        </article>
+        <article class="kpi" id="kpi-total"><p class="valor">—</p><p class="rotulo-kpi">—</p></article>
+        <article class="kpi" id="kpi-aprovadas"><p class="valor">—</p><p class="rotulo-kpi">—</p></article>
+        <article class="kpi" id="kpi-reprovadas"><p class="valor">—</p><p class="rotulo-kpi">—</p></article>
+        <article class="kpi" id="kpi-semmotivo"><p class="valor">—</p><p class="rotulo-kpi">—</p></article>
       </section>
 
-      <section class="cartao" aria-labelledby="t-resultado">
-        <h2 id="t-resultado">Resultado do credenciamento</h2>
-        <p class="descricao-bloco">
-          A checagem é automática, sobre o que a própria organização declarou.
-          Aprovado aqui não significa verificado — a comprovação vem depois.
-        </p>
+      <section class="bloco" aria-labelledby="t-resultado">
+        <header class="bloco-cabecalho">
+          <div>
+            <h2 id="t-resultado">Resultado do credenciamento</h2>
+            <p class="bloco-descricao">
+              A checagem é automática, sobre o que a própria organização
+              declarou. Aprovado aqui não significa verificado: a comprovação
+              vem em etapa posterior.
+            </p>
+          </div>
+        </header>
         <div class="legenda">
           <span class="chave"><i style="background: var(--serie-1)"></i>Aprovadas automaticamente</span>
           <span class="chave"><i style="background: var(--serie-2)"></i>Não aprovadas</span>
@@ -88,12 +109,12 @@
         <div id="grafico-resultado" class="area-grafico"></div>
       </section>
 
-      <!-- O bloco central: o que está barrando quem -->
-      <section class="cartao" aria-labelledby="t-criterios">
-        <div class="cabecalho-bloco">
+      <section class="bloco bloco-destaque" aria-labelledby="t-criterios">
+        <header class="bloco-cabecalho">
           <div>
+            <p class="etiqueta">Funil de elegibilidade</p>
             <h2 id="t-criterios">Requisitos não atendidos</h2>
-            <p class="descricao-bloco">
+            <p class="bloco-descricao">
               Quantas organizações responderam o valor que torna a proposta
               inelegível em cada requisito do edital.
             </p>
@@ -105,7 +126,7 @@
               <option value="todas">todas as respostas</option>
             </select>
           </label>
-        </div>
+        </header>
         <div id="grafico-criterios" class="area-grafico"></div>
         <p id="nota-criterios" class="meta"></p>
         <details class="tabela-alternativa">
@@ -115,38 +136,38 @@
       </section>
 
       <div class="duas-colunas">
-        <section class="cartao" aria-labelledby="t-estado">
+        <section class="bloco" aria-labelledby="t-estado">
           <h2 id="t-estado">Origem por estado</h2>
-          <p class="descricao-bloco">
-            O edital é para organizações com sede na Bahia, mas o formulário
-            aceita respostas de fora. Quem está fora aparece aqui.
+          <p class="bloco-descricao">
+            O edital é exclusivo para organizações com sede na Bahia, e o
+            formulário aceita respostas de fora. Quem está fora aparece aqui.
           </p>
           <div id="grafico-estado" class="area-grafico"></div>
         </section>
 
-        <section class="cartao" aria-labelledby="t-natureza">
+        <section class="bloco" aria-labelledby="t-natureza">
           <h2 id="t-natureza">Natureza jurídica</h2>
-          <p class="descricao-bloco">
-            "Nenhuma das opções" é o valor mais informativo: é quem não se
-            encaixa no desenho do edital.
+          <p class="bloco-descricao">
+            "Nenhuma das opções" é a resposta mais informativa da lista: marca
+            quem não se encaixa no desenho do edital.
           </p>
           <div id="grafico-natureza" class="area-grafico"></div>
         </section>
       </div>
 
-      <section class="cartao" aria-labelledby="t-evolucao">
+      <section class="bloco" aria-labelledby="t-evolucao">
         <h2 id="t-evolucao">Respostas por dia</h2>
-        <p class="descricao-bloco">
+        <p class="bloco-descricao">
           Cobre apenas o período em que o formulário esteve aberto.
         </p>
         <div id="grafico-evolucao" class="area-grafico"></div>
       </section>
 
-      <section class="cartao" aria-labelledby="t-organizacoes">
-        <div class="cabecalho-bloco">
+      <section class="bloco" aria-labelledby="t-organizacoes">
+        <header class="bloco-cabecalho">
           <h2 id="t-organizacoes">Organizações</h2>
           <p id="contagem-tabela" class="meta"></p>
-        </div>
+        </header>
         <div class="rolagem">
           <table id="tabela-organizacoes">
             <caption class="oculto">Organizações que responderam o credenciamento</caption>
@@ -165,11 +186,11 @@
         </div>
       </section>
 
-      <section class="cartao" aria-labelledby="t-qualidade">
+      <section class="bloco" aria-labelledby="t-qualidade">
         <h2 id="t-qualidade">Qualidade da base</h2>
-        <p class="descricao-bloco">
-          Um painel que não mostra a saúde do próprio dado convida à decisão
-          errada.
+        <p class="bloco-descricao">
+          O painel mostra a saúde do próprio dado, para que a leitura dos
+          números venha acompanhada do quanto se pode confiar neles.
         </p>
         <h3>Preenchimento</h3>
         <ul id="qualidade" class="lista-simples"></ul>
@@ -194,16 +215,10 @@
         <p id="sem-problemas" class="meta" hidden>Nenhum problema encontrado nesta execução.</p>
       </section>
 
-      <footer class="rodape">
-        <p id="procedencia" class="meta"></p>
-        <p class="meta">
-          Dados abertos:
-          <a href="../data/published/credenciamento.csv">CSV</a> ·
-          <a href="../data/published/credenciamento.json">JSON</a> ·
-          <a href="../data/published/manifest.json">manifesto</a>.
-          Esta página lê apenas <code>data/published/</code>.
-        </p>
-      </footer>
+      </section>
+      </div>
+
+      <p id="procedencia" class="procedencia"></p>
     </div>
 
     <div id="erro" class="caixa-erro" hidden>
@@ -225,6 +240,48 @@
       </details>
     </div>
   </main>
+
+  <footer class="rodape">
+    <div class="faixa">
+      <div class="coalizao">
+        <div class="grupo-marca grupo-principal">
+          <img src="assets/marca/logo-redes-bahia.png" alt="Redes Bahia" width="935" height="120">
+        </div>
+        <div class="grupo-marca">
+          <p class="etiqueta-grupo">Iniciativa</p>
+          <div class="linha-marcas">
+            <img src="assets/marca/logo-movimento-bem-maior.png" alt="Movimento Bem Maior" width="435" height="120">
+          </div>
+        </div>
+        <div class="grupo-marca">
+          <p class="etiqueta-grupo">Parceria estratégica</p>
+          <div class="linha-marcas">
+            <img src="assets/marca/logo-brainvest.png" alt="Brainvest Wealth Management" width="376" height="120">
+            <img src="assets/marca/logo-instituto-ivete-sangalo.png" alt="Instituto Ivete Sangalo" width="227" height="120">
+            <img src="assets/marca/logo-instituto-lina-galvani.png" alt="Instituto Lina Galvani" width="498" height="120">
+          </div>
+        </div>
+        <div class="grupo-marca">
+          <p class="etiqueta-grupo">Parceria técnica</p>
+          <div class="linha-marcas">
+            <img src="assets/marca/logo-bussola.png" alt="Bússola" width="480" height="120">
+            <img src="assets/marca/logo-instituto-phomenta.png" alt="Instituto Phomenta" width="463" height="120">
+            <img src="assets/marca/logo-phi.png" alt="phi" width="277" height="120">
+          </div>
+        </div>
+      </div>
+
+      <div class="rodape-final">
+        <p class="meta">
+          Dados abertos:
+          <a href="../data/published/credenciamento.csv">CSV</a> ·
+          <a href="../data/published/credenciamento.json">JSON</a> ·
+          <a href="../data/published/manifest.json">manifesto</a>
+        </p>
+        <p class="meta">Painel gerado a partir de <code>data/published/</code>.</p>
+      </div>
+    </div>
+  </footer>
 
   <script type="module" src="assets/painel.js"></script>
 </body>

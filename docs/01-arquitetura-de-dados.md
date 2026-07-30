@@ -8,10 +8,32 @@ na primeira coluna renomeada e não consegue mostrar evolução no tempo.
 
 A solução aqui é colocar **uma camada de contrato** entre a planilha e o painel.
 
+## As etapas do edital
+
+O edital anda em cinco etapas, e cada uma tem a sua planilha e a sua pasta:
+
+| # | Etapa | Pasta | O que traz |
+|---|---|---|---|
+| 1 | Divulgação | `data/raw/1-divulgacao/` | alcance da comunicação, origem de quem chegou |
+| 2 | Cadastramento | `data/raw/2-cadastramento/` | credenciamento e elegibilidade |
+| 3 | Triagem | `data/raw/3-triagem/` | propostas submetidas, conferência documental |
+| 4 | Seleção | `data/raw/4-selecao/` | avaliação de mérito |
+| 5 | Resultado | `data/raw/5-resultado/` | selecionadas e valores aprovados |
+
+As etapas são declaradas no bloco `etapas:` do contrato, e é dali que o painel
+monta o funil. **Etapa sem planilha não é erro**: o edital anda por fases, e as
+últimas ficam vazias por meses. O pipeline processa as que existem, e o painel
+mostra as demais como "ainda sem dados" — funil que só aparece quando o dado
+chega esconde para onde o processo ainda vai, que é metade da decisão.
+
+Uma etapa entra em operação quando ganha um dataset no contrato. Até lá, a
+pasta pode até ter planilha: ela é ignorada, e o `make perfil` serve para
+propor a estrutura.
+
 ## O caminho do dado
 
 ```
-  data/raw/2026-07-30_redes_bahia.xlsx        planilha do dia, como veio
+  data/raw/<etapa>/2026-07-30_<etapa>.xlsx    planilha do dia, como veio
             │
             │  1. leitura         pipeline/ingest.py
             ▼

@@ -39,13 +39,13 @@ def _hash_arquivo(caminho: Path) -> str:
     return h.hexdigest()
 
 
-def localizar(cfg: Config) -> list[Arquivo]:
-    """Lista as planilhas de origem, conforme fonte.selecao do contrato.
+def localizar(cfg: Config, diretorio: Path | None = None) -> list[Arquivo]:
+    """Lista as planilhas de uma pasta, conforme fonte.selecao do contrato.
 
     A ordenação é por nome, e não por data de modificação: o nome
     (AAAA-MM-DD_...) é estável ao clonar o repositório, o mtime não.
     """
-    diretorio = cfg.fonte.diretorio
+    diretorio = diretorio or cfg.fonte.diretorio
     if not diretorio.exists():
         raise ErroFonte(
             f"Pasta de origem não existe: {diretorio}\n"
@@ -56,11 +56,29 @@ def localizar(cfg: Config) -> list[Arquivo]:
         raise ErroFonte(
             f"Nenhum arquivo '{cfg.fonte.padrao_arquivo}' em {diretorio}.\n"
             "Coloque a planilha do dia lá, com nome no formato "
-            "AAAA-MM-DD_redes_bahia.xlsm, e rode de novo."
+            "AAAA-MM-DD_<etapa>.xlsx, e rode de novo."
         )
     if cfg.fonte.selecao == "mais_recente":
         encontrados = encontrados[-1:]
     return [Arquivo(p, _hash_arquivo(p), p.stat().st_size) for p in encontrados]
+
+
+def localizar_por_etapa(cfg: Config) -> dict[str, Arquivo]:
+    """Planilha mais recente de cada etapa que já tem dataset e arquivo.
+
+    Etapa sem planilha não é erro: o edital anda por fases, e as últimas ficam
+    vazias por meses. O painel precisa mostrar o funil inteiro desde o começo,
+    então quem trata a ausência é a camada de publicação, não uma exceção aqui.
+    """
+    achados: dict[str, Arquivo] = {}
+    for etapa in cfg.etapas:
+        if not etapa.dataset:
+            continue
+        try:
+            achados[etapa.dataset] = localizar(cfg, etapa.pasta)[-1]
+        except ErroFonte:
+            continue
+    return achados
 
 
 def abas_disponiveis(caminho: Path) -> list[str]:

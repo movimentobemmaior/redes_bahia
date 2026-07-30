@@ -22,7 +22,59 @@
 #                 referencia (chave estrangeira entre datasets)
 # =============================================================================
 
-versao: 2
+versao: 3
+
+# =============================================================================
+# ETAPAS DO EDITAL
+# =============================================================================
+# O painel monta o funil a partir desta lista, na ordem em que ela aparece.
+# Uma etapa existe mesmo antes de ter planilha: é assim que o funil inteiro
+# aparece desde o primeiro dia, marcando o que ainda não chegou em vez de
+# fingir que o edital começa onde os dados começam.
+#
+# Para ativar uma etapa: coloque o .xlsx na pasta dela, rode `make perfil`
+# para ver a estrutura, declare o dataset em `datasets:` e aponte `dataset:`
+# aqui.
+etapas:
+  - chave: divulgacao
+    nome: Divulgação
+    resumo: >-
+      Alcance da comunicação do edital: por onde as organizações souberam da
+      chamada e quantas chegaram ao formulário.
+    pasta: data/raw/1-divulgacao
+    dataset: null
+
+  - chave: cadastramento
+    nome: Cadastramento
+    resumo: >-
+      Organizações que responderam o formulário de credenciamento e o
+      resultado da checagem automática de elegibilidade.
+    pasta: data/raw/2-cadastramento
+    dataset: credenciamento
+
+  - chave: triagem
+    nome: Triagem
+    resumo: >-
+      Propostas efetivamente submetidas pelas organizações credenciadas e a
+      conferência documental.
+    pasta: data/raw/3-triagem
+    dataset: null
+
+  - chave: selecao
+    nome: Seleção
+    resumo: >-
+      Avaliação de mérito das propostas triadas: notas, critérios e
+      avaliadores.
+    pasta: data/raw/4-selecao
+    dataset: null
+
+  - chave: resultado
+    nome: Resultado
+    resumo: >-
+      Organizações selecionadas, valores aprovados e composição final da
+      carteira.
+    pasta: data/raw/5-resultado
+    dataset: null
 
 fonte:
   diretorio: data/raw
@@ -49,6 +101,7 @@ historico:
 datasets:
 
   credenciamento:
+    etapa: cadastramento
     aba: Credenciamento Redes Bahia
     descricao: >-
       Uma linha por organização que respondeu o formulário de credenciamento.

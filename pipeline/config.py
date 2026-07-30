@@ -50,8 +50,26 @@ class Coluna:
 
 
 @dataclass(frozen=True)
+class Etapa:
+    """Uma etapa do edital. O painel monta o funil a partir desta lista.
+
+    Etapa existe mesmo antes de haver planilha: é assim que o painel consegue
+    mostrar o funil inteiro desde o primeiro dia, marcando o que ainda não
+    chegou em vez de fingir que o edital começa onde os dados começam.
+    """
+
+    chave: str
+    nome: str
+    resumo: str
+    pasta: Path
+    dataset: str | None
+    ordem: int
+
+
+@dataclass(frozen=True)
 class Dataset:
     nome: str
+    etapa: str
     aba: str
     descricao: str
     linha_cabecalho: int
@@ -94,6 +112,7 @@ class Historico:
 @dataclass(frozen=True)
 class Config:
     versao: int
+    etapas: tuple[Etapa, ...]
     fonte: Fonte
     publicacao: Publicacao
     historico: Historico
@@ -201,6 +220,7 @@ def _ler_dataset(nome: str, bruto: Any) -> Dataset:
 
     return Dataset(
         nome=nome,
+        etapa=str(_exigir(bruto, "etapa", onde)),
         aba=str(_exigir(bruto, "aba", onde)),
         descricao=str(bruto.get("descricao", "")).strip(),
         linha_cabecalho=linha_cabecalho,
@@ -208,6 +228,55 @@ def _ler_dataset(nome: str, bruto: Any) -> Dataset:
         colunas=colunas,
         regras=_ler_regras(bruto.get("regras"), nome, nomes),
     )
+
+
+def _ler_etapas(bruto: Any, datasets: dict[str, Dataset]) -> tuple[Etapa, ...]:
+    """Lê a lista de etapas do edital e amarra cada uma ao seu dataset."""
+    if not isinstance(bruto, list) or not bruto:
+        raise ErroConfig("etapas: declare a lista de etapas do edital, em ordem.")
+
+    etapas: list[Etapa] = []
+    chaves: set[str] = set()
+    for i, item in enumerate(bruto, start=1):
+        onde = f"etapas[{i}]"
+        if not isinstance(item, dict):
+            raise ErroConfig(f"{onde}: cada etapa deve ser um bloco com 'chave' e 'nome'.")
+        chave = str(_exigir(item, "chave", onde))
+        if chave in chaves:
+            raise ErroConfig(f"{onde}: a chave '{chave}' se repete.")
+        chaves.add(chave)
+        alvo = item.get("dataset")
+        if alvo is not None and str(alvo) not in datasets:
+            raise ErroConfig(
+                f"{onde}: aponta para o dataset '{alvo}', que não está declarado. "
+                f"Declarados: {', '.join(datasets) or '(nenhum)'}."
+            )
+        etapas.append(
+            Etapa(
+                chave=chave,
+                nome=str(_exigir(item, "nome", onde)),
+                resumo=str(item.get("resumo", "")).strip(),
+                pasta=_resolver(item.get("pasta", f"data/raw/{chave}")),
+                dataset=str(alvo) if alvo is not None else None,
+                ordem=i,
+            )
+        )
+
+    # Todo dataset precisa pertencer a uma etapa declarada, e a ligação tem de
+    # valer nos dois sentidos: sem isso, um dataset sairia do funil em silêncio.
+    for nome, ds in datasets.items():
+        if ds.etapa not in chaves:
+            raise ErroConfig(
+                f"datasets > {nome} > etapa: '{ds.etapa}' não está em etapas. "
+                f"Declaradas: {', '.join(sorted(chaves))}."
+            )
+        etapa = next(e for e in etapas if e.chave == ds.etapa)
+        if etapa.dataset != nome:
+            raise ErroConfig(
+                f"datasets > {nome} diz pertencer à etapa '{ds.etapa}', mas essa etapa "
+                f"aponta para {etapa.dataset or '(nenhum dataset)'}."
+            )
+    return tuple(etapas)
 
 
 def _checar_referencias(datasets: dict[str, Dataset]) -> None:
@@ -276,9 +345,11 @@ def carregar(caminho: str | Path | None = None) -> Config:
         raise ErroConfig("datasets: declare ao menos um dataset.")
     datasets = {n: _ler_dataset(n, d) for n, d in datasets_brutos.items()}
     _checar_referencias(datasets)
+    etapas = _ler_etapas(_exigir(bruto, "etapas", str(caminho.name)), datasets)
 
     return Config(
         versao=int(bruto.get("versao", 1)),
+        etapas=etapas,
         fonte=fonte,
         publicacao=publicacao,
         historico=historico,

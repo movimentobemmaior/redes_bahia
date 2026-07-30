@@ -5,41 +5,51 @@ Referência única para telas e gráficos do painel. Os valores vivem em
 (para código que gera gráfico). **Nenhum componente escreve cor ou tamanho de
 fonte na mão.**
 
+Tudo aqui foi derivado do regulamento do edital
+(`docs/Edital-RedesBahia.pdf`): o roxo institucional, a tipografia e os tons
+pálidos dos blocos de conteúdo saíram de amostragem direta das páginas.
+
 ## Princípio
 
-O painel é instrumento de acompanhamento de política pública, não peça de
-comunicação. Prioridade: legibilidade, honestidade do número, acessibilidade.
-Ornamento que não ajuda a ler sai.
+O painel é instrumento de acompanhamento, não peça de comunicação. Ele veste a
+identidade do edital para que quem abre reconheça de onde vem, mas a prioridade
+segue sendo legibilidade, honestidade do número e acessibilidade. Ornamento que
+não ajuda a ler sai.
 
 ## Tipografia
 
-Uma família só, a sans do sistema operacional:
+**Raleway**, a mesma do regulamento, hospedada no próprio repositório
+(`dashboard/assets/fontes/`, licença SIL OFL).
 
 ```
-system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif
+"Raleway", system-ui, -apple-system, "Segoe UI", sans-serif
 ```
 
-Sem fonte de display, sem serifada, sem fonte carregada de servidor externo.
-Duas razões: o painel abre igual em qualquer máquina da equipe, e não depende
-de rede para renderizar. Se um dia houver tipografia institucional definida,
-substituir apenas `--fonte-ui` — nada mais muda.
+Servida localmente e não de CDN, por duas razões: o painel abre sem depender de
+rede de terceiros, e a fonte não muda debaixo dos pés numa atualização do
+provedor. São dois arquivos woff2 (latin e latin-ext, ~78 KB no total), com a
+sans do sistema como reserva enquanto carregam.
 
 ### Escala
 
 | Token | Tamanho | Uso |
 |---|---|---|
-| `--texto-hero` | 44px | número de destaque (um por bloco, no máximo) |
-| `--texto-2xl` | 32px | título da página |
-| `--texto-xl` | 24px | título de seção |
-| `--texto-lg` | 20px | título de cartão |
+| `--texto-hero` | 52px | número de destaque (um por bloco, no máximo) |
+| `--texto-3xl` | 40px | título da página, valor de indicador |
+| `--texto-2xl` | 30px | título de etapa |
+| `--texto-xl` | 22px | título de bloco |
 | `--texto-md` | 16px | texto corrente |
-| `--texto-sm` | 14px | rótulo, legenda, célula de tabela |
-| `--texto-xs` | 12px | metadado, nota de rodapé |
+| `--texto-sm` | 14px | descrição, legenda, célula de tabela |
+| `--texto-xs` | 12px | rótulo institucional, metadado |
 
-Três pesos: 400 (corrente), 500 (rótulo destacado), 650 (título e número
-grande). Nada de 300 — some em tela clara.
+Quatro pesos: 400 (corrente), 500 (rótulo destacado), 600 (título), 700 (número
+grande e título da página). Nada de 300 — some em tela clara.
 
-Entrelinha: 1.5 no texto corrente, 1.2 em título e número grande.
+Entrelinha: 1.6 no texto corrente, 1.15 em título e número grande.
+
+**Rótulo institucional** (`ETAPA 2`, `PARCERIA TÉCNICA`, `ÚLTIMA ATUALIZAÇÃO`)
+segue o padrão do regulamento: caixa alta, 12px, peso 600 e entreletra de
+0.12em. É o recurso que dá à tela o ar do documento sem precisar de ornamento.
 
 ### Números
 
@@ -53,43 +63,55 @@ datas em `dd/mm/aaaa` na tela (`AAAA-MM-DD` nos arquivos).
 
 ## Cor
 
+### Marca
+
+O roxo institucional, amostrado da capa do regulamento:
+
+| Token | Hex | Onde |
+|---|---|---|
+| `--roxo-900` | `#3e2166` | base do gradiente do cabeçalho |
+| `--roxo-800` | `#4f2d71` | títulos de seção no regulamento |
+| `--roxo-600` | `#6b489b` | topo do gradiente, série 1 |
+| `--roxo-050` | `#faf6fd` | fundo dos blocos, como no edital |
+
+O cabeçalho do painel usa o mesmo gradiente da capa (135°, do `--roxo-600` ao
+`--roxo-900`), com a marca do Movimento Bem Maior em branco.
+
 ### Séries categóricas
 
-Oito posições, **em ordem fixa**. Uma série recebe a cor pela sua identidade,
-nunca pela sua posição no ranking: se um filtro muda quantas séries aparecem,
-as que sobraram mantêm a cor que tinham.
+Quatro posições, **em ordem fixa**, com os hues da coalizão. Uma série recebe a
+cor pela sua identidade, nunca pela sua posição no ranking: se um filtro muda
+quantas séries aparecem, as que sobraram mantêm a cor que tinham.
 
-| Slot | Cor | Claro | Escuro |
-|---|---|---|---|
-| 1 | azul | `#2a78d6` | `#3987e5` |
-| 2 | laranja | `#eb6834` | `#d95926` |
-| 3 | verde-água | `#1baf7a` | `#199e70` |
-| 4 | amarelo | `#eda100` | `#c98500` |
-| 5 | magenta | `#e87ba4` | `#d55181` |
-| 6 | verde | `#008300` | `#008300` |
-| 7 | violeta | `#4a3aa7` | `#9085e9` |
-| 8 | vermelho | `#e34948` | `#e66767` |
+| Slot | Cor | Claro | Escuro | Origem |
+|---|---|---|---|---|
+| 1 | roxo | `#6b489b` | `#8f6fbe` | marca do edital |
+| 2 | laranja | `#e2711d` | `#d4701f` | Phomenta, Lina Galvani, phi |
+| 3 | verde | `#0f8a5f` | `#1d9463` | Instituto Lina Galvani |
+| 4 | azul | `#4a7fd4` | `#5a8fdb` | marca Redes Bahia |
 
 A ordem não é estética: ela é o que garante que cores **vizinhas** continuem
 distinguíveis para quem tem daltonismo. Reordenar quebra isso.
 
-Paleta verificada nos dois modos (protanopia, deuteranopia, tritanopia,
+Paleta verificada com `scripts/validate_palette.js` nos dois modos
+(protanopia, deuteranopia, tritanopia, faixa de luminosidade, chroma e
 contraste com a superfície):
 
-- claro: pior par vizinho ΔE 9.1 em CVD, 19.6 em visão normal — passa;
-- escuro: pior par vizinho ΔE 8.4 em CVD, 19.3 em visão normal — passa.
+- **claro** (superfície `#ffffff`): passa em todos os pares. Pior par vizinho
+  ΔE 17.8 em CVD e 20.1 em visão normal; pior par entre todos, 15.5.
+- **escuro** (superfície `#1b1526`): passa nos pares vizinhos, com ΔE 17.1 em
+  CVD e 19.9 em visão normal. **Em gráficos que comparam todos os pares**
+  (dispersão, bolhas, coroplético, pequenos múltiplos) o limite no modo escuro
+  é de **três séries**: com as quatro, roxo e azul ficam próximos demais.
 
-No modo claro, verde-água, amarelo e magenta ficam abaixo de 3:1 de contraste
-com o fundo. Onde essas cores forem usadas, o gráfico precisa trazer **rótulo
-visível ou tabela de dados** — a cor não pode ser a única pista.
+**Quinta série não existe.** Ao chegar em cinco categorias: agrupar em
+"Outros", quebrar em pequenos múltiplos, ou trocar de recorte. Cor gerada por
+algoritmo está fora.
 
-**Nona série não existe.** Ao chegar em nove categorias: agrupar em "Outros",
-quebrar em pequenos múltiplos, ou trocar de recorte. Cor gerada por algoritmo
-está fora.
-
-Em gráficos com todos contra todos (dispersão, bolhas, mapa coroplético,
-pequenos múltiplos), o limite cai para **três séries** — acima disso os pares
-não vizinhos deixam de ser distinguíveis com segurança.
+A paleta anterior tinha oito slots e não vinha da marca. Foi trocada em
+30/07/2026 para a identidade do edital; a checagem foi refeita do zero, e o
+número de slots caiu porque os hues da coalizão não cobrem espaço de cor
+suficiente para oito categorias seguras. Quatro cobrem o que o painel usa.
 
 ### Magnitude (rampa sequencial)
 
@@ -101,7 +123,7 @@ claro é o `--seq-250`: abaixo disso a forma some no fundo.
 
 ### Variação com sinal (divergente)
 
-Azul ↔ vermelho, com cinza no meio. O ponto neutro é cinza porque precisa ler
+Roxo ↔ laranja, com cinza no meio. O ponto neutro é cinza porque precisa ler
 como "nada"; uma terceira cor no meio vira uma terceira categoria.
 
 ### Status (reservado)
@@ -148,9 +170,12 @@ distribuição.
 
 ## Layout
 
-- Largura máxima do conteúdo: 1200px.
-- Espaçamento na escala de 4px (`--e-1` a `--e-12`).
-- Cantos: 4px em elementos pequenos, 8px em cartões, 12px em blocos grandes.
+- Largura máxima do conteúdo: 1160px.
+- Espaçamento na escala de 4px (`--e-1` a `--e-16`).
+- Cantos: 4px em elementos pequenos, 10px em cartões, 16px em blocos grandes —
+  o mesmo raio generoso dos blocos do regulamento.
+- Cabeçalho em gradiente roxo, conteúdo sobre plano claro, rodapé branco com a
+  faixa da coalizão. É a estrutura da capa do edital, na vertical.
 - Filtros ficam em uma faixa única acima dos gráficos, nunca espalhados.
 - A tela precisa funcionar em 360px de largura: tabela e gráfico largo rolam
   dentro do próprio contêiner, a página nunca rola na horizontal.
@@ -168,7 +193,8 @@ distribuição.
 
 1. Trocar hex de série exige revalidar a paleta inteira nos dois modos
    (contraste, faixa de luminosidade, separação para daltonismo entre pares
-   vizinhos).
+   vizinhos). Os números da última verificação estão registrados acima —
+   substitua-os pelos novos.
 2. Reordenar os slots é mudança de acessibilidade, não de gosto.
 3. Mudar `tokens.css` sem mudar `tokens.json` (ou o contrário) deixa gráfico e
    tela com cores diferentes.

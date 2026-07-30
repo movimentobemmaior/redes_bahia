@@ -6,6 +6,19 @@ data/interim/*
 
 # Arquivos de exemplo gerados por scripts/gerar_exemplo.py
 data/raw/exemplo_*
+data/raw/*/exemplo_*
+
+# TEMPORÁRIO — planilhas de origem fora do git enquanto o repositório é público.
+#
+# O desenho do projeto versiona data/raw/ (ADR 0001): é o que torna qualquer
+# publicação refazível. Com o repositório público, versionar essas planilhas
+# publicaria nome e e-mail de quem respondeu o formulário, e essa decisão ficou
+# em aberto (docs/06-governanca-e-lgpd.md).
+#
+# O painel não depende disso: ele lê data/published/, que não tem dado de
+# identificação. Para voltar ao desenho original, apague as duas linhas abaixo.
+data/raw/*/*.xlsx
+data/raw/*/*.xlsm
 
 # Lixo de planilha (arquivos temporários do Excel)
 ~$*

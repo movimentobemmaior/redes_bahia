@@ -138,10 +138,40 @@ def _atualizar_historico(
     return destino
 
 
+def _resumo_etapas(cfg: Config, tabelas: dict[str, pd.DataFrame]) -> list[dict[str, Any]]:
+    """O funil do edital, do jeito que o painel precisa desenhar.
+
+    Toda etapa entra, inclusive as que ainda não têm planilha: o funil só
+    informa a decisão se mostrar para onde o processo ainda vai.
+    """
+    resumo = []
+    for etapa in cfg.etapas:
+        df = tabelas.get(etapa.dataset) if etapa.dataset else None
+        if etapa.dataset is None:
+            estado = "sem_contrato"
+        elif df is None:
+            estado = "aguardando"
+        else:
+            estado = "com_dados"
+        resumo.append(
+            {
+                "chave": etapa.chave,
+                "nome": etapa.nome,
+                "resumo": etapa.resumo,
+                "ordem": etapa.ordem,
+                "dataset": etapa.dataset,
+                "pasta": caminho_curto(etapa.pasta),
+                "estado": estado,
+                "n_linhas": len(df) if df is not None else None,
+            }
+        )
+    return resumo
+
+
 def publicar(
     tabelas: dict[str, pd.DataFrame],
     cfg: Config,
-    arquivo: Arquivo,
+    fontes: dict[str, Arquivo],
     problemas: list[Problema],
     data_execucao: date,
     versao_pipeline: str,
@@ -175,6 +205,7 @@ def publicar(
         datasets_meta.append(
             {
                 "nome": nome,
+                "etapa": ds.etapa,
                 "aba": ds.aba,
                 "descricao": ds.descricao,
                 "grao": list(ds.chave),
@@ -185,7 +216,10 @@ def publicar(
             }
         )
 
-    historico = _atualizar_historico(cfg, tabelas, data_execucao, arquivo.nome)
+    principal = next(iter(fontes.values()), None)
+    historico = _atualizar_historico(
+        cfg, tabelas, data_execucao, principal.nome if principal else "(sem planilha)"
+    )
 
     manifesto = {
         "painel": "Redes Bahia",
@@ -193,10 +227,14 @@ def publicar(
         "data_execucao": data_execucao.isoformat(),
         "versao_pipeline": versao_pipeline,
         "versao_contrato": cfg.versao,
-        "fonte": {
-            "arquivo": arquivo.nome,
-            "hash_sha256": arquivo.hash_sha256,
-            "bytes": arquivo.bytes,
+        "etapas": _resumo_etapas(cfg, tabelas),
+        "fontes": {
+            nome: {
+                "arquivo": a.nome,
+                "hash_sha256": a.hash_sha256,
+                "bytes": a.bytes,
+            }
+            for nome, a in fontes.items()
         },
         "validacao": {
             "status": "reprovado" if erros else ("com_avisos" if avisos else "aprovado"),

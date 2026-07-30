@@ -1,121 +1,172 @@
 /* =============================================================================
    Design tokens — Painel Redes Bahia
    =============================================================================
+   Derivados do regulamento do edital (docs/Edital-RedesBahia.pdf): roxo
+   institucional, tipografia Raleway e os tons pálidos dos blocos de conteúdo.
+
    Fonte única da identidade visual. Nenhum componente do painel deve escrever
    cor, tamanho de fonte ou espaçamento "na mão": tudo sai daqui.
 
-   A paleta de séries foi validada para daltonismo (protan/deutan/tritan) e
-   contraste, nos dois modos. Ver docs/05-identidade-visual.md antes de mudar
-   qualquer hex — a ORDEM dos slots faz parte da acessibilidade, não é estética.
+   As cores de série foram verificadas para daltonismo e contraste nos dois
+   modos. Ver docs/05-identidade-visual.md antes de mudar qualquer hex — a
+   ORDEM dos slots faz parte da acessibilidade, não é estética.
    ========================================================================== */
+
+/* --- Tipografia do edital: Raleway, hospedada no próprio repositório -------
+   Servida localmente e não de CDN: o painel abre sem depender de rede de
+   terceiros, e a fonte não muda debaixo dos pés numa atualização do provedor.
+   Licença SIL OFL em dashboard/assets/fontes/Raleway-OFL.txt. */
+@font-face {
+  font-family: "Raleway";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("../../dashboard/assets/fontes/raleway-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Raleway";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("../../dashboard/assets/fontes/raleway-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
 
 :root {
   color-scheme: light;
 
+  /* --- Roxo institucional, amostrado da capa do edital -------------------- */
+  --roxo-900: #3e2166;  /* base do gradiente da capa */
+  --roxo-800: #4f2d71;  /* títulos e marca */
+  --roxo-700: #563583;
+  --roxo-600: #6b489b;  /* topo do gradiente da capa */
+  --roxo-400: #9678c4;
+  --roxo-100: #ece3f6;
+  --roxo-050: #faf6fd;  /* fundo dos blocos de conteúdo do edital */
+
+  --gradiente-marca: linear-gradient(135deg, var(--roxo-600) 0%, var(--roxo-900) 100%);
+
   /* --- Superfícies e tinta ------------------------------------------------ */
-  --plano-pagina:    #f9f9f7;
-  --superficie:      #fcfcfb;
-  --superficie-alt:  #f2f2ef;
-  --borda:           rgba(11, 11, 11, 0.10);
-  --grade:           #e1e0d9;
-  --eixo:            #c3c2b7;
+  --plano-pagina:    #f6f4f9;
+  --superficie:      #ffffff;
+  --superficie-alt:  #f7f4fb;
+  --borda:           rgba(62, 33, 102, 0.12);
+  --grade:           #e7e1ef;
+  --eixo:            #cfc5dd;
 
-  --tinta-1: #0b0b0b;  /* títulos e números de destaque */
-  --tinta-2: #52514e;  /* texto corrente */
-  --tinta-3: #898781;  /* rótulos de eixo, legendas, metadados */
+  --tinta-1: #241a33;  /* títulos e números de destaque */
+  --tinta-2: #3a4242;  /* texto corrente, amostrado do edital */
+  --tinta-3: #746a85;  /* rótulos de eixo, legendas, metadados */
+  --tinta-sobre-marca: #ffffff;
+  --tinta-sobre-marca-fraca: rgba(255, 255, 255, 0.72);
 
-  /* --- Séries categóricas (ordem fixa: nunca embaralhar, nunca ciclar) ---- */
-  --serie-1: #2a78d6;  /* azul     */
-  --serie-2: #eb6834;  /* laranja  */
-  --serie-3: #1baf7a;  /* verde-água */
-  --serie-4: #eda100;  /* amarelo  */
-  --serie-5: #e87ba4;  /* magenta  */
-  --serie-6: #008300;  /* verde    */
-  --serie-7: #4a3aa7;  /* violeta  */
-  --serie-8: #e34948;  /* vermelho */
+  /* --- Séries categóricas -------------------------------------------------
+     Ordem fixa: roxo, laranja, verde, azul. Nunca embaralhar, nunca ciclar.
+     Os quatro hues vêm da identidade do edital e dos logos da coalizão. */
+  --serie-1: #6b489b;  /* roxo   — a cor da marca */
+  --serie-2: #e2711d;  /* laranja — Phomenta, Lina Galvani, phi */
+  --serie-3: #0f8a5f;  /* verde  — Instituto Lina Galvani */
+  --serie-4: #4a7fd4;  /* azul   — marca Redes Bahia */
 
   /* --- Rampa sequencial (magnitude: mapas, mapas de calor) ---------------- */
-  --seq-100: #cde2fb;
-  --seq-250: #86b6ef;
-  --seq-400: #3987e5;
-  --seq-550: #1c5cab;
-  --seq-700: #0d366b;
+  --seq-100: #ece3f6;
+  --seq-250: #c9b4e2;
+  --seq-400: #9678c4;
+  --seq-550: #6b489b;
+  --seq-700: #3e2166;
 
   /* --- Status (reservado: nunca usar como cor de série) ------------------- */
-  --status-ok:       #0ca30c;
-  --status-atencao:  #fab219;
-  --status-serio:    #ec835a;
-  --status-critico:  #d03b3b;
-  --delta-positivo:  #006300;
+  --status-ok:       #0f8a5f;
+  --status-atencao:  #c98500;
+  --status-serio:    #d4701f;
+  --status-critico:  #c0392b;
+  --delta-positivo:  #0b6b49;
 
   /* --- Tipografia --------------------------------------------------------- */
-  --fonte-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --fonte-ui: "Raleway", system-ui, -apple-system, "Segoe UI", sans-serif;
   --fonte-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 
-  --texto-xs:  0.75rem;   /* 12px — metadados, notas de rodapé */
-  --texto-sm:  0.875rem;  /* 14px — rótulos, legendas, tabelas */
-  --texto-md:  1rem;      /* 16px — texto corrente */
-  --texto-lg:  1.25rem;   /* 20px — títulos de bloco */
-  --texto-xl:  1.5rem;    /* 24px — título de seção */
-  --texto-2xl: 2rem;      /* 32px — título da página */
-  --texto-hero: 2.75rem;  /* 44px — número de destaque */
+  --texto-xs:  0.75rem;
+  --texto-sm:  0.875rem;
+  --texto-md:  1rem;
+  --texto-lg:  1.125rem;
+  --texto-xl:  1.375rem;
+  --texto-2xl: 1.875rem;
+  --texto-3xl: 2.5rem;
+  --texto-hero: 3.25rem;
 
   --peso-normal: 400;
   --peso-medio: 500;
-  --peso-forte: 650;
+  --peso-forte: 600;
+  --peso-extra: 700;
 
-  --altura-apertada: 1.2;   /* números grandes e títulos */
-  --altura-normal: 1.5;     /* texto corrente */
+  --altura-apertada: 1.15;
+  --altura-normal: 1.6;
+
+  /* Rótulo institucional: caixa alta espaçada, como no edital. */
+  --entreletra-rotulo: 0.12em;
 
   /* --- Espaçamento (escala de 4px) ---------------------------------------- */
   --e-1: 0.25rem;
   --e-2: 0.5rem;
   --e-3: 0.75rem;
   --e-4: 1rem;
+  --e-5: 1.25rem;
   --e-6: 1.5rem;
   --e-8: 2rem;
+  --e-10: 2.5rem;
   --e-12: 3rem;
+  --e-16: 4rem;
 
   /* --- Formas ------------------------------------------------------------- */
-  --raio-sm: 4px;   /* ponta de barra, chips */
-  --raio-md: 8px;   /* cartões */
-  --raio-lg: 12px;  /* blocos maiores */
-  --largura-max: 1200px;
+  --raio-sm: 4px;
+  --raio-md: 10px;
+  --raio-lg: 16px;   /* blocos de conteúdo, como no edital */
+  --raio-pilula: 999px;
+  --largura-max: 1160px;
 }
 
-/* Modo escuro: passos próprios, escolhidos para a superfície escura —
-   não é inversão automática das cores do modo claro. */
+/* Modo escuro: passos próprios sobre uma superfície roxo-escura, escolhidos
+   para essa superfície — não é inversão automática do modo claro. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="claro"]) {
     color-scheme: dark;
 
-    --plano-pagina:   #0d0d0d;
-    --superficie:     #1a1a19;
-    --superficie-alt: #232322;
-    --borda:          rgba(255, 255, 255, 0.10);
-    --grade:          #2c2c2a;
-    --eixo:           #383835;
+    --plano-pagina:   #130f1b;
+    --superficie:     #1b1526;
+    --superficie-alt: #241c31;
+    --borda:          rgba(255, 255, 255, 0.12);
+    --grade:          #2f2740;
+    --eixo:           #453a5c;
 
-    --tinta-1: #ffffff;
-    --tinta-2: #c3c2b7;
-    --tinta-3: #898781;
+    --tinta-1: #f6f3fb;
+    --tinta-2: #cfc7dc;
+    --tinta-3: #9d93ae;
 
-    --serie-1: #3987e5;
-    --serie-2: #d95926;
-    --serie-3: #199e70;
-    --serie-4: #c98500;
-    --serie-5: #d55181;
-    --serie-6: #008300;
-    --serie-7: #9085e9;
-    --serie-8: #e66767;
+    --roxo-050: #241c31;
+    --roxo-100: #2f2542;
 
-    --seq-100: #0d366b;
-    --seq-250: #184f95;
-    --seq-400: #256abf;
-    --seq-550: #5598e7;
-    --seq-700: #b7d3f6;
+    --serie-1: #8f6fbe;
+    --serie-2: #d4701f;
+    --serie-3: #1d9463;
+    --serie-4: #5a8fdb;
 
-    --delta-positivo: #0ca30c;
+    --seq-100: #2f2542;
+    --seq-250: #4a3a68;
+    --seq-400: #6b489b;
+    --seq-550: #9678c4;
+    --seq-700: #c9b4e2;
+
+    --status-ok:       #1d9463;
+    --status-atencao:  #e0a52a;
+    --status-serio:    #e08544;
+    --status-critico:  #e05c4b;
+    --delta-positivo:  #1d9463;
   }
 }
 
@@ -123,31 +174,34 @@
 :root[data-tema="escuro"] {
   color-scheme: dark;
 
-  --plano-pagina:   #0d0d0d;
-  --superficie:     #1a1a19;
-  --superficie-alt: #232322;
-  --borda:          rgba(255, 255, 255, 0.10);
-  --grade:          #2c2c2a;
-  --eixo:           #383835;
+  --plano-pagina:   #130f1b;
+  --superficie:     #1b1526;
+  --superficie-alt: #241c31;
+  --borda:          rgba(255, 255, 255, 0.12);
+  --grade:          #2f2740;
+  --eixo:           #453a5c;
 
-  --tinta-1: #ffffff;
-  --tinta-2: #c3c2b7;
-  --tinta-3: #898781;
+  --tinta-1: #f6f3fb;
+  --tinta-2: #cfc7dc;
+  --tinta-3: #9d93ae;
 
-  --serie-1: #3987e5;
-  --serie-2: #d95926;
-  --serie-3: #199e70;
-  --serie-4: #c98500;
-  --serie-5: #d55181;
-  --serie-6: #008300;
-  --serie-7: #9085e9;
-  --serie-8: #e66767;
+  --roxo-050: #241c31;
+  --roxo-100: #2f2542;
 
-  --seq-100: #0d366b;
-  --seq-250: #184f95;
-  --seq-400: #256abf;
-  --seq-550: #5598e7;
-  --seq-700: #b7d3f6;
+  --serie-1: #8f6fbe;
+  --serie-2: #d4701f;
+  --serie-3: #1d9463;
+  --serie-4: #5a8fdb;
 
-  --delta-positivo: #0ca30c;
+  --seq-100: #2f2542;
+  --seq-250: #4a3a68;
+  --seq-400: #6b489b;
+  --seq-550: #9678c4;
+  --seq-700: #c9b4e2;
+
+  --status-ok:       #1d9463;
+  --status-atencao:  #e0a52a;
+  --status-serio:    #e08544;
+  --status-critico:  #e05c4b;
+  --delta-positivo:  #1d9463;
 }
