@@ -34,6 +34,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Alarme de incêndio. `data/raw/` guarda as planilhas originais, com CNPJ
+      # e e-mail; o projeto pressupõe repositório privado. Se o repositório
+      # estiver público E houver planilha versionada, houve exposição de dado
+      # pessoal — e o histórico do git a mantém acessível mesmo depois de
+      # apagada. O fluxo para aqui e grita, para a correção ser em minutos e
+      # não em meses.
+      #
+      # Não é prevenção: no momento em que este passo roda, o commit já
+      # aconteceu. É detecção imediata. A prevenção de verdade é o repositório
+      # ser privado.
+      - name: Recusar planilha versionada em repositório público
+        if: github.event.repository.private == false
+        run: |
+          if ls data/raw/*.xlsm data/raw/*.xlsx 2>/dev/null | grep -q .; then
+            echo "::error::EXPOSIÇÃO DE DADO PESSOAL: há planilha em data/raw/ e este repositório é PÚBLICO."
+            echo ""
+            echo "As planilhas contêm CNPJ e e-mail das organizações e agora estão acessíveis"
+            echo "a qualquer pessoa — inclusive pelo histórico do git, mesmo se forem apagadas."
+            echo ""
+            echo "O que fazer, nesta ordem:"
+            echo "  1. Torne o repositório privado AGORA (Settings > Danger Zone)."
+            echo "  2. Limpe o histórico com git filter-repo — apagar o arquivo não basta."
+            echo "  3. Registre o incidente: pode haver dever de notificação (LGPD)."
+            echo ""
+            echo "Ver docs/06-governanca-e-lgpd.md."
+            exit 1
+          fi
+          echo "::notice::Repositório público, mas sem planilha versionada. Nada exposto."
+
       # Este fluxo também dispara quando o contrato muda, e o contrato pode
       # mudar antes de existir qualquer planilha (é o caso da primeira semana).
       # Sem planilha não há o que publicar: isso é "nada a fazer", não falha.
